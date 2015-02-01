@@ -1,11 +1,14 @@
 /*
- * page.c
- *
- *  Created on: 2014/04/20
- *      Author: StarRing
- */
+[Module page.c]
+Copyright(c) 2015 mrtska.starring
 
-#include <page/page_types.h>
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/04/20
+*/
+
+
 #include <page/page.h>
 #include <internal/stdio.h>
 #include <system.h>

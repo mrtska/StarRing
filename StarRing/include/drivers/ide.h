@@ -1,9 +1,12 @@
 /*
- * ide.h
- *
- *  Created on: 2014/10/09
- *      Author: StarRing
- */
+[Module ide.h]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/10/09
+*/
 
 #pragma once
 

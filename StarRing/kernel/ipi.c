@@ -1,10 +1,12 @@
 /*
- * ipi.c
- *
- *  Created on: 2014/12/09
- *      Author: StarRing
- *  プロセッサ間割り込み
- */
+[Module ipi.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/12/09
+*/
 
 #include <apic.h>
 #include <ioapic.h>

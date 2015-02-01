@@ -1,8 +1,12 @@
 /*
- * dma.c
- *
- *  Created on: 2014/10/24
- *      Author: StarRing
+[Module dma.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+
+Created on: 2014/10/24
  */
 
 

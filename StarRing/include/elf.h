@@ -1,9 +1,12 @@
 /*
- * elf.h
- *
- *  Created on: 2014/10/27
- *      Author: StarRing
- */
+[Module elf.h]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/10/27
+*/
 
 #pragma once
 

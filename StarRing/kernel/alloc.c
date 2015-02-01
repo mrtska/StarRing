@@ -1,9 +1,12 @@
 /*
- * alloc.c
- *
- *  Created on: 2014/04/27
- *      Author: StarRing
- */
+[Module alloc.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/04/27
+*/
 
 #include <system.h>
 #include <mem/alloc.h>

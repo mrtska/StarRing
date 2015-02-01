@@ -1,9 +1,12 @@
 /*
- * keyboard.c
- *
- *  Created on: 2014/05/01
- *      Author: StarRing
- */
+[Module keyboard.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/05/01
+*/
 
 #include <internal/stdio.h>
 #include <desc.h>

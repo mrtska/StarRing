@@ -1,13 +1,12 @@
 /*
- * queue.h
- *
- *  Created on: 2014/05/09
- *      Author: StarRing
- */
+[Module queue.h]
+Copyright(c) 2015 mrtska.starring
 
-/*
- * 単純なキューの実装
- */
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/05/09
+*/
 #pragma once
 
 

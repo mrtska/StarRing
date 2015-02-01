@@ -1,9 +1,12 @@
 /*
- * pci.c
- *
- *  Created on: 2014/08/18
- *      Author: StarRing
- */
+[Module pci.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/08/18
+*/
 
 #include <drivers/pci.h>
 #include <pci_list.h>

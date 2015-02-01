@@ -1,16 +1,18 @@
 /*
- * page_fault.c
- *
- *  Created on: 2014/04/30
- *      Author: StarRing
- */
+[Module page_fault.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/04/30
+*/
 
 #include <system.h>
 #include <internal/stdio.h>
 #include <regs.h>
 
 #include <page/page.h>
-#include <page/page_types.h>
 #include <mem/phys.h>
 #include <apic.h>
 #include <task.h>

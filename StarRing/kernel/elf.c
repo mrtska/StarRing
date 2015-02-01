@@ -1,9 +1,12 @@
 /*
- * elf.c
- *
- *  Created on: 2014/11/26
- *      Author: StarRing
- */
+[Module elf.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/11/26
+*/
 
 #include <system.h>
 #include <elf.h>

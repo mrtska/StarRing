@@ -1,15 +1,17 @@
 /*
- * vmware.h
- *
- *  Created on: 2014/10/19
- *      Author: StarRing
- */
+[Module vmware.h]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/10/19
+*/
 
 #pragma once
 
 #include <system.h>
 #include <drivers/pci.h>
-#include <drivers/graphics.h>
 
 #define VMWARE_SVGA_VENDOR_ID	0x15AD
 #define VMWARE_SVGA_DEVICE_ID	0x0405

@@ -1,9 +1,12 @@
 /*
- * dma.h
- *
- *  Created on: 2014/10/11
- *      Author: StarRing
- */
+[Module dma.h]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/10/11
+*/
 
 #pragma once
 

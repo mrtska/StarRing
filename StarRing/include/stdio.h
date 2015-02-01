@@ -1,10 +1,12 @@
 /*
- * stdio.h
+[Module stdio.h]
+Copyright(c) 2015 mrtska.starring
 
- *
- *  Created on: 2014/04/03
- *      Author: StarRing
- */
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/04/03
+*/
 
 
 #pragma once

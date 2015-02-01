@@ -1,9 +1,12 @@
 /*
- * read.c
- *
- *  Created on: 2015/01/24
- *      Author: StarRing
- */
+[Module read.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2015/01/24
+*/
 
 #include <fs/read.h>
 #include <errno.h>

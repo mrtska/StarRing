@@ -1,17 +1,20 @@
 /*
- * list.h
- *
- *  Created on: 2014/06/12
- *      Author: StarRing
- */
+[Module list.h]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/06/12
+*/
 
 #pragma once
 
 #include <stddef.h>
 
 //デバッグ用
-#define LIST_POISON1  ((void*) 0x00100100)
-#define LIST_POISON2  ((void*) 0x00200200)
+#define LIST_POISON1  ((void*) 0x00111100)
+#define LIST_POISON2  ((void*) 0x00222200)
 
 
 struct list_head {

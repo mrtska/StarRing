@@ -1,9 +1,12 @@
 /*
- * fcntl.h
- *
- *  Created on: 2015/01/25
- *      Author: StarRing
- */
+[Module fcntl.h]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2015/01/25
+*/
 
 #pragma once
 

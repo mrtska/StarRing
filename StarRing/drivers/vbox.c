@@ -1,9 +1,12 @@
 /*
- * vbox.c
- *
- *  Created on: 2014/09/08
- *      Author: StarRing
- */
+[Module vbox.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/09/08
+*/
 
 #include <drivers/vbox.h>
 #include <drivers/graphics.h>

@@ -1,9 +1,12 @@
 /*
- * tag_parse.c
- *
- *  Created on: 2014/04/04
- *      Author: StarRing
- */
+[Module tag_parse.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/04/04
+*/
 
 #include <internal/tag_parse.h>
 #include <internal/stdio.h>

@@ -1,15 +1,17 @@
 /*
- * trap.c
- *
- *  Created on: 2014/04/06
- *      Author: StarRing
- */
+[Module trap.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/04/06
+*/
 
 #include <system.h>
 #include <internal/stdio.h>
 #include <trap.h>
 #include <desc.h>
-#include <page/page_types.h>
 #include <apic.h>
 #include <spinlock.h>
 #include <fs/input.h>

@@ -1,9 +1,12 @@
 /*
- * smp.h
- *
- *  Created on: 2014/08/27
- *      Author: StarRing
- */
+[Module smp.h]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/08/27
+*/
 
 #pragma once
 

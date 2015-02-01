@@ -1,9 +1,12 @@
 /*
- * input.c
- *
- *  Created on: 2015/01/27
- *      Author: StarRing
- */
+[Module input.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2015/01/27
+*/
 
 
 #include <fs/input.h>

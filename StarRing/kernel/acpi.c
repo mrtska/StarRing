@@ -1,9 +1,12 @@
 /*
- * acpi.c
- *
- *  Created on: 2014/04/06
- *      Author: StarRing
- */
+[Module acpi.c]
+Copyright(c) 2015 mrtska.starring
+
+This software is released under the MIT License.
+
+http://opensource.org/licenses/mit-license.php
+Created on: 2014/04/06
+*/
 
 #include <string.h>
 #include <internal/stdio.h>

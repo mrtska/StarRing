@@ -43,7 +43,6 @@ compile:
 	$(CD) acpica;$(MAKE)	#ACPICA
 	$(CD) fs;$(MAKE)		#ファイルシステム関連
 	$(CD) drivers;$(MAKE)	#ドライバ
-	$(CD) userspace;$(MAKE)
 
 
 .PHONY: install
@@ -62,7 +61,6 @@ clean:
 	$(CD) acpica;$(MAKE) clean
 	$(CD) fs;$(MAKE) clean
 	$(CD) drivers;$(MAKE) clean
-	$(CD) userspace;$(MAKE) clean
 	
 .PHONY: test
 test:
