@@ -20,7 +20,6 @@ Created on: 2014/04/06
 #include <slab.h>
 #include <mm.h>
 #include <ioapic.h>
-#include <pci.h>
 #include <desc.h>
 #include <page/page.h>
 

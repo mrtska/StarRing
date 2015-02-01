@@ -9,7 +9,6 @@ Created on: 2014/09/08
 */
 
 #include <drivers/vbox.h>
-#include <drivers/graphics.h>
 #include <internal/stdio.h>
 #include <drivers/pci.h>
 #include <system.h>
