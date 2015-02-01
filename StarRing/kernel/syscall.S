@@ -271,6 +271,7 @@ jmp 1b*/
 	push %rbp
 
 	//引数指定
+	mov %r10, %rcx
 
 	call do_systemcall_handler	//ハンドラ呼び出し
 
