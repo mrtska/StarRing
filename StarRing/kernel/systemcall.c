@@ -40,8 +40,6 @@ Created on: 2014/11/06
 #define MSR_CSTAR	0xC0000083
 
 
-#define SYS_RET	asmv("sysretq")
-
 
 void sys_exit(int err_code);
 void sys_read(unsigned int fd, char *buf, size_t count);
@@ -163,16 +161,18 @@ unsigned long user_stack;
 unsigned char system_call_stack[0x1000];
 
 extern void systemcall_handler(void);
-unsigned long do_systemcall_handler(unsigned long rax, unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5) {
+unsigned long do_systemcall_handler(unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5, unsigned long arg6) {
 
+	unsigned long rax;
+	asmv("" : "=a"(rax));
 
 	if(systemcall_table[rax]) {
 
-		unsigned long (*syscall_handler)(long, long, long, long) = (void*) systemcall_table[rax];
+		unsigned long (*syscall_handler)(long, long, long, long, long, long) = (void*) systemcall_table[rax];
 
 		//kprintf("system call %d, %p, %X, %p\n", rax, syscall_handler, arg1, arg2);
 
-		unsigned long ret = syscall_handler(arg1, arg2, arg3, arg4);
+		unsigned long ret = syscall_handler(arg1, arg2, arg3, arg4, arg5, arg6);
 
 		return ret;
 	} else {

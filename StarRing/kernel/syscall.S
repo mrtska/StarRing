@@ -271,12 +271,7 @@ jmp 1b*/
 	push %rbp
 
 	//引数指定
-	movq %r8, %r9
-	movq %r10, %r8
-	movq %rdx, %rcx
-	movq %rsi, %rdx
-	movq %rdi, %rsi
-	movq %rax, %rdi
+
 	call do_systemcall_handler	//ハンドラ呼び出し
 
 	//RAX以外のレジスタを戻す
