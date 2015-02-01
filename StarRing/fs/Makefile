@@ -1,5 +1,5 @@
 #ブート時
-FILE := vfs.o fat32.o null_device.o open.o write.o read.o input.o seek.o mmap.o stdout.o stat.o
+FILE := vfs.o fat32.o null_device.o open.o close.o write.o read.o input.o seek.o mmap.o stdout.o stat.o
 TARGET := fs.sys
 
 
