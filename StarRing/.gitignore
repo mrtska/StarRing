@@ -1,0 +1,7 @@
+
+*.o
+*.map
+*.sys
+/.cproject
+/.settings/
+/.project
