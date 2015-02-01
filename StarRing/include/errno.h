@@ -187,4 +187,6 @@ Created on: 2015/01/24
 #define ETOOSMALL	525	/* Buffer or request is too small */
 #define ESERVERFAULT	526	/* An untranslatable error occurred */
 #define EBADTYPE	527	/* Type not supported by server */
-#define EJUKEBOX	528	/* Request initiated, but will not complete before t*/                                                                                                                                                                                  
+#define EJUKEBOX	528	/* Request initiated, but will not complete before t*/
+
+

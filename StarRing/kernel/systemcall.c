@@ -26,6 +26,7 @@ Created on: 2014/11/06
 #include <fs/read.h>
 #include <fs/write.h>
 #include <fs/open.h>
+#include <fs/close.h>
 #include <fs/seek.h>
 #include <fs/mmap.h>
 #include <fs/stat.h>
@@ -42,8 +43,8 @@ Created on: 2014/11/06
 
 
 void sys_exit(int err_code);
-void sys_read(unsigned int fd, char *buf, size_t count);
-void sys_write(unsigned int fd, const char *buf, size_t count);
+long sys_read(unsigned int fd, char *buf, size_t count);
+long sys_write(unsigned int fd, const char *buf, size_t count);
 unsigned long sys_open(const char *filename, int flags, int mode);
 int sys_close(unsigned int fd);
 
@@ -52,7 +53,7 @@ int sys_close(unsigned int fd);
 int sys_fstat(unsigned int fd, struct stat *statbuf);
 
 unsigned long sys_lseek(unsigned int fd, unsigned long offset, unsigned int whence);
-long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset);
+long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset);
 int sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg);
 long sys_readv(unsigned long fd, const struct iovec *vec, unsigned long vlen);
 long sys_writev(unsigned long fd, const struct iovec *vec, unsigned long vlen);
@@ -207,50 +208,30 @@ void sys_exit(int err_code) {
 }
 
 
-void sys_read(unsigned int fd, char *buf, size_t count) {
+long sys_read(unsigned int fd, char *buf, size_t count) {
 
 
 	trace();
-	return;
+	return 0;
 }
 
-void sys_write(unsigned int fd, const char *buf, size_t count) {
+long sys_write(unsigned int fd, const char *buf, size_t count) {
 
-
-	//struct process *process = lookup_process_by_pid(smp_table[apic_read(APIC_ID_R) >> 24].execute_process_pid);
-	//buf = get_page_directory((unsigned long)buf, (unsigned long) process->page_tables) + ((unsigned long) buf & 0x1FFFFFUL);
-
-	trace();
-
-
+	//kprintf("[kernel/sys_write] fd %d, buf %p, count %X\n", fd, buf, count);
+	return write(fd, buf, count);
 }
 
 
 unsigned long sys_open(const char *filename, int flags, int mode) {
 
-	kprintf("sys_open file %s, flags %X, mode %X\n", filename, flags, mode);
+	kprintf("[kernel/sys_open] file %s, flags %X, mode %X\n", filename, flags, mode);
 	return open(filename, flags, mode);
 }
 int sys_close(unsigned int fd) {
 
 	kprintf("sys_close %d\n", fd);
-	struct process *process = get_process();
 
-	struct list_head *ptr;
-	list_for_each(ptr, &process->fd_list) {
-
-		struct file_descriptor *desc = list_entry(ptr, struct file_descriptor, list);
-		if(desc->fd == fd) {	//対応しているファイルディスクリプタを見つけ、削除する
-
-			close_fs(desc->node);
-			list_del(&desc->list);
-			kfree(desc, sizeof(struct file_descriptor));
-			return 0;
-		}
-
-	}
-
-	return -1;
+	return close(fd);
 }
 
 
@@ -266,7 +247,7 @@ unsigned long sys_lseek(unsigned int fd, unsigned long offset, unsigned int when
 	return lseek(fd, offset, whence);
 }
 
-long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset) {
+long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset) {
 
 	kprintf("[kernel/sys_mmap] %p, len %X, prot %X, flags %X, fd %X, offset %X\n", addr, len, prot, flags, fd, offset);
 	return mmap(addr, len, prot, flags, fd, offset);

@@ -14,6 +14,17 @@ Created on: 2015/01/22
 
 
 
+long write(unsigned long fd, const char *buf, size_t count) {
+
+
+	kprintf("%s", buf);
+
+
+
+	return count;
+}
+
+
 
 
 long writev(unsigned long fd, const struct iovec *vec, unsigned long vlen) {

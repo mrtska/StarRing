@@ -14,5 +14,5 @@ Created on: 2015/01/22
 #include <fs/iovec.h>
 
 
-
+long write(unsigned long fd, const char *buf, size_t count);
 long writev(unsigned long fd, const struct iovec *vec, unsigned long vlen);
