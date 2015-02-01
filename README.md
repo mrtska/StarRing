@@ -1,2 +1,4 @@
 # StarRing
-StarRing os
+StarRing OS
+
+このプログラムはMITライセンスで配布されています。
