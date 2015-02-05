@@ -146,16 +146,11 @@ void main(unsigned long magic, unsigned long mboot) {
 		asmv("movq %0, %%rbp" : : "r"(p));
 	}
 
-
 	//スラブアロケーター初期化
 	init_slaballocator();
 
-
-
 	//正式なGDTをロード
 	gdt_init();
-
-	kprintf("alloc blocks = %x, free blocks = %x\n", phys_memory.alloc_blocks, phys_memory.free_blocks);
 
 	//マシンチェック
 	machine_check();

@@ -11,7 +11,7 @@ Created on: 2014/09/30
 #pragma once
 
 #include <task.h>
-
+#include <fs/stat.h>
 
 
 //ファイルノード項目
@@ -45,6 +45,9 @@ typedef void (*mkdir_func) (struct fs_node*, char*, unsigned short);
 //ioctl関数ポインタ
 typedef int (*ioctl_func) (struct fs_node*, int, void*);
 
+//fstat関数ポインタ
+typedef int (*fstat_func) (struct fs_node*, unsigned int, struct stat*);
+
 //ファイルサイズ取得関数ポインタ
 typedef int (*get_size_func) (struct fs_node*);
 
@@ -57,8 +60,6 @@ struct file_descriptor {
 	int flags;				//フラグ
 	int mode;				//モード
 	struct fs_node *node;	//fdに対応したファイルノード
-
-
 };
 
 
@@ -103,6 +104,7 @@ struct fs_node {
 	create_func create;		//
 	mkdir_func mkdir;		//
 	ioctl_func ioctl;		//
+	fstat_func fstat;		//
 	get_size_func get_size;	//
 
 	//シンボリックリンク用ポインタ

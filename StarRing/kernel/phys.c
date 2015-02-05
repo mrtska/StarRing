@@ -18,7 +18,7 @@ Created on: 2014/05/23
 extern unsigned long kernel_end;
 
 //使用不可メモリ領域などの情報を物理メモリ管理に登録する
-void memory_allocate_and_free(phys_memory_info_t *info) {
+void memory_allocate_and_free(struct phys_memory_info *info) {
 
 
 	alloc_blocks(0, 0x100000);

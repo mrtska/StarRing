@@ -22,26 +22,24 @@ struct kmem_cache kmalloc_cache[E_KMALLOC_NUM];
 
 //汎用キャッシュ
 static const struct initial_cache initial_cache[E_KMALLOC_NUM] = {
-	{ 8,		"kmalloc-8"        },
-	{ 16,		"kmalloc-16"       },
-	{ 32,		"kmalloc-32"       },
-	{ 64,		"kmalloc-64"       },
-	{ 96,		"kmalloc-96"       },
-	{ 128,		"kmalloc-128"      },
-	{ 192,		"kmalloc-192"      },
-	{ 256,		"kmalloc-256"      },
-	{ 512,		"kmalloc-512"      },
-	{ 1024,		"kmalloc-1024"     },
-	{ 2048,		"kmalloc-2048"     },
-	{ 4096,		"kmalloc-4096"     },
-	{ 8192,		"kmalloc-8192"     },
-	{ 16384,	"kmalloc-16384"    },
-	{ 32768,	"kmalloc-32768"    },
-	{ 65536,	"kmalloc-65536"    },
-	{ 131072,	"kmalloc-131072"   },
+	{ 8,		"kmalloc-8"		},
+	{ 16,		"kmalloc-16"	},
+	{ 32,		"kmalloc-32"	},
+	{ 64,		"kmalloc-64"	},
+	{ 96,		"kmalloc-96"	},
+	{ 128,		"kmalloc-128"	},
+	{ 192,		"kmalloc-192"	},
+	{ 256,		"kmalloc-256"	},
+	{ 512,		"kmalloc-512"	},
+	{ 1024,		"kmalloc-1024"	},
+	{ 2048,		"kmalloc-2048"	},
+	{ 4096,		"kmalloc-4096"	},
+	{ 8192,		"kmalloc-8192"	},
+	{ 16384,	"kmalloc-16384"	},
+	{ 32768,	"kmalloc-32768"	},
+	{ 65536,	"kmalloc-65536"	},
+	{ 131072,	"kmalloc-131072"},
 };
-
-
 
 
 //kmem_cacheの名前
@@ -102,47 +100,6 @@ void kfree(void *object, size_t size) {
 		}
 	}
 }
-
-/*
-void *malloc(size_t size) {
-
-	spin_lock(&malloc_lock);
-
-	E_KMALLOC size_index;
-	void *object;
-
-	for(size_index = E_KMALLOC_8; size_index < E_KMALLOC_NUM; size_index++) {
-
-		if(size <= initial_cache[size_index].size) {
-
-			object = kmem_cache_alloc(&kmalloc_cache[size_index], 0);
-
-			if(object == NULL) {
-				kprintf("WARNING\n");
-				continue;
-			}
-			spin_unlock(&malloc_lock);
-			return object;
-		}
-	}
-	kprintf("[slaballocater] over size! size = %p\n", size);
-	char buf[32];
-	sprintf(buf, "%u", size);
-
-	struct kmem_cache *cache = kmem_cache_create(buf, size, 0, 0, NULL);
-
-	spin_unlock(&malloc_lock);
-
-	return kmem_cache_alloc(cache, 0);
-
-}*/
-void free(void *obj) {
-
-
-
-}
-
-
 
 //スラブのサイズを計算する
 static int calc_slab_size(struct kmem_cache *cache) {

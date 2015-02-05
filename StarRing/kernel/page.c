@@ -39,9 +39,6 @@ void page_init(void) {
 
 	kprintf("pml4 %p\n", kernel_pml4[0x110]);
 	write_cr3((unsigned long) VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(kernel_pml4));
-
-	mfence();
-
 }
 
 
@@ -62,13 +59,43 @@ void combine_kernel_pml4(unsigned long destination_pml4) {
 	int i;
 	for(i = 1; i < 0x200; i++) {
 
-		if(source[i] & 1) {
+
+		if(source[i] & PG_PRESENT) {
 
 			dest[i] = source[i];
 		}
 	}
 }
 
+//ページテーブルを構築
+void map_pt(unsigned long virt, unsigned long phys, unsigned long *pt, int flags) {
+
+	unsigned int pte = pt_index(virt);
+
+	if((unsigned long)pt < 0xFFFF880000000000ULL) {
+
+		pt = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(pt);
+	}
+
+	int page_flags = PG_PRESENT;
+
+	if(flags & FLAGS_WRITABLE_PAGE) {
+
+		page_flags |= PG_WRITE;
+	}
+
+	if(flags & FLAGS_USER_PAGE) {
+
+		page_flags |= PG_USER;
+	}
+
+	if(flags & FLAGS_NO_EXECUTE) {
+
+		page_flags |= PG_NX;
+	}
+
+	pt[pte] = phys | (page_flags);
+}
 
 //ページディレクトリを構築する
 void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags) {
@@ -80,8 +107,6 @@ void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags
 
 		pd = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(pd);
 	}
-
-	unsigned long *p = pd;
 
 	//kprintf("map_pd   %p\n", p);
 	int page_flags = PG_PRESENT;
@@ -111,15 +136,17 @@ void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags
 			int i;
 			for(i = 0; i < 0x200; i++, phys += 0x200000) {
 
-				p[i] = phys | (page_flags);
+				pd[i] = phys | (page_flags);
 			}
 
 			//kprintf("map_pd %p, %p\n", p[i], virt);
 		} else {
 
-			p[pde] = phys | (page_flags);
+			pd[pde] = phys | (page_flags);
 		}
+	} else {
 
+		map_pt(virt, phys, pd, flags);
 	}
 }
 
@@ -154,7 +181,7 @@ void map_pdpt(unsigned long virt, unsigned long phys, unsigned long *pdpt, int f
 		pdpt = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(pdpt);
 	}
 
-	if(pdpt[pdpte] & 1) {
+	if(pdpt[pdpte] & PG_PRESENT) {
 
 		p = (pdpt[pdpte] & MASK_FRAME_ADDR);
 
@@ -236,19 +263,6 @@ void map_pml4(unsigned long virt, unsigned long phys, unsigned long *pml4, int f
 void map_page(unsigned long virt, unsigned long phys, unsigned long *cr3, int flags) {
 
 
-	map_pml4(virt, phys, cr3, FLAGS_LARGE_PAGE | flags);
-}
-
-unsigned long get_page_directory(unsigned long virt, unsigned long cr3) {
-
-	unsigned int pml4e = pml4_index(virt);
-	unsigned int pdpte = pdpt_index(virt);
-	unsigned int pde = pd_index(virt);
-
-	unsigned long *pml4 = (unsigned long*) cr3;
-	unsigned long *pointer = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(pml4[pml4e] & MASK_FRAME_ADDR);
-	unsigned long *pd = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(pointer[pdpte] & MASK_FRAME_ADDR);
-
-	return pd[pde];
+	map_pml4(virt, phys, cr3, flags);
 }
 

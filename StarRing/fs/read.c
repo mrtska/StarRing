@@ -32,7 +32,7 @@ int readv(unsigned long fd, const struct iovec *vec, unsigned long vlen) {
 		const struct iovec *v = &vec[i];
 
 		read_fs(node, v->iov_len, 1, v->iov_base);
-		kprintf("[kernel/readv] base %X, len %X, buf %X, %X\n",  v->iov_base, v->iov_len, *(unsigned char*)&v->iov_base[0], *(unsigned char*)&v->iov_base[0xF]);
+		kprintf("[kernel/readv] base %X, len %X\n",  v->iov_base, v->iov_len);
 		node->seek += v->iov_len;
 
 	}

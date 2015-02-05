@@ -399,7 +399,7 @@ int load_elf_binary(struct process *process) {
 
 			const struct elf64_program_header *cur_p = &pheader[i];
 
-			kprintf("type = %u, offset %X, addr = %X, size = %X, page %X\n", cur_p->p_type, cur_p->p_offset, cur_p->p_vaddr, cur_p->p_memsz, cur_p->p_fizesz);
+			kprintf("type %u, offset %X, addr %X, size %X, page %X\n", cur_p->p_type, cur_p->p_offset, cur_p->p_vaddr, cur_p->p_memsz, cur_p->p_fizesz);
 
 			switch(cur_p->p_type) {
 
@@ -410,21 +410,29 @@ int load_elf_binary(struct process *process) {
 
 			case ELF_PT_LOAD: {
 
-				//kprintf("type = %s, flags = %s, addr = %X, offset = %X, page %X\n", conv_pt(cur_p->p_type), conv_pf(cur_p->p_flags), cur_p->p_vaddr, cur_p->p_offset, cur_p->p_align);
 				unsigned char *base = alloc_memory_block(1);
 
 				//ページの属性を設定する
 				int page_flags = FLAGS_USER_PAGE;
 
+				//ラージページに設定
+				if(cur_p->p_align == 0x200000) {
+
+					page_flags |= FLAGS_LARGE_PAGE;
+				}
+
+				//書き込み権限を与える
 				if(cur_p->p_flags & ELF_PF_W) {
 
 					page_flags |= FLAGS_WRITABLE_PAGE;
 				}
 
+				//実行権限を剥奪
 				if(!(cur_p->p_flags & ELF_PF_X)) {
 
-					page_flags |= FLAGS_WRITABLE_PAGE;
+					page_flags |= FLAGS_NO_EXECUTE;
 				}
+
 
 				map_page(cur_p->p_vaddr, (unsigned long) base, process->page_tables, page_flags);
 				memcpy((void*) cur_p->p_vaddr, read_file_offset(header, cur_p->p_offset), cur_p->p_fizesz);

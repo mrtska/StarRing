@@ -269,8 +269,8 @@ size_t strnlen(const char *s, size_t count) {
 
 char *strtok(char *s1, const char s2) {
 
-	static unsigned char *p = 0;
-	static unsigned char *ret;
+	static char *p = 0;
+	static char *ret;
 
 	if(s1 != 0) {
 		p = s1;

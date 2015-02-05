@@ -21,7 +21,7 @@ void vmm_allocator_init() {
 
 	unsigned long p = (unsigned long)  alloc_memory_block(1);
 	p += 0xFFFF880000000000;
-	vmm.base = (unsigned long*) p;
+	vmm.base = (unsigned char*) p;
 
 
 
@@ -55,7 +55,7 @@ void *vmm_page_table_alloc(void) {
 //解放する
 void vmm_page_table_free(void *table) {
 
-	unsigned char p = (unsigned char) table & 0x1FFFFF;
+	unsigned char p = (unsigned long) table & 0x1FFFFF;
 	vmm.base[p] = 0x0000;
 
 

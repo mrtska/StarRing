@@ -124,11 +124,6 @@ void kmem_cache_free(struct kmem_cache *cp, void *buf);
 void kmem_cache_destroy(struct kmem_cache *cp);
 
 
-void *malloc(size_t size);
-void free(void *obj);
-
-
-
 void *kmalloc(size_t size, int flags);
 void kfree(void *object, size_t size);
 

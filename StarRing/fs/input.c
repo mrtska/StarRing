@@ -28,10 +28,10 @@ static unsigned int read_input(struct fs_node *node, unsigned int offset, unsign
 	return 1;
 }
 
-static unsigned int write_input(struct fs_node *node, unsigned int offset, unsigned int size, unsigned int *buffer) {
+static unsigned int write_input(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer) {
 
 	struct input_device_data *data = node->data;
-	data->key_code[data->cursor] = *buffer;
+	data->key_code[data->cursor] = *(unsigned int*)buffer;
 	data->cursor++;
 	return 1;
 }

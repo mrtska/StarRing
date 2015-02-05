@@ -16,7 +16,28 @@ Created on: 2014/04/27
 #include <mem/phys.h>
 #include <page/page.h>
 
-phys_memory_info_t phys_memory;
+
+
+struct phys_memory_info phys_memory;
+static __inline__ void set_bit(unsigned long num) {
+
+	phys_memory.bit_map[num / 64] |= (1 << (num % 64));
+}
+
+static __inline__ void clear_bit(unsigned long num) {
+
+	phys_memory.bit_map[num / 64] &= ~(1 << (num % 64));
+}
+
+static __inline__ _Bool test_bit(unsigned long num) {
+
+
+	return (phys_memory.bit_map[num / 64] & (1 << (num % 64))) > 0;
+}
+
+
+
+
 extern unsigned long physical_memory_bitmap;
 
 
@@ -39,8 +60,7 @@ void find_memory_block(unsigned long *block_num, int num) {
 				for(i = 0; i < num; i++) {
 					if(!test_bit(bit_count - i)) {
 
-						success++;
-						if(success == num) {
+						if(++success == num) {
 							*block_num = bitmap_index * (sizeof(unsigned long) * 8) + bit_count;
 							return;
 						}
@@ -53,6 +73,8 @@ void find_memory_block(unsigned long *block_num, int num) {
 			}
 		}
 	}
+
+	kprintf("[memoryallocater/find_memory_block] free memory not found.\n");
 	*block_num = 0x7E;
 	return;
 }

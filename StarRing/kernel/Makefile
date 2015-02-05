@@ -1,5 +1,5 @@
 #ブート時
-FILE := idt.o gdt.o apic.o ioapic.o syscall.o trap.o page.o spinlock.o alloc.o page_fault.o cpuid.o phys.o slab.o acpi.o pci.o smp.o wait.o task.o systemcall.o elf.o ipi.o vmm.o ioctl.o
+FILE := string.o idt.o gdt.o apic.o ioapic.o syscall.o trap.o page.o spinlock.o alloc.o page_fault.o cpuid.o phys.o slab.o acpi.o pci.o smp.o wait.o task.o systemcall.o elf.o ipi.o vmm.o ioctl.o
 FILE += prctl.o sys.o env.o
 
 TARGET := kernel.sys

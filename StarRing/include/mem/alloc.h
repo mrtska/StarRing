@@ -20,7 +20,7 @@ extern unsigned long memory_size;
 
 
 //物理メモリ情報
-typedef struct phys_memory_info {
+struct phys_memory_info {
 
 	//メモリ総量
 	unsigned long memory_size;
@@ -40,32 +40,7 @@ typedef struct phys_memory_info {
 	//マップのサイズ
 	unsigned long map_size;
 
-} phys_memory_info_t;
-
-
-
-extern phys_memory_info_t phys_memory;
-
-
-
-
-
-static __inline__ void set_bit(unsigned long num) {
-
-	phys_memory.bit_map[num / 64] |= (1 << (num % 64));
-}
-
-static __inline__ void clear_bit(unsigned long num) {
-
-	phys_memory.bit_map[num / 64] &= ~(1 << (num % 64));
-}
-
-static __inline__ _Bool test_bit(unsigned long num) {
-
-
-	return (phys_memory.bit_map[num / 64] & (1 << (num % 64))) > 0;
-}
-
+};
 
 
 

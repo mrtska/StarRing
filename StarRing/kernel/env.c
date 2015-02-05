@@ -29,7 +29,7 @@ void environment_valiable_init(void) {
 
 	while(tok != NULL) {
 
-		unsigned char *buf = kmalloc(0x100, 0);
+		char *buf = kmalloc(0x100, 0);
 		kprintf("env %s\n", tok);
 		strcpy(buf, tok);
 		entry->name = buf;

@@ -26,7 +26,7 @@ export MAKE
 export INCLUDE
 
 
-OBJECTS := boot/boot.sys lib/lib.sys internal/internal.sys kernel/kernel.sys acpica/acpica.sys fs/fs.sys drivers/drivers.sys
+OBJECTS := boot/boot.sys internal/internal.sys kernel/kernel.sys acpica/acpica.sys fs/fs.sys drivers/drivers.sys
 
 .PHONY: all
 all: compile
@@ -37,7 +37,6 @@ compile:
 	touch ./boot/boot.S
 	
 	$(CD) boot;$(MAKE) 		#ブート時処理をコンパイル
-	$(CD) lib;$(MAKE)  		#標準ライブラリをコンパイル
 	$(CD) internal;$(MAKE)	#内部処理をコンパイル
 	$(CD) kernel;$(MAKE)	#カーネル本体をコンパイル
 	$(CD) acpica;$(MAKE)	#ACPICA
@@ -55,7 +54,6 @@ install:
 .PHONY: clean
 clean:
 	$(CD) boot;$(MAKE) clean
-	$(CD) lib;$(MAKE) clean
 	$(CD) internal;$(MAKE) clean
 	$(CD) kernel;$(MAKE) clean
 	$(CD) acpica;$(MAKE) clean

@@ -12,11 +12,14 @@ Created on: 2015/01/29
 #include <fs/mmap.h>
 #include <page/page.h>
 #include <errno.h>
+#include <task.h>
+#include <apic.h>
+#include <smp.h>
 
 unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset) {
 
 
-
+	//struct process *process = get_process();
 	unsigned int page_flags = FLAGS_USER_PAGE;
 
 	if(prot & PROT_WRITE) {
@@ -26,13 +29,20 @@ unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, un
 
 	if(flags & MAP_ANONYMOUS) {
 
-		trace();
+		if(addr == 0) {
+
+
+		}
+
+		return 0;
 	} else {
 
 		if(fd == -1) {
 
 			return -EBADF;
 		}
+
+
 
 
 	}

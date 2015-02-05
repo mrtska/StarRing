@@ -20,7 +20,6 @@ Created on: 2014/10/25
 #include <wait.h>
 #include <env.h>
 
-
 #include <fs/vfs.h>
 
 //プロセスを管理するリスト
@@ -202,7 +201,7 @@ void enter_user_64(struct process *process, unsigned int apic_id) {
 }
 
 //32bitユーザー領域に移行する
-static void enter_user_32(struct process *process) {
+void enter_user_32(struct process *process) {
 
 	//エントリポイント
 	unsigned long entry = process->entry_point;
@@ -253,11 +252,9 @@ void run_process(struct process *process) {
 	int apic_id = apic_read(APIC_ID_R) >> 24;
 
 	load_elf_binary(process);
-	map_page(0x7FFFFFE00000, (unsigned long) alloc_memory_block(1), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE);	//スタック領域を0x7FFFFFFFF000に割り当てる
+	map_page(0x7FFFFFE00000, (unsigned long) alloc_memory_block(1), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE | FLAGS_LARGE_PAGE);	//スタック領域を0x7FFFFFFFF000に割り当てる
 	elf64_create_table(process, 1, (unsigned char*)0x7FFFFFFFD000);
 
-	asmv("mov $8, %ax");
-	asmv("mov %ax, %gs");
 	map_page(0xF0000000, VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(process->heap_base), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE);	//
 	smp_table[apic_id].execute_process = process;
 
