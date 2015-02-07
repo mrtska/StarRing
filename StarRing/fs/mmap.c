@@ -47,9 +47,8 @@ static unsigned long get_mmap_address(struct process *process, unsigned long len
 	return base;
 }
 
-static unsigned long mmap_anon_4k(unsigned long len, unsigned int page_flags) {
+static unsigned long mmap_anon_4k(struct process *process, unsigned long len, unsigned int page_flags) {
 
-	struct process *process = get_process();
 	unsigned long addr = get_mmap_address(process, len);
 
 	map_page(addr, (unsigned long) alloc_memory_block_4k_phys(), process->page_tables, page_flags);
@@ -58,13 +57,10 @@ static unsigned long mmap_anon_4k(unsigned long len, unsigned int page_flags) {
 }
 
 
-
-
-
 unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset) {
 
 
-	//struct process *process = get_process();
+	struct process *process = get_process();
 	unsigned int page_flags = FLAGS_USER_PAGE;
 
 	if(prot & PROT_WRITE) {
@@ -78,7 +74,7 @@ unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, un
 
 			if(len < MEMORY_BLOCK_SIZE) {
 
-				return mmap_anon_4k(len, page_flags);
+				return mmap_anon_4k(process, len, page_flags);
 			} else {
 
 				trace();
