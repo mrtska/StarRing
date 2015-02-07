@@ -79,7 +79,7 @@ static __inline__ void* alloc_memory_block_4k_phys(void) {
 	return p;
 }
 
-static __inline__ void alloc_memory_block_4k_phys(void* p) {
+static __inline__ void free_memory_block_4k_phys(void* p) {
 
 	p = (void*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(p);
 	free_memory_block4k(p);

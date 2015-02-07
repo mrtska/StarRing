@@ -237,7 +237,6 @@ int load_elf_binary(struct process *process) {
 		}
 	}
 	kprintf("id %d\n", apic_read(APIC_ID_R) >> 24);
-	STOP;
 	return 0;
 
 }
