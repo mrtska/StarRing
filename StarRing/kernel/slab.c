@@ -155,6 +155,7 @@ static int init_kmem_cache(struct kmem_cache *cache, const char *name, size_t ob
 	//オブジェクトの属性を初期化
 	cache->obj_size = obj_size;
 	cache->total_obj_num = 0;
+	cache->align = align;
 
 	//スラブの属性を初期化
 	if(SLAB_LARGE_OBJECT_SIZE <= cache->obj_size) {
@@ -588,6 +589,11 @@ int kmem_cache_grow(struct kmem_cache *cache, int flags) {
 		kmem_bufctl = get_kmem_bufctl(slab);
 
 		s_mem = (void*) (kmem_bufctl + cache->obj_num);
+		if(cache->align) {
+
+			s_mem += cache->obj_size;
+			s_mem = (void*)((unsigned long)s_mem & ~(cache->align - 1));
+		}
 	}
 
 	init_slab(slab, s_mem);

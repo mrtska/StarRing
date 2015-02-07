@@ -212,8 +212,6 @@ void main(unsigned long magic, unsigned long mboot) {
 	//APIC有効化
 	apic_write(APIC_SVR, apic_read(APIC_SVR) | APIC_ENABLED);
 
-
-
 	//割り込みを許可
 	asmv("sti");
 
@@ -238,9 +236,9 @@ void main(unsigned long magic, unsigned long mboot) {
 	vfs_mount("/dev/zero", create_null_device());
 	vfs_mount("/dev/tty", create_stdout());
 
-
 	environment_valiable_init();
 
+	allocator_4k_init();
 
 	//初期化プロセスを生成
 	task_init();

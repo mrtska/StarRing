@@ -13,8 +13,6 @@
 #include <spinlock.h>
 #include <string.h>
 #include <internal/stdio.h>
-#include <page/page.h>
-
 
 static struct phys_memory_info phys_memory;
 static __inline__ void set_bit(unsigned long num) {
@@ -139,6 +137,26 @@ void free_memory_block(void *phys_addr) {
 }
 
 
+static struct kmem_cache *cache_4k;
+
+void *alloc_memory_block4k(void) {
+
+
+	return kmem_cache_alloc(cache_4k, 0);
+}
+
+void free_memory_block4k(void *p) {
+
+	kmem_cache_free(cache_4k, p);
+}
+
+void allocator_4k_init(void) {
+
+
+	cache_4k = kmem_cache_create("4kb_page", 0x1000, 0x1000, 0, NULL);
+
+}
+
 //物理メモリ割り当てerの初期化 memory_sizeはbyte単位
 void allocator_init(unsigned long memory_size) {
 
@@ -159,6 +177,9 @@ void allocator_init(unsigned long memory_size) {
 
 	//メモリマップをパースする
 	parse_mmap();
+
+
+
 }
 
 

@@ -10,6 +10,8 @@ Created on: 2014/04/27
 
 #pragma once
 
+#include <page/page.h>
+
 
 
 #define MAGIC 0xDEADFACE
@@ -66,7 +68,25 @@ void free_memory_block(void *phys_addr);
 
 
 
+void *alloc_memory_block4k(void);
 
+void free_memory_block4k(void *p);
+
+static __inline__ void* alloc_memory_block_4k_phys(void) {
+
+	void *p = alloc_memory_block4k();
+	p = (void*) VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(p);
+	return p;
+}
+
+static __inline__ void alloc_memory_block_4k_phys(void* p) {
+
+	p = (void*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(p);
+	free_memory_block4k(p);
+}
+
+
+void allocator_4k_init(void);
 
 
 
