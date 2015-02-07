@@ -194,7 +194,7 @@ int load_elf_binary(struct process *process) {
 
 			case ELF_PT_LOAD: {
 
-				unsigned char *base = alloc_memory_block();
+				unsigned char *base;
 
 				//ページの属性を設定する
 				int page_flags = FLAGS_USER_PAGE;
@@ -203,6 +203,10 @@ int load_elf_binary(struct process *process) {
 				if(cur_p->p_align == 0x200000) {
 
 					page_flags |= FLAGS_LARGE_PAGE;
+					base = alloc_memory_block();
+				} else {
+
+					base = alloc_memory_block4k();
 				}
 
 				//書き込み権限を与える
@@ -220,6 +224,9 @@ int load_elf_binary(struct process *process) {
 
 				map_page(cur_p->p_vaddr, (unsigned long) base, process->page_tables, page_flags);
 				memcpy((void*) cur_p->p_vaddr, read_file_offset(header, cur_p->p_offset), cur_p->p_fizesz);
+
+				unsigned long brk = (cur_p->p_vaddr + cur_p->p_fizesz + MEMORY_BLOCK_SIZE) & 0xFFFFFFFFFFF00000;
+				process->start_brk = process->end_brk = (process->start_brk > brk) ? process->start_brk : brk;
 				break;
 			}
 			case ELF_PT_INTERP: {

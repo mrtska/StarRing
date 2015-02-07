@@ -1,13 +1,12 @@
 /*
-[Module systemcall.c]
-Copyright(c) 2015 mrtska.starring
+ [Module systemcall.c]
+ Copyright(c) 2015 mrtska.starring
 
-This software is released under the MIT License.
+ This software is released under the MIT License.
 
-http://opensource.org/licenses/mit-license.php
-Created on: 2014/11/06
-*/
-
+ http://opensource.org/licenses/mit-license.php
+ Created on: 2014/11/06
+ */
 
 #include <system.h>
 #include <string.h>
@@ -41,15 +40,11 @@ Created on: 2014/11/06
 #define MSR_LSTAR	0xC0000082
 #define MSR_CSTAR	0xC0000083
 
-
-
 void sys_exit(int err_code);
 long sys_read(unsigned int fd, char *buf, size_t count);
 long sys_write(unsigned int fd, const char *buf, size_t count);
 unsigned long sys_open(const char *filename, int flags, int mode);
 int sys_close(unsigned int fd);
-
-
 
 int sys_fstat(unsigned int fd, struct stat *statbuf);
 
@@ -73,21 +68,18 @@ unsigned int sys_getgid(void);
 unsigned int sys_geteuid(void);
 unsigned int sys_getegid(void);
 
-
 long sys_arch_prctl(int code, unsigned long addr);
 
-
 void sys_exit_group(int exit_code);
-
 
 long sys_set_tid_address(int *tidptr);
 unsigned long systemcall_table[] = {
 
-		(unsigned long)sys_read, (unsigned long)sys_write, (unsigned long)sys_open, (unsigned long)sys_close, 0, (unsigned long)sys_fstat,	//0 ~ 5
-		0, 0, (unsigned long)sys_lseek, (unsigned long)sys_mmap, 0,	//10
-		0, (unsigned long)sys_brk, 0, 0, 0,	//15
-		(unsigned long)sys_ioctl, 0, 0, (unsigned long)sys_readv, (unsigned long)sys_writev,	//20
-		(unsigned long)sys_access, 0, 0, 0, 0,	//25
+(unsigned long) sys_read, (unsigned long) sys_write, (unsigned long) sys_open, (unsigned long) sys_close, 0, (unsigned long) sys_fstat,	//0 ~ 5
+		0, 0, (unsigned long) sys_lseek, (unsigned long) sys_mmap, 0,	//10
+		0, (unsigned long) sys_brk, 0, 0, 0,	//15
+		(unsigned long) sys_ioctl, 0, 0, (unsigned long) sys_readv, (unsigned long) sys_writev,	//20
+		(unsigned long) sys_access, 0, 0, 0, 0,	//25
 		0, 0, 0, 0, 0,	//30
 		0, 0, 0, 0, 0,	//35
 		0, 0, 0, 0, 0,	//40
@@ -95,16 +87,16 @@ unsigned long systemcall_table[] = {
 		0, 0, 0, 0, 0,	//50
 		0, 0, 0, 0, 0,	//55
 		0, 0, 0, 0, 0,	//60
-		0, 0, (unsigned long)sys_new_name, 0, 0,	//65
+		0, 0, (unsigned long) sys_new_name, 0, 0,	//65
 		0, 0, 0, 0, 0,	//70
 		0, 0, 0, 0, 0,	//75
 		0, 0, 0, 0, 0,	//80
 		0, 0, 0, 0, 0,	//85
-		0, 0, 0, (unsigned long)sys_readlink, 0,	//90
+		0, 0, 0, (unsigned long) sys_readlink, 0,	//90
 		0, 0, 0, 0, 0,	//95
 		0, 0, 0, 0, 0,	//100
-		0, (unsigned long)sys_getuid, 0, (unsigned long)sys_getgid, 0,	//105
-		0, (unsigned long)sys_geteuid, (unsigned long)sys_getegid, 0, 0,	//110
+		0, (unsigned long) sys_getuid, 0, (unsigned long) sys_getgid, 0,	//105
+		0, (unsigned long) sys_geteuid, (unsigned long) sys_getegid, 0, 0,	//110
 		0, 0, 0, 0, 0,	//115
 		0, 0, 0, 0, 0,	//120
 		0, 0, 0, 0, 0,	//125
@@ -129,7 +121,7 @@ unsigned long systemcall_table[] = {
 		0, 0, (unsigned long) sys_set_tid_address, 0, 0,	//220
 		0, 0, 0, 0, 0,	//225
 		0, 0, 0, 0, 0,	//230
-		(unsigned long)sys_exit_group, 0, 0, 0, 0,	//235
+		(unsigned long) sys_exit_group, 0, 0, 0, 0,	//235
 		0, 0, 0, 0, 0,	//240
 		0, 0, 0, 0, 0,	//245
 		0, 0, 0, 0, 0,	//250
@@ -155,8 +147,6 @@ unsigned long systemcall_table[] = {
 		0, 0, 0, 0, 0,	//310
 		0, 0, 0, 0, 0,	//315
 };
-
-
 
 unsigned long user_stack;
 
@@ -185,8 +175,6 @@ unsigned long do_systemcall_handler(unsigned long arg1, unsigned long arg2, unsi
 	return 0;
 }
 
-
-
 //システムコール呼び出しの準備 MSRにハンドラの位置を書き込む MSRが無いCPUなんて知らぬ(´･ω･｀)
 void systemcall_init(void) {
 
@@ -195,22 +183,17 @@ void systemcall_init(void) {
 	write_msr(MSR_CSTAR, (unsigned long) &systemcall_handler);
 }
 
-
-
 void sys_exit(int err_code) {
 
 	//TODO ここにプロセスが使用していたメモリ領域の開放、プロセスの開放を行う これを忘れると・・・
 
-
-
-
 	kprintf("Task Exit\n");
-	while(1) asmv("hlt");//とりあえず止める
+	while(1)
+		asmv("hlt");
+	//とりあえず止める
 }
 
-
 long sys_read(unsigned int fd, char *buf, size_t count) {
-
 
 	trace();
 	return 0;
@@ -221,7 +204,6 @@ long sys_write(unsigned int fd, const char *buf, size_t count) {
 	//kprintf("[kernel/sys_write] fd %d, buf %p, count %X\n", fd, buf, count);
 	return write(fd, buf, count);
 }
-
 
 unsigned long sys_open(const char *filename, int flags, int mode) {
 
@@ -235,13 +217,11 @@ int sys_close(unsigned int fd) {
 	return close(fd);
 }
 
-
 int sys_fstat(unsigned int fd, struct stat *statbuf) {
 
 	kprintf("[kernel/sys_fstat] fd %d, stat %p\n", fd, statbuf);
 	return fstat(fd, statbuf);
 }
-
 
 unsigned long sys_lseek(unsigned int fd, unsigned long offset, unsigned int whence) {
 
@@ -282,7 +262,6 @@ long sys_new_name(struct new_utsname *name) {
 	kprintf("[kernel/sys_new_name] %p\n", name);
 	return new_name(name);
 }
-
 
 unsigned int sys_readlink(const char *path, char *buf, int bufsiz) {
 
@@ -338,18 +317,14 @@ unsigned long sys_get_width(void) {
 
 unsigned long monitor_depth;
 
-
 unsigned long sys_get_depth(void) {
 
 	return monitor_depth;
 }
 
-
 long sys_brk(unsigned long brk) {
 
-
 	kprintf("[kernel/sys_brk] %p\n", brk);
-
 
 	struct process *process = smp_table[apic_read(APIC_ID_R) >> 24].execute_process;
 
@@ -358,31 +333,17 @@ long sys_brk(unsigned long brk) {
 		return -1;
 	}
 
+	if(brk < process->start_brk) {
 
-	unsigned long start_brk	= 0xF000000;
-	//unsigned long end_brk	= 0xF100000;
-/*
-
-	if(!process->heap_base) {
-
-		process->heap_base = alloc_memory_block();
-		process->brk = start_brk;
-		map_page(start_brk, (unsigned long) process->heap_base, process->page_tables, FLAGS_USER_PAGE | FLAGS_WRITABLE_PAGE | FLAGS_NO_EXECUTE | FLAGS_LARGE_PAGE);
+		return process->start_brk;
 	}
-*/
-
-
-	if(brk < start_brk) {
-
-		return process->end_brk;
-	}
-
 
 	if(process->end_brk == brk) {
 
 		return process->end_brk;
 	}
-	if (brk <= process->end_brk) {
+
+	if(brk <= process->end_brk) {
 		process->end_brk = brk;
 		return brk;
 	}
@@ -390,29 +351,18 @@ long sys_brk(unsigned long brk) {
 	return process->end_brk = brk;
 }
 
-
-
 long sys_arch_prctl(int code, unsigned long addr) {
 
 	kprintf("[kernel/sys_arch_prctl] code %X, addr %p\n", code, addr);
 	return arch_prctl(code, addr);
 }
 
-
-
-
-
-
 long sys_set_tid_address(int *tidptr) {
-
 
 	kprintf("[kernel/sys_set_tid_address] %p, %d\n", tidptr, *tidptr);
 
 	return 0;
 }
-
-
-
 
 void sys_exit_group(int exit_code) {
 
@@ -421,26 +371,4 @@ void sys_exit_group(int exit_code) {
 
 	STOP;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

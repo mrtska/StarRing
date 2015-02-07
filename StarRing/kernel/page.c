@@ -21,21 +21,21 @@ Created on: 2014/04/20
 unsigned long *kernel_pml4;
 
 //ページ初期化
-void page_init(void) {
+void page_init(unsigned long memory_max) {
 
 	kernel_pml4 = vmm_page_table_alloc();
 
 	kprintf("kernel %p\n", kernel_pml4);
 
-
 	//物理メモリ ストレートマッピング
-	map_page(0xFFFF880000000000, 0x00000000, kernel_pml4, FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE | FLAGS_ALLOC_512);
-	map_page(0xFFFF880040000000, 0x40000000, kernel_pml4, FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE | FLAGS_ALLOC_512);
-	map_page(0xFFFF880080000000, 0x80000000, kernel_pml4, FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE | FLAGS_ALLOC_512);
-	map_page(0xFFFF8800C0000000, 0xC0000000, kernel_pml4, FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE | FLAGS_ALLOC_512);
+	unsigned long i;
+	for(i = 0; i < memory_max; i += 0x40000000) {
+
+		map_page(0xFFFF880000000000 + i, i, kernel_pml4, FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE | FLAGS_ALLOC_512MB);
+	}
 
 	//カーネルテキスト
-	map_page(0xFFFFFFFF80000000, 0x00000000, kernel_pml4, FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE | FLAGS_ALLOC_512);
+	map_page(0xFFFFFFFF80000000, 0x00000000, kernel_pml4, FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE | FLAGS_ALLOC_512MB);
 
 	kprintf("pml4 %p\n", kernel_pml4[0x110]);
 	write_cr3((unsigned long) VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(kernel_pml4));
@@ -83,25 +83,24 @@ void map_pt(unsigned long virt, unsigned long phys, unsigned long *pt, int flags
 
 		page_flags |= PG_WRITE;
 	}
-
 	if(flags & FLAGS_USER_PAGE) {
 
 		page_flags |= PG_USER;
 	}
-
 	if(flags & FLAGS_NO_EXECUTE) {
 
 		page_flags |= PG_NX;
 	}
 
 	pt[pte] = phys | (page_flags);
+
+	kprintf("map_pt %p, phys %p\n", pt, phys);
 }
 
 //ページディレクトリを構築する
 void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags) {
 
 	unsigned int pde = pd_index(virt);
-	//unsigned long *pd = (unsigned long*) ((unsigned long)pdpt & MASK_FRAME_ADDR);
 
 	if((unsigned long)pd < 0xFFFF880000000000ULL) {
 
@@ -131,7 +130,7 @@ void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags
 
 		page_flags |= PG_LARGE;
 
-		if(flags & FLAGS_ALLOC_512) {
+		if(flags & FLAGS_ALLOC_512MB) {
 
 			int i;
 			for(i = 0; i < 0x200; i++, phys += 0x200000) {
@@ -143,10 +142,28 @@ void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags
 		} else {
 
 			pd[pde] = phys | (page_flags);
+			kprintf("map_pd %p, %p\n", pde, virt);
 		}
 	} else {
 
-		map_pt(virt, phys, pd, flags);
+		unsigned long p;
+
+		if(pd[pde] & PG_PRESENT) {
+
+			p = (pd[pde] & MASK_FRAME_ADDR);
+		} else {
+
+			p = (unsigned long) vmm_page_table_alloc();
+		}
+		//PDにPTをセットする
+		if(p > 0xFFFF880000000000) {
+
+			pd[pde] = VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(p) | (page_flags);
+		} else {
+
+			pd[pde] = p | (page_flags);
+		}
+		map_pt(virt, phys, (unsigned long*)p, flags);
 	}
 }
 
@@ -154,6 +171,11 @@ void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags
 void map_pdpt(unsigned long virt, unsigned long phys, unsigned long *pdpt, int flags) {
 
 
+
+	if((unsigned long)pdpt < 0xFFFF880000000000ULL) {
+
+		pdpt = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(pdpt);
+	}
 
 	unsigned int pdpte = pdpt_index(virt);
 
@@ -163,23 +185,16 @@ void map_pdpt(unsigned long virt, unsigned long phys, unsigned long *pdpt, int f
 
 		page_flags |= PG_WRITE;
 	}
-
 	if(flags & FLAGS_USER_PAGE) {
 
 		page_flags |= PG_USER;
 	}
-
 	if(flags & FLAGS_NO_EXECUTE) {
 
 		page_flags |= PG_NX;
 	}
 
 	unsigned long p;
-
-	if((unsigned long)pdpt < 0xFFFF880000000000ULL) {
-
-		pdpt = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(pdpt);
-	}
 
 	if(pdpt[pdpte] & PG_PRESENT) {
 
@@ -219,22 +234,19 @@ void map_pml4(unsigned long virt, unsigned long phys, unsigned long *pml4, int f
 
 		page_flags |= PG_WRITE;
 	}
-
 	if(flags & FLAGS_USER_PAGE) {
 
 		page_flags |= PG_USER;
 	}
-
 	if(flags & FLAGS_NO_EXECUTE) {
 
 		page_flags |= PG_NX;
 	}
 
-
-
 	unsigned long p;
 
-	if(pml4[pml4e] & 1) {
+	//PDPTが存在するか
+	if(pml4[pml4e] & PG_PRESENT) {
 
 		p = pml4[pml4e] & MASK_FRAME_ADDR;
 
@@ -259,7 +271,7 @@ void map_pml4(unsigned long virt, unsigned long phys, unsigned long *pml4, int f
 
 // map_page(0xFFFFFFFFC0000000, 0x2000000, NULL, 0);
 
-//ページをマップする processにNULLを指定した場合は現在のcr3が使用される 一度に512個のページテーブルが構築される cr3は仮想アドレスを指定する
+//ページをマップする cr3は仮想アドレスを指定する
 void map_page(unsigned long virt, unsigned long phys, unsigned long *cr3, int flags) {
 
 

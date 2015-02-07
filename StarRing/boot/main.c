@@ -142,7 +142,7 @@ void main(unsigned long magic, unsigned long mboot) {
 
 
 	//正式なページテーブルを初期化&ロード
-	page_init();
+	page_init(memory_size);
 
 	//スタックポインタを正しいものに
 	{

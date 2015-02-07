@@ -18,7 +18,7 @@ Created on: 2014/04/28
 #define FLAGS_LARGE_PAGE	0x01
 #define FLAGS_WRITABLE_PAGE	0x02
 #define FLAGS_USER_PAGE		0x04
-#define FLAGS_ALLOC_512		0x08
+#define FLAGS_ALLOC_512MB		0x08
 #define FLAGS_NEW_ALLOC		0x10
 #define FLAGS_NO_EXECUTE	0x20
 
@@ -50,7 +50,7 @@ extern unsigned long *kernel_pml4;
 
 
 //ページング初期化
-void page_init();
+void page_init(unsigned long memory_max);
 
 //ユーザーページ作成
 void setup_user_page(struct process *process);
