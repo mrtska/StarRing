@@ -20,7 +20,6 @@ Created on: 2014/10/25
 #include <wait.h>
 #include <env.h>
 
-#include <fs/vfs.h>
 #include <mem/alloc.h>
 
 //プロセスを管理するリスト
@@ -157,6 +156,9 @@ int create_process(char *name, struct fs_node *node, int flags) {
 	//ファイルの初期化
 	process->file = node;
 	process->file_base = (unsigned char*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block());
+
+	process->mmap_base = 0x7F0000000000;
+	INIT_LIST_HEAD(&process->mmap_list);
 
 	//ファイルディスクリプタリストを初期化
 	INIT_LIST_HEAD(&process->fd_list);

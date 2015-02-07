@@ -13,43 +13,15 @@ Created on: 2014/10/25
 
 #include <list.h>
 #include <stdio.h>
-#include <fs/fs.h>
+#include <fs/vfs.h>
+#include <fs/mmap.h>
 #include <regs.h>
+#include <tss.h>
 
 #define TASK_RUNNING		0x01
 #define TASK_SLEEPING		0x02
 #define TASK_WAITING		0x04
 #define TASK_START_WAITING	0x08
-
-#define TSS_DESC_DPL0 (0x00 << 1)
-#define TSS_DESC_DPL1 (0x01 << 1)
-#define TSS_DESC_DPL2 (0x02 << 1)
-#define TSS_DESC_DPL3 (0x03 << 1)
-
-#define TSS_DESC_P 0x80
-#define TSS_DESC_TYPE_AVAIL 0x9
-
-struct tss_descriptor {
-
-	unsigned short limit1;
-	unsigned short base1;
-	unsigned char base2;
-	unsigned char flags;
-	unsigned char limit2;
-	unsigned char base3;
-	unsigned int base4;
-	unsigned int reserved;
-} __attribute__((packed));
-
-struct tss {
-
-	unsigned int reserved1;
-	unsigned long rsp[3];
-	unsigned long reserved2;
-	unsigned long ist[7];
-	unsigned short reserved3[5];
-	unsigned short io_map_base;
-} __attribute__((packed));
 
 
 //スレッド構造体
@@ -83,8 +55,13 @@ struct process {
 	unsigned long start_brk;
 	unsigned long end_brk;
 
+	//ファイルディスクリプタマネージャー
 	struct file_descriptor *fd;
 	struct list_head fd_list;
+
+	unsigned long mmap_base;
+	struct list_head mmap_list;
+
 
 
 
@@ -92,7 +69,7 @@ struct process {
 	struct regs registers;
 
 
-	int flags;						//フラグ
+	unsigned int flags;				//フラグ
 };
 
 

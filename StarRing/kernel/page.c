@@ -94,7 +94,7 @@ void map_pt(unsigned long virt, unsigned long phys, unsigned long *pt, int flags
 
 	pt[pte] = phys | (page_flags);
 
-	kprintf("map_pt %p, phys %p\n", pt, phys);
+	//kprintf("map_pt %p, phys %p\n", pt, phys);
 }
 
 //ページディレクトリを構築する
@@ -142,7 +142,7 @@ void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags
 		} else {
 
 			pd[pde] = phys | (page_flags);
-			kprintf("map_pd %p, %p\n", pde, virt);
+			//kprintf("map_pd %p, %p\n", pde, virt);
 		}
 	} else {
 
