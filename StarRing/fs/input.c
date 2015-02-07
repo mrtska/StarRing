@@ -91,7 +91,7 @@ struct fs_node *create_input_device(char num) {
 
 	struct input_device_data *data = node->data;
 	data->cursor = 0;
-	kprintf("create_input_device %d\n", num);
+	//kprintf("create_input_device %d\n", num);
 
 	return node;
 }

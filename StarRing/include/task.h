@@ -75,13 +75,13 @@ struct process {
 	unsigned long *page_tables;		//ページテーブルを保管する領域
 	unsigned long *base;			//実際にELFが展開される先
 	struct fs_node *file;			//ファイルの本体のノード
-	unsigned char *file_base;		//ELFファイル本体の位置
+	void *file_base;				//ELFファイル本体の位置
 	unsigned long entry_point;		//エントリポイント
 	int cpu_id;						//このプロセスを実行中しているCPUのAPIC ID
 
-
-	unsigned long *heap_base;		//ヒープ領域
-	unsigned long brk;
+	//ヒープ領域
+	unsigned long start_brk;
+	unsigned long end_brk;
 
 	struct file_descriptor *fd;
 	struct list_head fd_list;

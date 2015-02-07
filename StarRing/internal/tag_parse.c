@@ -15,52 +15,54 @@ Created on: 2014/04/04
 #include <mem/alloc.h>
 
 
-unsigned long memory_size;
+static struct multiboot_tag_mmap* mb_tag_mmap;
 
 
-#include <mem/phys.h>
+//
+unsigned long get_max_physical_address(void) {
 
 
-void parse_mmap(struct multiboot_tag_mmap *tag) {
-
-	unsigned long memorysize = 0;
-
+	unsigned long memory_size = 0;
+	struct multiboot_tag_mmap *tag = mb_tag_mmap;
 
 	multiboot_memory_map_t *mmap;
 	for(mmap = ((struct multiboot_tag_mmap *) tag)->entries; (multiboot_uint8_t *) mmap < (multiboot_uint8_t *) tag + tag->size; mmap = (multiboot_memory_map_t*) ((unsigned long) mmap + ((struct multiboot_tag_mmap*) tag)->entry_size)) {
 
 		int type = mmap->type;
-		unsigned long len = mmap->len;
 		unsigned long addr = mmap->addr;
+		unsigned long len = mmap->len;
+		unsigned long size = addr + len;
 
-		if(len < MEMORY_BLOCK_SIZE) {
-			len = MEMORY_BLOCK_SIZE;
-		} else {
-			len = len / MEMORY_BLOCK_SIZE;
-		}
+		kprintf("type %d, addr %p, len %p\n", type, addr, len);
+		memory_size = (size > memory_size) ? size : memory_size;
+	}
+	return memory_size;
+}
+
+void parse_mmap(void) {
+
+	struct multiboot_tag_mmap *tag = mb_tag_mmap;
+
+	multiboot_memory_map_t *mmap;
+	for(mmap = ((struct multiboot_tag_mmap *) tag)->entries; (multiboot_uint8_t *) mmap < (multiboot_uint8_t *) tag + tag->size; mmap = (multiboot_memory_map_t*) ((unsigned long) mmap + ((struct multiboot_tag_mmap*) tag)->entry_size)) {
+
+		int type = mmap->type;
+		unsigned long addr = mmap->addr;
+		unsigned long len = mmap->len;
 
 		switch(type) {
-		case MULTIBOOT_MEMORY_AVAILABLE:
-			memorysize += mmap->len;
-			break;
 		case MULTIBOOT_MEMORY_RESERVED:
+		case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE:
+		case MULTIBOOT_MEMORY_NVS:
 
-			alloc_blocks(addr & 0xFFFFFFFFFFF00000, len);
+			alloc_blocks(addr, len);
 			break;
-		case 3:
-			alloc_blocks(addr & 0xFFFFFFFFFFF00000, len);
-			break;
-		case 4:
-			alloc_blocks(addr & 0xFFFFFFFFFFF00000, len);
+		case MULTIBOOT_MEMORY_BADRAM:
+
+			kprintf("Bad memory found.\n");
 			break;
 		}
-
-		kprintf("type %d, addr %p, len %p\n", mmap->type, mmap->addr, mmap->len);
-
 	}
-	memory_size = memorysize;
-	kprintf("memory_size %u\n", memorysize);
-
 }
 
 void tag_parse(unsigned long addr) {
@@ -91,7 +93,7 @@ void tag_parse(unsigned long addr) {
 			break;
 		case MULTIBOOT_TAG_TYPE_MMAP: {
 
-			parse_mmap((struct multiboot_tag_mmap*)tag);
+			mb_tag_mmap = (struct multiboot_tag_mmap*) tag;
 			break;
 		}
 		case MULTIBOOT_TAG_TYPE_FRAMEBUFFER: {

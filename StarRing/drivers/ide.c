@@ -17,6 +17,7 @@ Created on: 2014/10/09
 #include <desc.h>
 #include <apic.h>
 #include <page/page.h>
+#include <mem/alloc.h>
 
 
 //BUSYビットが折れるのを待つ
@@ -299,7 +300,7 @@ void ide_read_sector_via_dma(unsigned int lba, unsigned char *buf, int sector) {
 	//エラー回数
 	int error = 0;
 	struct prd *prd = (struct prd*) prdt_pointer;
-	void *p = alloc_memory_block(1);
+	void *p = alloc_memory_block();
 	set_prdt(prd, p, sector * 0x200);	//PRDTを設定
 
 	ata_ready();

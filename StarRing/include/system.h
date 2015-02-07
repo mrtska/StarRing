@@ -23,13 +23,7 @@ Created on: 2014/04/02
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-#define zeromem(s, n)	memset(s, 0, n)
 
-typedef unsigned char uc;
-typedef unsigned short us;
-typedef unsigned int ui;
-typedef unsigned long ul;
-typedef unsigned long long ull;
 typedef _Bool bool;
 
 #define true	1
@@ -147,27 +141,6 @@ static __inline__ unsigned int read_mxcsr(void) {
 	asmv("stmxcsr %0" : "=m"(value));
 	return value;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -11,6 +11,7 @@ Created on: 2014/08/12
 #include <slab.h>
 #include <internal/stdio.h>
 #include <spinlock.h>
+#include <mem/alloc.h>
 
 
 static int kmem_cache_grow(struct kmem_cache *cache, int flags);

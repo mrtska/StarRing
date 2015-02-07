@@ -12,6 +12,7 @@ Created on: 2014/04/05
 #include <gdt.h>
 #include <internal/stdio.h>
 #include <apic.h>
+#include <mem/alloc.h>
 
 //GDT本体
 struct gdt_page default_gdt_page = {
@@ -51,7 +52,7 @@ void gdt_init(void) {
 	gdtr->size = sizeof(struct gdt_page) - 1;
 	gdtr->address = (unsigned long) gdt_page;
 
-	kprintf("gdt_page %p, %p\n", gdt_page, gdtr);
+	//kprintf("gdt_page %p, %p\n", gdt_page, gdtr);
 
 	lgdt(gdtr);
 

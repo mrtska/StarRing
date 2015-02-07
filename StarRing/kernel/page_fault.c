@@ -13,7 +13,6 @@ Created on: 2014/04/30
 #include <regs.h>
 
 #include <page/page.h>
-#include <mem/phys.h>
 #include <apic.h>
 #include <task.h>
 #include <smp.h>
@@ -55,13 +54,6 @@ void do_page_fault(unsigned long fault_addr, struct regs_with_error *r) {
 	spin_unlock(&page_lock);
 	STOP;
 
-	if((r->i.rsp & 0xFFF000) == (fault_addr & 0xFFF000)) {
-
-		map_page(fault_addr, (unsigned long) alloc_memory_block(1), process->page_tables, FLAGS_USER_PAGE | FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE);
-		return;
-	}
-
-	STOP;
 
 	static int count;
 	if(++count == 1) {

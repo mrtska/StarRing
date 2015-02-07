@@ -19,6 +19,7 @@ Created on: 2014/11/06
 #include <msr.h>
 
 #include <page/page.h>
+#include <mem/alloc.h>
 
 #include <fs/fs.h>
 #include <fs/vfs.h>
@@ -360,31 +361,33 @@ long sys_brk(unsigned long brk) {
 
 	unsigned long start_brk	= 0xF000000;
 	//unsigned long end_brk	= 0xF100000;
+/*
 
 	if(!process->heap_base) {
 
-		process->heap_base = alloc_memory_block(1);
+		process->heap_base = alloc_memory_block();
 		process->brk = start_brk;
-		map_page(start_brk, (unsigned long) process->heap_base, process->page_tables, FLAGS_USER_PAGE | FLAGS_WRITABLE_PAGE | FLAGS_NO_EXECUTE);
+		map_page(start_brk, (unsigned long) process->heap_base, process->page_tables, FLAGS_USER_PAGE | FLAGS_WRITABLE_PAGE | FLAGS_NO_EXECUTE | FLAGS_LARGE_PAGE);
 	}
+*/
 
 
 	if(brk < start_brk) {
 
-		return process->brk;
+		return process->end_brk;
 	}
 
 
-	if(process->brk == brk) {
+	if(process->end_brk == brk) {
 
-		return process->brk;
+		return process->end_brk;
 	}
-	if (brk <= process->brk) {
-		process->brk = brk;
+	if (brk <= process->end_brk) {
+		process->end_brk = brk;
 		return brk;
 	}
 
-	return process->brk = brk;
+	return process->end_brk = brk;
 }
 
 

@@ -59,23 +59,14 @@ SECTIONS {
 		_bss_end = .;
 		*(COMMON)
 
-		. = ALIGN(0x10);
-
-		stack_pointer = .;
-
-		. += 0x100000;
 
 		. = ALIGN(0x10);
-		physical_memory_bitmap = .;
-		. += 0x1000;
-
 
 		ap_stack = .;
 		. += 0x20000;
+
 	}
 
-
-	. = ALIGN(0x1000);
 
 	kernel_end = .;
 
@@ -87,12 +78,4 @@ SECTIONS {
 	}
 
 }
-
-
-
-
-
-
-
-
 

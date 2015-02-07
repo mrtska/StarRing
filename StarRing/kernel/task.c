@@ -21,6 +21,7 @@ Created on: 2014/10/25
 #include <env.h>
 
 #include <fs/vfs.h>
+#include <mem/alloc.h>
 
 //プロセスを管理するリスト
 LIST_HEAD(processes);
@@ -142,20 +143,20 @@ int create_process(char *name, struct fs_node *node, int flags) {
 	//プロセスの初期化
 	struct process *process = kmalloc(sizeof(struct process), 0);
 	process->name = name;
-	process->stack = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block(1));
+	process->stack = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block());
 	process->pid = get_next_pid();
 	process->file = node;
 	process->userid = 0;
 
 	//ページテーブルの初期化
-	process->page_tables = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block(1));
-	process->base = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block(1));
+	process->page_tables = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block());
+	process->base = (unsigned long*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block());
 
 	//ヒープマネージャの初期化
 
 	//ファイルの初期化
 	process->file = node;
-	process->file_base = (unsigned char*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block(2));
+	process->file_base = (unsigned char*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block());
 
 	//ファイルディスクリプタリストを初期化
 	INIT_LIST_HEAD(&process->fd_list);
@@ -252,10 +253,10 @@ void run_process(struct process *process) {
 	int apic_id = apic_read(APIC_ID_R) >> 24;
 
 	load_elf_binary(process);
-	map_page(0x7FFFFFE00000, (unsigned long) alloc_memory_block(1), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE | FLAGS_LARGE_PAGE);	//スタック領域を0x7FFFFFFFF000に割り当てる
+	map_page(0x7FFFFFE00000, (unsigned long) alloc_memory_block(), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE | FLAGS_LARGE_PAGE);	//スタック領域を0x7FFFFFFFF000に割り当てる
 	elf64_create_table(process, 1, (unsigned char*)0x7FFFFFFFD000);
 
-	map_page(0xF0000000, VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(process->heap_base), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE);	//
+	//map_page(0xF0000000, VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(process->heap_base), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE | FLAGS_LARGE_PAGE);	//
 	smp_table[apic_id].execute_process = process;
 
 	kprintf("run process id = %d\n", apic_id);
@@ -279,7 +280,7 @@ void schedule(struct regs *registers) {
 		return;
 	}
 
-	struct process *current_process = smp_table[apic_id].execute_process;
+	struct process *current_process = get_process();
 
 	//kprintf("cur proc %p\n", current_process);
 

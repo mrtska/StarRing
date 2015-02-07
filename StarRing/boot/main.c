@@ -22,7 +22,6 @@ Created on: 2014/04/02
 #include <trap.h>
 #include <timer.h>
 #include <gdt.h>
-#include <mem/phys.h>
 #include <mem/alloc.h>
 #include <page/page.h>
 
@@ -124,12 +123,19 @@ void main(unsigned long magic, unsigned long mboot) {
 
 	kprintf("Welcome to StarRing! (compiled at (Date %s), (Time %s))\n", __DATE__, __TIME__);
 
+
+
 	//GRUB2からの情報をパースする
 	tag_parse(mboot);
 
+	unsigned long memory_size = get_max_physical_address();
+	kprintf("physical memory size %p\n", memory_size);
 
 	//ページアロケーター初期化
 	allocator_init(memory_size);
+
+
+
 
 	//仮想メモリマネージャー初期化
 	vmm_allocator_init();
@@ -297,7 +303,7 @@ void do_ap_main(void) {
 	asmv("sti");
 	smp_table_set_flags(apic_id, SMP_PROCESSOR_INTERRUPT_RECEIVABLE);
 
-	kprintf("ap_main id = %d\n", apic_id);
+	//kprintf("ap_main id = %d\n", apic_id);
 
 	//APはアイドル時、ここのHLTで止まっている
 	while(1) {

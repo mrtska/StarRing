@@ -56,8 +56,6 @@ void smp_init(void) {
 
 	//BSP
 	smp_table[apic_read(APIC_ID_R) >> 24].flags |= SMP_PROCESSOR_BSP | SMP_PROCESSOR_EXISTED | SMP_PROCESSOR_ENABLED | SMP_PROCESSOR_INTERRUPT_RECEIVABLE;
-
-	kprintf("bsp table %b\n", smp_table[0].flags);
 }
 
 

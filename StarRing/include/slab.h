@@ -13,7 +13,6 @@ Created on: 2014/07/30
 #include <string.h>
 #include <list.h>
 #include <system.h>
-#include <mem/phys.h>
 
 
 typedef unsigned long kmem_bufctl;

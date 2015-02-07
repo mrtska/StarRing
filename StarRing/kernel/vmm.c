@@ -19,7 +19,7 @@ struct vmm vmm;
 void vmm_allocator_init() {
 
 
-	unsigned long p = (unsigned long)  alloc_memory_block(1);
+	unsigned long p = (unsigned long)  alloc_memory_block();
 	p += 0xFFFF880000000000;
 	vmm.base = (unsigned char*) p;
 
