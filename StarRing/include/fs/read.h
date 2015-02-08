@@ -13,7 +13,9 @@ Created on: 2015/01/24
 
 #include <system.h>
 #include <fs/iovec.h>
+#include <string.h>
 
+long read(unsigned long fd, const char *buf, size_t count);
 int readv(unsigned long fd, const struct iovec *vec, unsigned long vlen);
 
 

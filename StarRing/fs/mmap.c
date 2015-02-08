@@ -68,7 +68,7 @@ static unsigned long mmap_anon_4k(struct process *process, unsigned long len, un
 
 	unsigned long addr = get_mmap_address(process, len);
 
-	map_page(addr, (unsigned long) alloc_memory_block_4k_phys(), process->page_tables, page_flags);
+	map_page(addr, (unsigned long) alloc_memory_block(), process->page_tables, page_flags | FLAGS_LARGE_PAGE);
 
 	return addr;
 }

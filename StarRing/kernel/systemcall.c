@@ -197,8 +197,8 @@ void sys_exit(int err_code) {
 
 long sys_read(unsigned int fd, char *buf, size_t count) {
 
-	trace();
-	return 0;
+	kprintf("[kernel/sys_read] fd %d, buf %p, count %X\n", fd, buf, count);
+	return read(fd, buf, count);
 }
 
 long sys_write(unsigned int fd, const char *buf, size_t count) {
@@ -209,7 +209,7 @@ long sys_write(unsigned int fd, const char *buf, size_t count) {
 
 unsigned long sys_open(const char *filename, int flags, int mode) {
 
-	kprintf("[kernel/sys_open] file %s, flags %X, mode %X\n", filename, flags, mode);
+	//kprintf("[kernel/sys_open] file %s, flags %X, mode %X\n", filename, flags, mode);
 	return open(filename, flags, mode);
 }
 int sys_close(unsigned int fd) {

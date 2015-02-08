@@ -13,6 +13,22 @@ Created on: 2015/01/24
 #include <fs/vfs.h>
 #include <fs/fcntl.h>
 
+
+long read(unsigned long fd, const char *buf, size_t count) {
+
+
+	struct fs_node *node = get_node(fd);
+
+	if(!node) {
+
+		kprintf("[kernel/read] can not find file\n");
+		return -EMFILE;
+	}
+
+	read_fs(node, node->seek, count, (unsigned char*) buf);
+	return count;
+}
+
 int readv(unsigned long fd, const struct iovec *vec, unsigned long vlen) {
 
 

@@ -42,6 +42,6 @@ static __inline__ unsigned long read_msr(unsigned int msr) {
 
 static __inline__ void write_msr(unsigned int msr, unsigned long val) {
 
-	asmv("wrmsr" : /* no output */ : "c" (msr), "a" (val), "d" (val >> 32) : "memory");
+	asmv("wrmsr" : : "c" (msr), "a" (val), "d" (val >> 32) : "memory");
 }
 
