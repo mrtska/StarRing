@@ -1,12 +1,12 @@
 /*
-[Module fat32.c]
-Copyright(c) 2015 mrtska.starring
+ [Module fat32.c]
+ Copyright(c) 2015 mrtska.starring
 
-This software is released under the MIT License.
+ This software is released under the MIT License.
 
-http://opensource.org/licenses/mit-license.php
-Created on: 2014/10/05
-*/
+ http://opensource.org/licenses/mit-license.php
+ Created on: 2014/10/05
+ */
 
 #include <fs/fat32.h>
 #include <drivers/ide.h>
@@ -14,9 +14,6 @@ Created on: 2014/10/05
 #include <string.h>
 #include <internal/stdio.h>
 #include <fs/vfs.h>
-
-
-
 
 //FAT32の情報を格納 グローバル変数での実装は複数のFAT32デバイスに対応できないので FIXME
 struct fat32_info info;
@@ -69,6 +66,8 @@ void fat32_filesystem_init(void) {
 	root_node.write = fat32_fwrite;
 	root_node.finddir = fat32_finddir;
 
+	root_node.flags = FS_READONLY;
+
 	//VFSのルートにマウント FIXME
 	vfs_mount("/", &root_node);
 }
@@ -104,7 +103,6 @@ static int read_directory_entry(const char *path, struct fat32_directory_entry *
 		//ロードしたディレクトリエントリを走査して該当するものを探す
 		int i;
 		for(i = 0; (entry[i].DIR_Name[0] & 0xFF) != 0x00; i++) {
-
 
 			//ディレクトリエントリが無効なエントリだったらスルーする
 			if((entry[i].DIR_Name[0] & 0xFF) == 0xE5) {
@@ -160,8 +158,7 @@ static int read_directory_entry(const char *path, struct fat32_directory_entry *
 
 		goto fail;
 	}
-fail:
-STOP;
+	fail:
 	kprintf("can not find %s\n", path);
 	kfree(lbuf, 0x200);	//ファイルを見つけられなかった時はfreeする
 	return -1;
@@ -315,6 +312,8 @@ struct fs_node *fat32_file_init(const char *filename) {
 	node->write = fat32_fwrite;
 	node->finddir = fat32_finddir;
 
+	node->flags |= FS_READONLY;
+
 	node->seek = 0;
 	node->data = kmalloc(sizeof(struct fat32_cluster_cache), 0);
 
@@ -324,24 +323,22 @@ struct fs_node *fat32_file_init(const char *filename) {
 //fopen関数 FIXME
 void fat32_fopen(struct fs_node *node, unsigned int flags) {
 
-	/*
-	 unsigned char buf[0x200];
-	 //kprintf("[fat32/fopen] path = %s\n", node->filename);
-	 read_fs(node, 0x200, 1, buf);
+	unsigned char buf[0x100];
+	//kprintf("[fat32/fopen] path = %s\n", node->filename);
+	read_fs(node, 0, 0x100, buf);
 
-	 if(strncmp("!<symlink>", (char*) buf, 10) == 0) {
+	if(strncmp("!<symlink>", (char*) buf, 10) == 0) {
 
-	 node->flags |= FS_SYMLINK;
-	 char name[0x100];
-	 strcpy(name, node->filename);
-	 char *n = strrchr(name, '/') + 1;
-	 *n = 0;
-	 //kprintf("sym fopen %s\n", name);
+		node->flags |= FS_SYMLINK;
+		char name[0x100];
+		strcpy(name, node->filename);
+		char *n = strrchr(name, '/') + 1;
+		*n = 0;
+		kprintf("[fat32/fopen] sym fopen %s\n", name);
 
-	 node->ptr = kopen(strcat(name, (char*) &buf[0xA]), 0);
-	 node->length = node->ptr->length;
-	 }
-	 */
+		node->ptr = kopen(strcat(name, (char*) &buf[0xA]), 0);
+		node->length = node->ptr->length;
+	}
 
 }
 
@@ -363,7 +360,6 @@ static void read_block_by_lba(unsigned long lba, int sector, void *p) {
 
 static unsigned long read_block_by_cluster(unsigned int cluster, unsigned char *p) {
 
-
 	unsigned long lba = info.root_directory_entry + (cluster - 2) * info.boot_sectors->BPB_SecPerClus;
 	ide_read_sector_via_dma(lba, p, 0x20);
 	//kprintf("read sector %X lba %X,      %X %X\n", p, lba, p[0], p[1]);
@@ -382,6 +378,7 @@ static unsigned int *read_fat(struct fat32_cluster_cache *cache, unsigned int st
 
 		return cache->clusters;
 	}
+	cache->dirty = 0;
 
 	unsigned int fat_sector = info.FAT_region + (start_cluster * 4 / info.boot_sectors->BPB_BytsPerSec);
 	unsigned int fat_offset = (start_cluster * 4) % info.boot_sectors->BPB_BytsPerSec;
@@ -432,6 +429,7 @@ unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int
 
 		kprintf("symbolic link %s\n", node->ptr->filename);
 		read_directory_entry(node->ptr->filename, &file);
+		cache->dirty = 1;
 	} else {
 
 		read_directory_entry(node->filename, &file);
@@ -481,32 +479,34 @@ unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int
 				break;
 			}
 
-			kprintf("[fat32/fread] read end\n");
-			memcpy(buffer, buf, OFFSET_MASK(offset));
+			kprintf("[fat32/fread] read end, %X, %p\n", i * info.cluster_size, buffer);
+			//memcpy(buffer, buf, OFFSET_MASK(offset));
+			memcpy(buffer, buf, info.cluster_size - (i * info.cluster_size - size));
 			break;
 		}
 		//最初はオフセットを考慮する
 		if(i == 1) {
 
 			memcpy(buffer, buf + OFFSET_MASK(offset), info.cluster_size - OFFSET_MASK(offset));
+			buffer += info.cluster_size - OFFSET_MASK(offset);
 		} else {
 
 			memcpy(buffer, buf, info.cluster_size);
+			buffer += info.cluster_size;
 		}
 		//バッファを進める
-		buffer += info.cluster_size;
 	}
-/*
-	unsigned char *dist_buf = buffer;
-	buf = dist_buf;
-	kprintf("buffer dump\n");
-	for(i = 0; i < 0x10; i++) {
+	/*
+	 unsigned char *dist_buf = buffer;
+	 buf = dist_buf;
+	 kprintf("buffer dump\n");
+	 for(i = 0; i < 0x10; i++) {
 
-		kprintf("%2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X\n",
-				buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], buf[12], buf[13], buf[14], buf[15]);
-		buf += 0x10;
-	}
-	STOP;*/
+	 kprintf("%2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X, %2X\n",
+	 buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7], buf[8], buf[9], buf[10], buf[11], buf[12], buf[13], buf[14], buf[15]);
+	 buf += 0x10;
+	 }
+	 STOP;*/
 
 	return 0;
 }
