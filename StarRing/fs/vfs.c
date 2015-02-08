@@ -221,6 +221,11 @@ unsigned int read_fs(struct fs_node *node, unsigned int offset, unsigned int siz
 //ファイルシステムにファイルを書き込む
 unsigned int write_fs(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer) {
 
+	if(node->flags & FS_READONLY) {
+
+		return -1;
+	}
+
 	if(node->write) {
 
 		return node->write(node, offset, size, buffer);

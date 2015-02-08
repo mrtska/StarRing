@@ -19,7 +19,6 @@ LIST_HEAD(env);
 void environment_valiable_init(void) {
 
 	struct fs_node *node = kopen("/config/env", 0);
-	struct env_entry *entry = kmalloc(sizeof(struct env_entry), 0);
 	unsigned char *p = kmalloc(node->length, 0);
 
 
@@ -29,15 +28,16 @@ void environment_valiable_init(void) {
 
 	while(tok != NULL) {
 
+		struct env_entry *entry = kmalloc(sizeof(struct env_entry), 0);
 		char *buf = kmalloc(0x100, 0);
 		kprintf("env %s\n", tok);
 		strcpy(buf, tok);
 		entry->name = buf;
 
 		tok = strtok(0, '\n');
+		list_add_tail(&entry->list, &env);
 	}
 
-	list_add_tail(&entry->list, &env);
 }
 
 

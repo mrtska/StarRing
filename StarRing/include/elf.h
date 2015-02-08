@@ -276,7 +276,7 @@ int load_elf64_shared_library(struct process *process, struct elf64_dynamic_tabl
 
 
 
-void elf64_create_table(struct process *process, int argc, void *p);
+void elf64_create_table(struct process *process, void *p);
 
 
 

@@ -47,8 +47,11 @@ struct process {
 	unsigned long *page_tables;		//ページテーブルを保管する領域
 	unsigned long *base;			//実際にELFが展開される先
 	struct fs_node *file;			//ファイルの本体のノード
-	void *file_base;				//ELFファイル本体の位置
+	void *elf_base;					//ELFファイル本体の位置
+	void *interp_base;				//インタープリターの本体の位置
+	unsigned long interp_addr;
 	unsigned long entry_point;		//エントリポイント
+	unsigned long entry_interp;
 	int cpu_id;						//このプロセスを実行中しているCPUのAPIC ID
 
 	//ヒープ領域
@@ -62,7 +65,8 @@ struct process {
 	unsigned long mmap_base;
 	struct list_head mmap_list;
 
-
+	int argc;
+	char *cmdline;
 
 
 
@@ -77,7 +81,7 @@ struct process {
 void schedule(struct regs *registers);
 void task_init(void);
 void tss_init(void);
-int create_process(char *name, struct fs_node *node, int flags);
+int create_process(char *name, struct fs_node *node, int argc, char *cmdline, int flags);
 
 struct process *lookup_process_by_pid(int pid);
 

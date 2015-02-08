@@ -134,10 +134,10 @@ void task_init(void) {
 
 	struct fs_node *f = kopen("/init.elf", 0);
 
-	create_process("init", f, 0);
+	create_process("init", f, 2, "--list", 0);
 }
 
-int create_process(char *name, struct fs_node *node, int flags) {
+int create_process(char *name, struct fs_node *node, int argc, char *cmdline, int flags) {
 
 	//プロセスの初期化
 	struct process *process = kmalloc(sizeof(struct process), 0);
@@ -155,10 +155,15 @@ int create_process(char *name, struct fs_node *node, int flags) {
 
 	//ファイルの初期化
 	process->file = node;
-	process->file_base = (unsigned char*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block());
+	process->elf_base = (void*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block());
+	process->interp_base = (void*) PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(alloc_memory_block());
+	process->interp_addr = 0x7FFFF0000000;
 
 	process->mmap_base = 0x7F0000000000;
 	INIT_LIST_HEAD(&process->mmap_list);
+
+	process->argc = argc;
+	process->cmdline = cmdline;
 
 	//ファイルディスクリプタリストを初期化
 	INIT_LIST_HEAD(&process->fd_list);
@@ -168,8 +173,12 @@ int create_process(char *name, struct fs_node *node, int flags) {
 	struct file_descriptor *stderr = kmalloc(sizeof(struct file_descriptor), 0);
 
 	stdin->fd = 0;
+
 	stdout->fd = 1;
+	stdout->node = kopen("/dev/stdout", 0);
+
 	stderr->fd = 2;
+	stderr->node = kopen("/dev/stderr", 0);
 
 	list_add_tail(&stdin->list, &process->fd_list);
 	list_add_tail(&stdout->list, &process->fd_list);
@@ -196,7 +205,7 @@ void enter_user_64(struct process *process, unsigned int apic_id) {
 	//smp_table[apic_id].flags &= ~SMP_PROCESSOR_INTERRUPT_RECEIVABLE;
 
 	//エントリポイント
-	unsigned long entry = process->entry_point;
+	unsigned long entry = process->entry_interp;
 
 
 	kprintf("enter_user_64 id = %d, entry = %p\n", apic_id, entry);
@@ -252,11 +261,11 @@ void save_registers(struct regs *registers, struct process *process) {
 void run_process(struct process *process) {
 
 	//APIC ID
-	int apic_id = apic_read(APIC_ID_R) >> 24;
+	int apic_id = get_apic_id();
 
 	load_elf_binary(process);
 	map_page(0x7FFFFFE00000, (unsigned long) alloc_memory_block(), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE | FLAGS_LARGE_PAGE);	//スタック領域を0x7FFFFFFFF000に割り当てる
-	elf64_create_table(process, 1, (unsigned char*)0x7FFFFFFFD000);
+	elf64_create_table(process, (unsigned char*)0x7FFFFFFFD000);
 
 	//map_page(0xF0000000, VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(process->heap_base), process->page_tables, FLAGS_WRITABLE_PAGE | FLAGS_USER_PAGE | FLAGS_LARGE_PAGE);	//
 	smp_table[apic_id].execute_process = process;

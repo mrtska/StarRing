@@ -48,6 +48,7 @@ Created on: 2014/04/02
 #include <fs/fat32.h>
 #include <fs/input.h>
 #include <fs/stdout.h>
+#include <fs/stderr.h>
 
 //BSSセクション
 extern unsigned int _bss_start;
@@ -234,7 +235,8 @@ void main(unsigned long magic, unsigned long mboot) {
 	//マウントポイント作成
 	vfs_mount("/dev/null", create_null_device());
 	vfs_mount("/dev/zero", create_null_device());
-	vfs_mount("/dev/tty", create_stdout());
+	vfs_mount("/dev/stdout", create_stdout());
+	vfs_mount("/dev/stderr", create_stderr());
 
 	environment_valiable_init();
 

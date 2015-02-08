@@ -20,9 +20,9 @@ Created on: 2015/01/27
 
 struct input_device_data {
 
-	int key_code[0x100];
-	int cursor;
-	int count;
+	unsigned int key_code[0x100];
+	unsigned int cursor;
+	unsigned int count;
 };
 
 

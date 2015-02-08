@@ -45,18 +45,18 @@ void find_memory_block(unsigned long *block_num) {
 			//全てのビットを走査
 			for(bit_count = 0; bit_count < 64; bit_count++) {
 
-				if(!test_bit(bit_count)) {
+				if(!test_bit((bitmap_index * 64) + bit_count)) {
 
 					*block_num = bitmap_index * (sizeof(unsigned long) * 8) + bit_count;
 					return;
 				}
 			}
 		}
-
-		kprintf("[memoryallocater/find_memory_block] free memory not found.\n");
-		STOP;
-		return;
 	}
+
+	kprintf("[memoryallocater/find_memory_block] free memory not found. %d\n", bitmap_index);
+	STOP;
+	return;
 }
 
 //1ページ分(2MB)を使用中にする
@@ -163,6 +163,7 @@ void allocator_init(unsigned long memory_size) {
 
 	void *physical_memory_bitmap = (void*) 0xFFFF880000400000;
 
+
 	phys_memory.memory_size = memory_size;							//メモリサイズを代入
 	phys_memory.memory_blocks = memory_size / MEMORY_BLOCK_SIZE;	//メモリブロックサイズで割って必要なメモリブロック数を代入する
 	phys_memory.free_blocks = phys_memory.memory_blocks;			//初期値は0
@@ -170,7 +171,7 @@ void allocator_init(unsigned long memory_size) {
 	phys_memory.bit_map = physical_memory_bitmap;					//実体はbootlinker.ldに 最大32TBまで対応
 
 	phys_memory.map_size = phys_memory.memory_blocks / 64;			//unsigned longで一つの要素に付き64x0x200000バイト管理できるので64で割ったサイズがマップサイズになる
-
+	memset(physical_memory_bitmap, 0x00, phys_memory.map_size);
 	kprintf("memory blocks = %p\n", phys_memory.bit_map);
 
 	memory_allocate_and_free();							//メモリマップをビットマップに反映する

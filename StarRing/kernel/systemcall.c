@@ -45,11 +45,13 @@ long sys_read(unsigned int fd, char *buf, size_t count);
 long sys_write(unsigned int fd, const char *buf, size_t count);
 unsigned long sys_open(const char *filename, int flags, int mode);
 int sys_close(unsigned int fd);
-
+int sys_stat(const char *filename, struct stat *statbuf);
 int sys_fstat(unsigned int fd, struct stat *statbuf);
 
 unsigned long sys_lseek(unsigned int fd, unsigned long offset, unsigned int whence);
 long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset);
+
+long sys_munmap(unsigned long addr, unsigned long len);
 int sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg);
 long sys_readv(unsigned long fd, const struct iovec *vec, unsigned long vlen);
 long sys_writev(unsigned long fd, const struct iovec *vec, unsigned long vlen);
@@ -75,9 +77,9 @@ void sys_exit_group(int exit_code);
 long sys_set_tid_address(int *tidptr);
 unsigned long systemcall_table[] = {
 
-(unsigned long) sys_read, (unsigned long) sys_write, (unsigned long) sys_open, (unsigned long) sys_close, 0, (unsigned long) sys_fstat,	//0 ~ 5
+(unsigned long) sys_read, (unsigned long) sys_write, (unsigned long) sys_open, (unsigned long) sys_close, (unsigned long)sys_stat, (unsigned long) sys_fstat,	//0 ~ 5
 		0, 0, (unsigned long) sys_lseek, (unsigned long) sys_mmap, 0,	//10
-		0, (unsigned long) sys_brk, 0, 0, 0,	//15
+		(unsigned long)sys_munmap, (unsigned long) sys_brk, 0, 0, 0,	//15
 		(unsigned long) sys_ioctl, 0, 0, (unsigned long) sys_readv, (unsigned long) sys_writev,	//20
 		(unsigned long) sys_access, 0, 0, 0, 0,	//25
 		0, 0, 0, 0, 0,	//30
@@ -212,9 +214,15 @@ unsigned long sys_open(const char *filename, int flags, int mode) {
 }
 int sys_close(unsigned int fd) {
 
-	kprintf("sys_close %d\n", fd);
+	kprintf("[kernel/sys_close] fd %d\n", fd);
 
 	return close(fd);
+}
+
+int sys_stat(const char *filename, struct stat *statbuf) {
+
+	kprintf("[kernel/sys_stat] name %s, stat %p\n", filename, statbuf);
+	return stat(filename, statbuf);
 }
 
 int sys_fstat(unsigned int fd, struct stat *statbuf) {
@@ -233,6 +241,15 @@ long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigne
 	kprintf("[kernel/sys_mmap] %p, len %X, prot %X, flags %X, fd %X, offset %X\n", addr, len, prot, flags, fd, offset);
 	return mmap(addr, len, prot, flags, fd, offset);
 }
+
+
+
+long sys_munmap(unsigned long addr, unsigned long len) {
+
+	kprintf("[kernel/sys_munmap] addr %p, len %p\n", addr, len);
+	return munmap(addr, len);
+}
+
 int sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg) {
 
 	kprintf("sys_ioctl fd %d, cmd %X, arg %p\n", fd, cmd, arg);
@@ -247,7 +264,7 @@ long sys_readv(unsigned long fd, const struct iovec *vec, unsigned long vlen) {
 
 long sys_writev(unsigned long fd, const struct iovec *vec, unsigned long vlen) {
 
-	//kprintf("[kernel/sys_writev] fd %d, vec %p, vlen %X\n", fd, vec, vlen);
+	kprintf("[kernel/sys_writev] fd %d, vec %p, vlen %X\n", fd, vec, vlen);
 	return writev(fd, vec, vlen);
 }
 
@@ -326,7 +343,9 @@ long sys_brk(unsigned long brk) {
 
 	kprintf("[kernel/sys_brk] %p\n", brk);
 
-	struct process *process = smp_table[apic_read(APIC_ID_R) >> 24].execute_process;
+	struct process *process = get_process();
+
+	kprintf("[kernel/sys_brk] start %p, end %p\n", process->start_brk, process->end_brk);
 
 	if(!process) {
 

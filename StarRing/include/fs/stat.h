@@ -57,8 +57,8 @@ struct stat {
 	unsigned int st_mode;
 	unsigned int st_uid;
 	unsigned int st_gid;
-
 	unsigned int __pad0;
+
 	unsigned long st_rdev;
 	unsigned long st_size;
 	unsigned long st_blksize;
@@ -74,6 +74,8 @@ struct stat {
 };
 
 
+
+int stat(const char *filename, struct stat *statbuf);
 int fstat(unsigned int fd, struct stat *statbuf);
 
 

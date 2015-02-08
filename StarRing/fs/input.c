@@ -19,7 +19,7 @@ static unsigned int read_input(struct fs_node *node, unsigned int offset, unsign
 	struct input_device_data *data = node->data;
 	*buffer = data->key_code[data->cursor];
 	data->key_code[data->cursor] = 0;
-	if(data->cursor == 0) {
+	if(data->cursor <= 0) {
 
 		return 1;
 	}
@@ -28,10 +28,10 @@ static unsigned int read_input(struct fs_node *node, unsigned int offset, unsign
 	return 1;
 }
 
-static unsigned int write_input(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer) {
+static unsigned int write_input(struct fs_node *node, unsigned int offset, unsigned int size, unsigned int *buffer) {
 
 	struct input_device_data *data = node->data;
-	data->key_code[data->cursor] = *(unsigned int*)buffer;
+	data->key_code[data->cursor] = *buffer;
 	data->cursor++;
 	return 1;
 }
@@ -53,10 +53,10 @@ void wait_type_key(unsigned int key_code) {
 
 	int apic_id = get_apic_id();
 	struct input_device_data buf;
-
+	memset(&buf, 0x00, sizeof(struct input_device_data));
 
 	io_apic_set_cpu(1, apic_id);
-	while((buf.key_code[buf.cursor] & 0xFF) != key_code) {
+	while(buf.key_code[buf.cursor] != key_code) {
 
 
 		read_fs(smp_table_get_input_node(apic_id), 0, 0, (void*)&buf);
@@ -66,7 +66,7 @@ void wait_type_key(unsigned int key_code) {
 			continue;
 		}
 
-		kkprintf("wait type %X, type %X\n", key_code, buf.key_code[buf.cursor] & 0xFF);
+		kkprintf("wait type %X, type %X, cursor %d\n", key_code, buf.key_code[buf.cursor], buf.cursor);
 
 		asmv("sti;hlt");
 

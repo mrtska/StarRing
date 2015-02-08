@@ -47,7 +47,7 @@ struct mmap_entry {
 
 
 unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset);
-
+long munmap(unsigned long addr, unsigned long len);
 
 
 

@@ -244,11 +244,7 @@ page_fault:
 //システムコールハンドラ
 systemcall_handler:
 
-/*
-cli
-1:
-hlt
-jmp 1b*/
+
 	//ユーザースタックを退避
 	movq %rsp, user_stack
 	//システムコールスタックを代入
@@ -293,8 +289,6 @@ jmp 1b*/
 
 	//ユーザースタックへ
 	movq user_stack, %rsp
-
-
 
 	//Ring-3へ
 	sysretq

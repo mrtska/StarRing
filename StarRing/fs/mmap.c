@@ -27,6 +27,23 @@ static void register_mmap_entry(struct process *process, unsigned long addr, uns
 	list_add_tail(&entry->list, &process->mmap_list);
 }
 
+static int unregister_mmap_entry(struct process *process, unsigned long addr, unsigned long len) {
+
+	struct list_head *ptr;
+	list_for_each(ptr, &process->mmap_list) {
+
+		struct mmap_entry *entry = list_entry(ptr, struct mmap_entry, list);
+
+		if(entry->addr == addr && entry->len == len) {
+
+			//FIXME
+			return 0;
+		}
+	}
+
+	return -1;
+}
+
 static unsigned long get_mmap_address(struct process *process, unsigned long len) {
 
 	unsigned long base = process->mmap_base;
@@ -99,7 +116,11 @@ unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, un
 	return 0;
 }
 
+long munmap(unsigned long addr, unsigned long len) {
 
+
+	return unregister_mmap_entry(get_process(), addr, len);
+}
 
 
 
