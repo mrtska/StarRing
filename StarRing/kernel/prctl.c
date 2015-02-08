@@ -11,8 +11,10 @@ http://opensource.org/licenses/mit-license.php
 #include <system.h>
 #include <gdt.h>
 #include <apic.h>
+#include <msr.h>
 
-
+#define MSR_FS_BASE		0xc0000100
+#define MSR_GS_BASE		0xc0000101
 
 long arch_prctl(int code, unsigned long addr) {
 
@@ -23,24 +25,34 @@ long arch_prctl(int code, unsigned long addr) {
 
 	case ARCH_SET_FS: {
 
+		if(addr <= 0xFFFFFFFF) {
 
-		struct desc_struct *desc = &get_gdt(apic_id)->gdt[GDT_ENTRY_TLS_MIN];
+			struct desc_struct *desc = &get_gdt(apic_id)->gdt[GDT_ENTRY_TLS_MIN];
 
-		desc->base0 = addr & 0xFFFF;
-		desc->base1 = (addr & 0x00FF0000) >> 16;
-		desc->base2 = (addr & 0xFF000000) >> 24;
-		desc->s = 1;
-		desc->dpl = 0x3;
-		desc->p = 1;
-		desc->limit = 0xF;
-		desc->limit0 = 0xFFFF;
-		desc->d = 1;
-		desc->g = 1;
-		desc->avl = 1;
-		desc->l = 0;
-		desc->type = 3;
-		asmv("mov %0, %%ax" : : "i"(GDT_ENTRY_FS_TLS_SEL));
-		asmv("mov %ax, %fs");
+			desc->base0 = addr & 0xFFFF;
+			desc->base1 = (addr & 0x00FF0000) >> 16;
+			desc->base2 = (addr & 0xFF000000) >> 24;
+			desc->s = 1;
+			desc->dpl = 0x3;
+			desc->p = 1;
+			desc->limit = 0xF;
+			desc->limit0 = 0xFFFF;
+			desc->d = 1;
+			desc->g = 1;
+			desc->avl = 1;
+			desc->l = 0;
+			desc->type = 3;
+			asmv("mov %0, %%ax" : : "i"(GDT_ENTRY_FS_TLS_SEL));
+			asmv("mov %ax, %fs");
+		} else {
+
+
+			asmv("mov $0, %ax");
+			asmv("mov %ax, %fs");
+			write_msr(MSR_FS_BASE, addr);
+		}
+
+
 		break;
 	}
 	}
