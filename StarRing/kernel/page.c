@@ -274,7 +274,7 @@ void map_pml4(unsigned long virt, unsigned long phys, unsigned long *pml4, int f
 //ページをマップする cr3は仮想アドレスを指定する
 void map_page(unsigned long virt, unsigned long phys, unsigned long *cr3, int flags) {
 
-
+	kprintf("[kernel/map_page] %p\n", virt);
 	map_pml4(virt, phys, cr3, flags);
 }
 

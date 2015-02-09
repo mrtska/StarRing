@@ -81,6 +81,45 @@ int vprintf(const char *format, va_list args) {
 	return ret;
 }
 
+int vvprintf(const char *format, void **args) {
+
+	char buf[256];
+
+	int ret = vvsprintf(buf, format, args);
+
+
+	unsigned char *c = (unsigned char*) buf;
+	while(*c) {
+		if(*c == '\n') {
+			x = 0;
+			y++;
+			c++;
+			if(y >= 25) {
+				y = 24;
+				scroll();
+			}
+			continue;
+		}
+		print(*c, x++, y, (0x07 & 0x0F));
+		if(x == 80) {
+			x = 0;
+			y++;
+		}
+		if(y >= 25) {
+			y = 24;
+			scroll();
+		}
+		c++;
+	}
+	int cur_pos = x + y * 80;
+	outb(0x3D4, 15);
+	outb(0x3D5, cur_pos);
+	outb(0x3D4, 14);
+	outb(0x3D5, cur_pos >> 8);
+
+	return ret;
+}
+
 
 int kkprintf(const char *format, ...) {
 
@@ -491,4 +530,168 @@ int vsprintf(char *buf, const char *format, va_list args) {
 	return str - buf;
 }
 
+int vvsprintf(char *buf, const char *format, void **args) {
+
+	int len;
+	unsigned long num;
+	int i;
+	int base;
+	char *str;
+	const char *s;
+
+	int flags;
+
+	int field_width;
+	int precision;
+
+	int qualifier;
+
+
+	//フォーマット指定子パース処理
+	for(str = buf; *format; ++format) {
+		if(*format != '%') {
+			*str++ = *format;
+			continue;
+		}
+		flags = 0;
+		reqeat: ++format;
+		switch(*format) {
+		case '-':
+			flags |= LEFT;
+			goto reqeat;
+		case '+':
+			flags |= PLUS;
+			goto reqeat;
+		case ' ':
+			flags |= SPACE;
+			goto reqeat;
+		case '#':
+			flags |= SPECIAL;
+			goto reqeat;
+		case '0':
+			flags |= ZEROPAD;
+			goto reqeat;
+		}
+
+		field_width = -1;
+		if(isdigit(*format)) {
+			field_width = skip_atoi(&format);
+		} else if(*format == '*') {
+			++format;
+			field_width = *(int*)*args++;
+			if(field_width < 0) {
+				field_width = -field_width;
+				flags |= LEFT;
+			}
+		}
+		precision = -1;
+		if(*format == '.') {
+			++format;
+			if(isdigit(*format)) {
+				precision = skip_atoi(&format);
+			} else if(*format == '*') {
+				++format;
+				//次のフォーマット指定子に移る
+				precision = *(int*) *args++;
+			}
+			if(precision < 0) {
+				precision = 0;
+			}
+		}
+
+		qualifier = -1;
+		if(*format == 'h' || *format == 'l' || *format == 'L') {
+			qualifier = *format;
+			++format;
+		}
+		base = 10;
+		//%xのxの部分の処理
+		switch(*format) {
+		case 'b':
+
+			str = number(str, (unsigned long) *args++, 2, field_width, 0, flags);
+			continue;
+		case 'c':
+			if(!(flags & LEFT)) {
+				while(--field_width > 0) {
+					*str++ = ' ';
+				}
+			}
+			*str++ = *(unsigned char*) *args++;
+			while(--field_width > 0) {
+				*str++ = ' ';
+			}
+			continue;
+		case 's':
+			s = *args++;
+			len = strnlen(s, precision);
+			if(!(flags & LEFT)) {
+				while(len < field_width--) {
+					*str++ = ' ';
+				}
+			}
+			for(i = 0; i < len; ++i) {
+				*str++ = *s++;
+			}
+			while(len < field_width--) {
+				*str++ = ' ';
+			}
+			continue;
+		case 'p':
+			if(field_width == -1) {
+				field_width = 2 * sizeof(void*);
+				flags |= ZEROPAD;
+			}
+			str = number(str, (unsigned long) *args++, 16, field_width, precision, flags);
+			continue;
+		case 'n':
+			if(qualifier == 'l') {
+				long *ip = *args++;
+				*ip = (str - buf);
+			} else {
+				int *ip = *args++;
+				*ip = (str - buf);
+			}
+			continue;
+		case '%':
+			*str++ = '%';
+			continue;
+		case 'o':
+			base = 8;
+			break;
+		case 'x':
+			flags |= SMALL;
+		case 'X':
+			base = 16;
+			break;
+		case 'd':
+		case 'i':
+			flags |= SIGN;
+		case 'u':
+			break;
+		default:
+			*str++ = '%';
+			if(*format) {
+				*str++ = *format;
+			} else {
+				--format;
+			}
+			continue;
+		}
+		if(qualifier == 'l') {
+			num = *(unsigned long*) *args++;
+		} else if(qualifier == 'h') {
+			num = *(unsigned short*) *args++;
+			if(flags & SIGN)
+				num = (short) num;
+		} else if(flags & SIGN) {
+			num = *(unsigned long*) *args++;
+		} else {
+			num = *(unsigned long*) *args++;
+		}
+		str = number(str, num, base, field_width, precision, flags);
+	}
+	*str = '\0';
+	return str - buf;
+}
 

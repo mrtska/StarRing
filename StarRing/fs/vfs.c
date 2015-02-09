@@ -18,6 +18,8 @@ Created on: 2014/09/28
 #include <apic.h>
 #include <smp.h>
 
+#include <fs/stat.h>
+
 //ルートファイルシステムマウントポイント
 struct tree *fs_tree;
 
@@ -138,7 +140,6 @@ next:
 	}
 	if(mount_point->filename[0] == 0x00) {
 
-		kprintf("[root]\n");
 		//マウントポイントがルートだった場合
 		mount_point = ((struct vfs_entry*)fs_tree->root->value)->file;
 	}
@@ -234,6 +235,40 @@ unsigned int write_fs(struct fs_node *node, unsigned int offset, unsigned int si
 	return -1;
 }
 
+//ファイルシステムにファイルを書き込む
+unsigned int writev_fs(struct fs_node *node, const struct iovec* vec, unsigned long len) {
+
+	if(node->flags & FS_READONLY) {
+
+		return -1;
+	}
+
+	if(node->writev) {
+
+		return node->writev(node, vec, len);
+	}
+
+	int ret = 0;
+	int i;
+	for(i = 0; i < len; i++) {
+
+		const struct iovec *v = &vec[i];
+
+		ret = write_fs(node, 0, v->iov_len, v->iov_base);
+		if(ret == -1) {
+
+			goto fail;
+		}
+	}
+
+	return ret;
+
+fail:
+	trace();
+	return -1;
+}
+
+
 //ファイルをオープンする
 void open_fs(struct fs_node *node, unsigned int flags) {
 
@@ -275,7 +310,16 @@ struct fs_node *finddir_fs(struct fs_node *node, char *name) {
 	return NULL;
 }
 
+int fstat_fs(struct fs_node *node, struct stat *stat) {
 
+	if(node->fstat) {
+
+		return node->fstat(node, stat);
+	}
+
+	kprintf("could not execute fstat %s\n", node->filename);
+	return -1;
+}
 
 
 

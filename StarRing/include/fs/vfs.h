@@ -13,6 +13,7 @@ Created on: 2014/09/28
 
 #include <fs/fs.h>
 #include <slab.h>
+#include <fs/stat.h>
 
 
 //仮想ファイルシステムエントリ
@@ -42,7 +43,7 @@ struct file_descriptor *get_file_descriptor(unsigned int fd);
 //ファイルリード/ライト
 unsigned int read_fs(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer);
 unsigned int write_fs(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer);
-
+unsigned int writev_fs(struct fs_node *node, const struct iovec* vec, unsigned long len);
 //ファイルオープン/クローズ
 void open_fs(struct fs_node *node, unsigned int flags);
 void close_fs(struct fs_node *node);
@@ -50,4 +51,4 @@ void close_fs(struct fs_node *node);
 //ファイルサーチ
 struct fs_node *finddir_fs(struct fs_node *node, char *name);
 
-
+int fstat_fs(struct fs_node *node, struct stat *stat);

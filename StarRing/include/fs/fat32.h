@@ -10,7 +10,7 @@ Created on: 2014/10/05
 
 #pragma once
 
-#include <fs/fs.h>
+#include <fs/vfs.h>
 
 
 #define FAT32_MAX_ROOT_DIRECTORY_COUNT 65535
@@ -153,4 +153,6 @@ struct fs_node *fat32_finddir(struct fs_node *node, char *name);
 //ファイルライト/リード
 unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char*buffer);
 unsigned int fat32_fwrite(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char*buffer);
+
+int fat32_fstat(struct fs_node *node, struct stat *stat);
 

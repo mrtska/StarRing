@@ -26,6 +26,7 @@ long read(unsigned long fd, const char *buf, size_t count) {
 	}
 
 	read_fs(node, node->seek, count, (unsigned char*) buf);
+	node->seek += count;
 	return count;
 }
 

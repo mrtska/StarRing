@@ -23,7 +23,7 @@ static void register_mmap_entry(struct process *process, unsigned long addr, uns
 
 	struct mmap_entry *entry = kmalloc(sizeof(struct mmap_entry), 0);
 	entry->addr = addr;
-	entry->len = len - 1;
+	entry->len = len;
 	list_add_tail(&entry->list, &process->mmap_list);
 }
 
@@ -44,9 +44,10 @@ static int unregister_mmap_entry(struct process *process, unsigned long addr, un
 	return -1;
 }
 
-static unsigned long get_mmap_address(struct process *process, unsigned long len) {
+static unsigned long get_mmap_address(struct process *process, unsigned long len, unsigned long page_size) {
 
 	unsigned long base = process->mmap_base;
+
 
 	struct list_head *ptr;
 	list_for_each(ptr, &process->mmap_list) {
@@ -60,25 +61,49 @@ static unsigned long get_mmap_address(struct process *process, unsigned long len
 			base += entry->len;
 		}
 	}
+
+	base += page_size;
+	base &= ~(page_size - 1);
+
 	register_mmap_entry(process, base, len);
+	kprintf("[kernel/mmap_address] return %p\n", base);
 	return base;
 }
 
 static unsigned long mmap_anon_4k(struct process *process, unsigned long len, unsigned int page_flags) {
 
-	unsigned long addr = get_mmap_address(process, len);
+	unsigned long addr = get_mmap_address(process, len, 0x1000);
 
-	map_page(addr, (unsigned long) alloc_memory_block(), process->page_tables, page_flags | FLAGS_LARGE_PAGE);
+	int i;
+	for(i = 0; i < len; i += 0x1000) {
+
+		map_page(addr + i, (unsigned long) alloc_memory_block_4k_phys(), process->page_tables, page_flags);
+	}
 
 	return addr;
 }
+
+static unsigned long mmap_anon_2m(struct process *process, unsigned long len, unsigned int page_flags) {
+
+	unsigned long addr = get_mmap_address(process, len, 0x200000);
+
+	int i;
+	for(i = 0; i < len; i += 0x200000) {
+
+		map_page(addr + i, (unsigned long) alloc_memory_block(), process->page_tables, page_flags | FLAGS_LARGE_PAGE);
+	}
+
+	return addr;
+}
+
+
 
 
 unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset) {
 
 
 	struct process *process = get_process();
-	unsigned int page_flags = FLAGS_USER_PAGE;
+	unsigned int page_flags = FLAGS_USER_PAGE | FLAGS_WRITABLE_PAGE;
 
 	if(prot & PROT_WRITE) {
 
@@ -94,10 +119,11 @@ unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, un
 				return mmap_anon_4k(process, len, page_flags);
 			} else {
 
-				trace();
+				return mmap_anon_2m(process, len, page_flags);
 			}
 		}
 
+		trace();
 		return 0;
 	} else {
 
@@ -106,9 +132,35 @@ unsigned long mmap(unsigned long addr, unsigned long len, unsigned long prot, un
 			return -EBADF;
 		}
 
+		struct fs_node *node = get_node(fd);
+		if(addr == 0) {
 
+			unsigned long p;
 
+			if(len < MEMORY_BLOCK_SIZE) {
 
+				if(len % 0x1000 != 0) {
+
+					len += 0x1000;
+					len &= ~(0x1000 - 1);
+				}
+				p = mmap_anon_4k(process, len, page_flags);
+			} else {
+
+				if(len % 0x200000 != 0) {
+
+					len += 0x200000;
+					len &= ~(0x200000 - 1);
+				}
+
+				p = mmap_anon_2m(process, len, page_flags);
+			}
+			read_fs(node, offset, len, (unsigned char*) p);
+			return p;
+		} else {
+
+			trace();
+		}
 	}
 
 
@@ -122,6 +174,10 @@ long munmap(unsigned long addr, unsigned long len) {
 	return unregister_mmap_entry(get_process(), addr, len);
 }
 
+long mprotect(unsigned long start, size_t len, unsigned long prot) {
+
+	return 0;
+}
 
 
 

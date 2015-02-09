@@ -15,7 +15,12 @@ Created on: 2015/02/01
 
 int stat(const char *filename, struct stat *statbuf) {
 
+	struct fs_node *node = kopen(filename, 0);
 
+	if(!node) {
+
+		return -ENOENT;
+	}
 
 
 
@@ -31,12 +36,7 @@ int fstat(unsigned int fd, struct stat *statbuf) {
 		return -EBADF;
 	}
 
-	statbuf->st_uid = node->uid;
-	statbuf->st_gid = node->gid;
-	statbuf->st_ino = node->inode;
-	statbuf->st_size = node->length;
-
-	return 0;
+	return fstat_fs(node, statbuf);
 }
 
 

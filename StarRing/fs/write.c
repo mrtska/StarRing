@@ -26,19 +26,11 @@ long writev(unsigned long fd, const struct iovec *vec, unsigned long vlen) {
 
 	if(!node) {
 
+		trace();
 		return -ENOENT;
 	}
 
-	long ret = 0;
-
-	int i;
-	for(i = 0; i < vlen; i++) {
-
-		const struct iovec *v = &vec[i];
-
-		write_fs(node, 0, v->iov_len, v->iov_base);
-		ret += v->iov_len;
-	}
+	long ret = writev_fs(node, vec, vlen);
 
 	return ret;
 }

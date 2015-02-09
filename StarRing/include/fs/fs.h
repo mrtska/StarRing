@@ -12,6 +12,7 @@ Created on: 2014/09/30
 
 #include <task.h>
 #include <fs/stat.h>
+#include <fs/iovec.h>
 
 
 //ファイルノード項目
@@ -24,12 +25,29 @@ Created on: 2014/09/30
 #define FS_MOUNTPOINT		0x40
 #define FS_READONLY			0x80
 
+#define S_IFMT   0170000  /* ファイルのタイプ */
+#define S_IFIFO  0010000  /* 名前付きパイプ (fifo) */
+#define S_IFCHR  0020000  /* キャラクタ型特殊ファイル */
+#define S_IFDIR  0040000  /* ディレクトリ */
+#define S_IFBLK  0060000  /* ブロック型特殊ファイル */
+#define S_IFREG  0100000  /* 通常 */
+#define S_IFLNK  0120000  /* シンボリックリンク */
+#define S_IFSOCK 0140000  /* ソケット */
+#define S_IFWHT  0160000  /* ホワイトアウト */
+#define S_ISUID  0004000  /* 実行時にユーザ ID を設定 */
+#define S_ISGID  0002000  /* 実行時にグループ ID を設定 */
+#define S_ISVTX  0001000  /* 使用後にもスワップされたテキストを保存 */
+#define S_IRUSR  0000400  /* 読取り権限の所有者 */
+#define S_IWUSR  0000200  /* 書込み権限の所有者 */
+#define S_IXUSR  0000100  /* 実行 / 検索権限の所有者 */
+
 struct fs_node;
 
 
 //ファイルノード読込み/書込み関数ポインタ
 typedef unsigned int (*read_func) (struct fs_node*, unsigned int, unsigned int, unsigned char*);
 typedef unsigned int (*write_func) (struct fs_node*, unsigned int, unsigned int, unsigned char*);
+typedef unsigned int (*writev_func) (struct fs_node*, const struct iovec*, unsigned long);
 
 //ファイルノードオープン/クローズ関数ポインタ
 typedef void (*open_func) (struct fs_node*, unsigned int);
@@ -47,7 +65,7 @@ typedef void (*mkdir_func) (struct fs_node*, char*, unsigned short);
 typedef int (*ioctl_func) (struct fs_node*, int, void*);
 
 //fstat関数ポインタ
-typedef int (*fstat_func) (struct fs_node*, unsigned int, struct stat*);
+typedef int (*fstat_func) (struct fs_node*, struct stat*);
 
 //ファイルサイズ取得関数ポインタ
 typedef int (*get_size_func) (struct fs_node*);
@@ -98,6 +116,7 @@ struct fs_node {
 	//ファイルオペレーション
 	read_func read;			//unsigned int : struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer
 	write_func write;		//unsigned int : struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer
+	writev_func writev;
 	open_func open;			//void : struct fs_node *node, unsigned int flags
 	close_func close;		//void : struct fs_node *node
 	readdir_func readdir;	//

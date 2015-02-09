@@ -159,7 +159,7 @@ static int read_directory_entry(const char *path, struct fat32_directory_entry *
 		goto fail;
 	}
 	fail:
-	kprintf("can not find %s\n", path);
+	//kprintf("can not find %s\n", path);
 	kfree(lbuf, 0x200);	//ファイルを見つけられなかった時はfreeする
 	return -1;
 }
@@ -311,6 +311,7 @@ struct fs_node *fat32_file_init(const char *filename) {
 	node->read = fat32_fread;
 	node->write = fat32_fwrite;
 	node->finddir = fat32_finddir;
+	node->fstat = fat32_fstat;
 
 	node->flags |= FS_READONLY;
 
@@ -334,7 +335,7 @@ void fat32_fopen(struct fs_node *node, unsigned int flags) {
 		strcpy(name, node->filename);
 		char *n = strrchr(name, '/') + 1;
 		*n = 0;
-		kprintf("[fat32/fopen] sym fopen %s\n", name);
+		//kprintf("[fat32/fopen] sym fopen %s\n", name);
 
 		node->ptr = kopen(strcat(name, (char*) &buf[0xA]), 0);
 		node->length = node->ptr->length;
@@ -427,7 +428,6 @@ unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int
 	//シンボリックリンクだったらリンク先をロードする
 	if(node->flags & FS_SYMLINK) {
 
-		kprintf("symbolic link %s\n", node->ptr->filename);
 		read_directory_entry(node->ptr->filename, &file);
 		cache->dirty = 1;
 	} else {
@@ -520,4 +520,31 @@ struct fs_node *fat32_finddir(struct fs_node *node, char *name) {
 
 	return fat32_file_init(name);
 }
+
+
+int fat32_fstat(struct fs_node *node, struct stat *stat) {
+
+	stat->st_nlink = 1;
+
+	stat->st_uid = node->uid;
+	stat->st_gid = node->gid;
+	stat->st_ino = node->inode;
+	stat->st_size = node->length;
+
+	kprintf("[fat32/fstat] size %X\n", node->length);
+
+	if(node->flags & FS_FILE) {
+
+		stat->st_mode = S_IFREG;
+	} else if(node->flags & FS_DIRECTORY) {
+
+		stat->st_mode = S_IFDIR;
+	}
+
+	return 0;
+}
+
+
+
+
 

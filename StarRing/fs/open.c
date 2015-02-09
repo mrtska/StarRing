@@ -28,7 +28,6 @@ int open(const char *filename, int flags, int mode) {
 	//ファイルが見つからなかった時
 	if(!node) {
 
-		trace();
 		return -ENOENT;
 	}
 

@@ -50,7 +50,7 @@ int sys_fstat(unsigned int fd, struct stat *statbuf);
 
 unsigned long sys_lseek(unsigned int fd, unsigned long offset, unsigned int whence);
 long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset);
-
+long sys_mprotect(unsigned long start, size_t len, unsigned long prot);
 long sys_munmap(unsigned long addr, unsigned long len);
 int sys_ioctl(unsigned int fd, unsigned int cmd, unsigned long arg);
 long sys_readv(unsigned long fd, const struct iovec *vec, unsigned long vlen);
@@ -61,6 +61,10 @@ unsigned long sys_get_height(void);
 unsigned long sys_get_width(void);
 unsigned long sys_get_depth(void);
 long sys_brk(unsigned long size);
+
+
+int sys_getpid(void);
+
 long sys_new_name(struct new_utsname *name);
 
 unsigned int sys_readlink(const char *path, char *buf, int bussiz);
@@ -78,13 +82,13 @@ long sys_set_tid_address(int *tidptr);
 unsigned long systemcall_table[] = {
 
 (unsigned long) sys_read, (unsigned long) sys_write, (unsigned long) sys_open, (unsigned long) sys_close, (unsigned long)sys_stat, (unsigned long) sys_fstat,	//0 ~ 5
-		0, 0, (unsigned long) sys_lseek, (unsigned long) sys_mmap, 0,	//10
+		0, 0, (unsigned long) sys_lseek, (unsigned long) sys_mmap, (unsigned long)sys_mprotect,	//10
 		(unsigned long)sys_munmap, (unsigned long) sys_brk, 0, 0, 0,	//15
 		(unsigned long) sys_ioctl, 0, 0, (unsigned long) sys_readv, (unsigned long) sys_writev,	//20
 		(unsigned long) sys_access, 0, 0, 0, 0,	//25
 		0, 0, 0, 0, 0,	//30
 		0, 0, 0, 0, 0,	//35
-		0, 0, 0, 0, 0,	//40
+		0, 0, 0, (unsigned long) sys_getpid, 0,	//40
 		0, 0, 0, 0, 0,	//45
 		0, 0, 0, 0, 0,	//50
 		0, 0, 0, 0, 0,	//55
@@ -242,6 +246,11 @@ long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigne
 	return mmap(addr, len, prot, flags, fd, offset);
 }
 
+long sys_mprotect(unsigned long start, size_t len, unsigned long prot) {
+
+	kprintf("[kernel/sys_mprotect] start %p, len %X, prot %X\n", start, len, prot);
+	return mprotect(start, len, prot);
+}
 
 
 long sys_munmap(unsigned long addr, unsigned long len) {
@@ -264,20 +273,32 @@ long sys_readv(unsigned long fd, const struct iovec *vec, unsigned long vlen) {
 
 long sys_writev(unsigned long fd, const struct iovec *vec, unsigned long vlen) {
 
-	kprintf("[kernel/sys_writev] fd %d, vec %p, vlen %X\n", fd, vec, vlen);
+	//kprintf("[kernel/sys_writev] fd %d, vec %p, vlen %X\n", fd, vec, vlen);
 	return writev(fd, vec, vlen);
 }
 
 long sys_access(const char *filename, int mode) {
 
 	kprintf("[kernel/sys_access] filename %s, mode %X\n", filename, mode);
-	return -ENOENT;
+	struct fs_node *node = kopen(filename, 0);
+	if(!node) {
+
+		return -ENOENT;
+	}
+
+	return 0;
 }
 
 long sys_new_name(struct new_utsname *name) {
 
 	kprintf("[kernel/sys_new_name] %p\n", name);
 	return new_name(name);
+}
+
+
+int sys_getpid(void) {
+
+	return get_process()->pid;
 }
 
 unsigned int sys_readlink(const char *path, char *buf, int bufsiz) {
