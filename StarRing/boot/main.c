@@ -242,6 +242,8 @@ void main(unsigned long magic, unsigned long mboot) {
 
 	allocator_4k_init();
 
+
+
 	//初期化プロセスを生成
 	task_init();
 
@@ -291,7 +293,6 @@ void do_ap_main(void) {
 
 	//SMPテーブルにAPを登録
 	smp_ap_init();
-
 	//キーボードブロックデバイス生成
 	struct fs_node *input = create_input_device(apic_id);
 	smp_table_set_input_node(apic_id, input);

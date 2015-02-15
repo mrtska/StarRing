@@ -102,9 +102,9 @@ static void *copy_arg(char *addr, const char *cmdline, unsigned long *index) {
 		int len = strlen(tok) + 1;
 		strcpy(addr, tok);
 		index[i] = (unsigned long) addr;
+		kprintf("[copy_arg] %s, %p\n", addr, index[i]);
 		addr += len;
-		kprintf("[copy_arg] %s, %p\n", cmdline, index[i]);
-		tok = strtok(0, '/');
+		tok = strtok(0, ' ');
 		i++;
 	}
 
@@ -168,8 +168,10 @@ void elf64_create_table(struct process *process, void *p) {
 	i = 0;
 	while(env_addr[i] != 0) {
 
-		elf_write64(p, env_addr[i++]);
+		elf_write64(p, env_addr[i]);
+		kprintf("[env_addr] %d %p %p\n", i, env_addr[i], p);
 		NEXT_POINTER(p, 1);
+		i++;
 
 	}
 	elf_write64(p, 0);
@@ -182,9 +184,8 @@ void elf64_create_table(struct process *process, void *p) {
 	int aux_index = 0;
 
 	NEW_AUX_ENT(AT_SYSINFO_EHDR, 0);
-	NEW_AUX_ENT(AT_HWCAP, 0x1FABFBFF);
-	NEW_AUX_ENT(AT_PAGESZ, 0x1000);
-	NEW_AUX_ENT(AT_CLKTCK, 1000000);
+	NEW_AUX_ENT(AT_PAGESZ, 0x200000);
+	NEW_AUX_ENT(AT_CLKTCK, 100);
 	NEW_AUX_ENT(AT_PHDR, (unsigned long) read_file_offset((void*)0x400000, header->e_phoff));
 	NEW_AUX_ENT(AT_PHENT, sizeof(struct elf64_program_header));
 	NEW_AUX_ENT(AT_PHNUM, header->e_phnum);

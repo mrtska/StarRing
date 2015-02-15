@@ -106,7 +106,7 @@ static int get_next_pid(void) {
 	struct process *process;
 	bool flag = true;
 
-	for(i = 0; i < 0xFF; i++) {
+	for(i = 1; i < 0xFF; i++) {
 
 		list_for_each(ptr, &processes)
 		{
@@ -134,7 +134,7 @@ void task_init(void) {
 
 	struct fs_node *f = kopen("/init.elf", 0);
 
-	create_process("init", f, 2, "--list", 0);
+	create_process("/init.elf", f, 1, "", 0);
 }
 
 int create_process(char *name, struct fs_node *node, int argc, char *cmdline, int flags) {

@@ -19,12 +19,11 @@ int stat(const char *filename, struct stat *statbuf) {
 
 	if(!node) {
 
+		trace();
 		return -ENOENT;
 	}
 
-
-
-	return 0;
+	return fstat_fs(node, statbuf);
 }
 
 
@@ -33,6 +32,7 @@ int fstat(unsigned int fd, struct stat *statbuf) {
 	struct fs_node *node = get_node(fd);
 	if(!node) {
 
+		trace();
 		return -EBADF;
 	}
 

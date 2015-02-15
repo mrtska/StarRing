@@ -165,6 +165,7 @@ struct fs_node *kopen(const char *name, unsigned int flags) {
 
 	if(node == NULL) {
 
+		kprintf("[kopen] No such file or directory %s\n", path);
 		return NULL;
 	}
 	open_fs(node, 0);

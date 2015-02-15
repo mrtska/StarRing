@@ -201,7 +201,7 @@ void sys_exit(int err_code) {
 
 long sys_read(unsigned int fd, char *buf, size_t count) {
 
-	kprintf("[kernel/sys_read] fd %d, buf %p, count %X\n", fd, buf, count);
+	kprintf("[kernel/sys_read] fd %d, buf %p, size %X\n", fd, buf, count);
 	return read(fd, buf, count);
 }
 
@@ -243,7 +243,9 @@ unsigned long sys_lseek(unsigned int fd, unsigned long offset, unsigned int when
 long sys_mmap(unsigned long addr, unsigned long len, unsigned long prot, unsigned long flags, int fd, unsigned long offset) {
 
 	kprintf("[kernel/sys_mmap] %p, len %X, prot %X, flags %X, fd %X, offset %X\n", addr, len, prot, flags, fd, offset);
-	return mmap(addr, len, prot, flags, fd, offset);
+	addr = mmap(addr, len, prot, flags, fd, offset);
+	kprintf("[kernel/sys_mmap] return %p\n", addr);
+	return addr;
 }
 
 long sys_mprotect(unsigned long start, size_t len, unsigned long prot) {
@@ -298,6 +300,7 @@ long sys_new_name(struct new_utsname *name) {
 
 int sys_getpid(void) {
 
+	//kprintf("[kernel/sys_getpid]\n");
 	return get_process()->pid;
 }
 
@@ -407,7 +410,7 @@ long sys_set_tid_address(int *tidptr) {
 void sys_exit_group(int exit_code) {
 
 	struct process *process = smp_table[apic_read(APIC_ID_R) >> 24].execute_process;
-	kprintf("STOP process %s, id %d\n", process->name, apic_read(APIC_ID_R) >> 24);
+	kprintf("STOP process %s, id %d, exit %X\n", process->name, get_apic_id(), exit_code);
 
 	STOP;
 }

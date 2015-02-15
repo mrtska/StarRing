@@ -138,6 +138,11 @@ static int read_directory_entry(const char *path, struct fat32_directory_entry *
 
 					//kprintf("directory = %s, LBA = %X\n", tok, lba);
 					tok = strtok(0, '/');
+					if(tok == NULL) {
+
+						*buf = ent;
+						return 0;
+					}
 					goto restart;
 				} else {
 
@@ -192,12 +197,10 @@ static void conv_file_name(struct fat32_directory_entry *entry, char *buf) {
 		if(entry->DIR_NTRes & 0x08) {
 
 			//数字は判定に含まない
-			if(left_name[i] >= '0' && left_name[i] <= '9') {
+			if(left_name[i] >= 'A' && left_name[i] <= 'Z') {
 
-				continue;
+				left_name[i] += 0x20;
 			}
-			left_name[i] += 0x20;
-
 		}
 	}
 	//拡張子を取得
@@ -213,7 +216,7 @@ static void conv_file_name(struct fat32_directory_entry *entry, char *buf) {
 		if(entry->DIR_NTRes & 0x08) {
 
 			//数字は判定に含まない
-			if(!(right_name[i - 8] >= '0' && right_name[i - 8] <= '9')) {
+			if(right_name[i - 8] >= 'A' && right_name[i - 8] <= 'Z') {
 
 				right_name[i - 8] += 0x20;
 			}
@@ -280,32 +283,36 @@ struct fs_node *fat32_file_init(const char *filename) {
 
 	struct fs_node *node = kmalloc(sizeof(struct fs_node), 0);
 
-//ファイル名からディレクトリエントリを取得
+	//ファイル名からディレクトリエントリを取得
 	struct fat32_directory_entry file;
 	int ret = read_directory_entry(filename, &file);
 
-//ファイルが
+	//ファイルが
 	if(ret == -1) {
 
+		trace();
 		return NULL;
 	}
 
-//ファイルパスをコピー
+	//ファイルパスをコピー
 	strcpy(node->filename, filename);
 
-//ファイルサイズを代入
+	//ファイルサイズを代入
 	node->length = file.DIR_FileSize;
 
-//ファイルかディレクトリかを判定
+	//ファイルかディレクトリかを判定
 	if(file.DIR_Attr & FAT32_ATTR_DIRECTORY) {
 
 		node->flags = FS_DIRECTORY;
 	} else {
 
 		node->flags = FS_FILE;
+		node->data = kmalloc(sizeof(struct fat32_cluster_cache), 0);
 	}
 
-//各種ハンドラ設定
+	node->inode = (file.DIR_FstClusHI << 16) | file.DIR_FstClusLO;
+
+	//各種ハンドラ設定
 	node->open = fat32_fopen;
 	node->close = fat32_fclose;
 	node->read = fat32_fread;
@@ -316,7 +323,8 @@ struct fs_node *fat32_file_init(const char *filename) {
 	node->flags |= FS_READONLY;
 
 	node->seek = 0;
-	node->data = kmalloc(sizeof(struct fat32_cluster_cache), 0);
+
+
 
 	return node;
 }
@@ -443,10 +451,10 @@ unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int
 
 	if(node->flags & FS_SYMLINK) {
 
-		kprintf("[fat32/fread] symbolic link %s, offset %X, size %X\n", node->ptr->filename, offset, size);
+		//kprintf("[fat32/fread] symbolic link %s, offset %X, size %X\n", node->ptr->filename, offset, size);
 	} else {
 
-		kprintf("[fat32/fread] path = %s, offset = %X, size = %X\n", node->filename, offset, size);
+		//kprintf("[fat32/fread] path = %s, offset = %X, size = %X\n", node->filename, offset, size);
 	}
 
 	unsigned char *buf = kmalloc(info.cluster_size, 0);
@@ -461,7 +469,7 @@ unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int
 		//終了クラスタ
 		if(cluster >= 0x0FFFFFF8) {
 
-			kprintf("[fat32/fread] cluster break\n");
+			//kprintf("[fat32/fread] cluster break\n");
 			break;
 		}
 
@@ -474,12 +482,12 @@ unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int
 
 			if(i == 1) {
 
-				kprintf("[fat32/fread] i0 read end\n");
+				//kprintf("[fat32/fread] i0 read end\n");
 				memcpy(buffer, buf + OFFSET_MASK(offset), size);
 				break;
 			}
 
-			kprintf("[fat32/fread] read end, %X, %p\n", i * info.cluster_size, buffer);
+			//kprintf("[fat32/fread] read end, %X, %p\n", i * info.cluster_size, buffer);
 			//memcpy(buffer, buf, OFFSET_MASK(offset));
 			memcpy(buffer, buf, info.cluster_size - (i * info.cluster_size - size));
 			break;
@@ -530,6 +538,8 @@ int fat32_fstat(struct fs_node *node, struct stat *stat) {
 	stat->st_gid = node->gid;
 	stat->st_ino = node->inode;
 	stat->st_size = node->length;
+
+
 
 	kprintf("[fat32/fstat] size %X\n", node->length);
 

@@ -25,7 +25,7 @@ long new_name(struct new_utsname *name) {
 	strcpy(name->machine, "x86_64");
 	strcpy(name->release, "3.0.0");
 	strcpy(name->sysname, "StarRing");
-	strcpy(name->version, "3.0.0");
+	strcpy(name->version, "2.6.32");
 	strcpy(name->nodename, "StarRing");
 	return 0;
 }

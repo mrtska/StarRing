@@ -41,3 +41,12 @@ void writes_serial(char *c) {
 		write_serial(*c++);
 	}
 }
+
+void writes_serial_count(char *c, unsigned long size) {
+
+	int i;
+	for(i = 0; i < size; i++) {
+
+		write_serial(*c++);
+	}
+}
