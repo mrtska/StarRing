@@ -137,9 +137,7 @@ struct fat32_cluster_cache {
 };
 
 
-void fat32_filesystem_init(void);
-
-struct fs_node *fat32_file_init(const char *path);
+void fat32_filesystem_init(struct file_system *fs);
 
 
 //ファイルオープン

@@ -13,7 +13,7 @@ Created on: 2014/09/30
 #include <task.h>
 #include <fs/stat.h>
 #include <fs/iovec.h>
-
+#include <drivers/storage.h>
 
 //ファイルノード項目
 #define FS_FILE				0x1
@@ -100,6 +100,16 @@ struct file_descriptor {
 
 
 
+struct file_system {
+
+	struct storage_device *storge;
+	struct file_system_operations *opt;
+
+
+
+
+};
+
 //ファイルノード マウントポイントごとに設定される
 struct fs_node {
 
@@ -130,7 +140,8 @@ struct fs_node {
 	unsigned int mtime;		//変更タイム
 	unsigned int ctime;		//作成タイム
 
-	struct file_system_operations *opt;
+	struct file_system *fs;
+
 
 	//シンボリックリンク用ポインタ
 	struct fs_node *ptr;

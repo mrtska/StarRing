@@ -49,7 +49,7 @@ install:
 	
 	$(LD) -nodefaultlibs -Map kernel.map -T boot/bootlinker.ld -o kernel.sys $(OBJECTS)
 	$(CP) -f ./kernel.sys /cygdrive/g/KERNEL.SYS
-
+	sync
 
 .PHONY: clean
 clean:

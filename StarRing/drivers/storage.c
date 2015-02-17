@@ -11,14 +11,61 @@ Created on: 2015/02/17
 
 
 #include <system.h>
+#include <mem/alloc.h>
+
 #include <drivers/storage.h>
 #include <drivers/pci.h>
+#include <drivers/ata.h>
+#include <list.h>
 
+
+
+static struct storage_device storage[0x10];
+
+
+
+//ATA,SATA,SCSI,USBなどのPCIストレージデバイスを認識する
 void scan_storage_device(void) {
 
+	int index = 0;
 
-	pci_find_device_by_class_code(PCI_CLASS_CODE_BUS_MASTER);
+	struct list_head *p;
+	list_for_each(p, get_pci_device_list()) {
 
+		struct pci_device *device = list_entry(p, struct pci_device, list);
+
+		struct pci_classcode class;
+		pci_pack_class_code(device->class_code, &class);
+
+		if(class.base_class != 1) {
+
+			continue;
+		}
+
+
+		struct storage_device *storage_device = &storage[index++];
+		storage_device->classcode = device->class_code;
+		storage_device->storage_buffer = alloc_memory_block();
+
+		switch(class.sub_class) {
+
+		//IDE
+		case 1:
+
+			//ATAドライバ初期化
+			ata_init(storage_device);
+			break;
+		default:
+
+			kprintf("storage.c %X %X %X\n", class.base_class, class.sub_class, class.device);
+			STOP;
+			break;
+		}
+
+
+
+
+	}
 }
 
 

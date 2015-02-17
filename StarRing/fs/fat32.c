@@ -9,7 +9,7 @@
  */
 
 #include <fs/fat32.h>
-#include <drivers/ide.h>
+#include <drivers/ata.h>
 #include <slab.h>
 #include <string.h>
 #include <internal/stdio.h>
@@ -38,16 +38,16 @@ struct fat32_info info;
 struct fs_node root_node;
 
 static void conv_file_name(struct fat32_directory_entry *entry, char *buf);
-static int read_directory_entry(const char *path, struct fat32_directory_entry *buf);
+static int read_directory_entry(struct file_system *fs, const char *path, struct fat32_directory_entry *buf);
 
 //ファイルシステム初期化
-void fat32_filesystem_init(void) {
+void fat32_filesystem_init(struct file_system *fs) {
 
 	//バッファ 1セクタ分
 	unsigned char buf1[0x200];
 
-	//デバイスからブートセクタをロード FAT32デバイスがIDEとは限らないので FIXME
-	ide_read_sector_via_dma(0x0000, buf1, 1);
+	//デバイスからブートセクタをロード
+	fs->storge->opts->dma_read(0x0000, buf1, 1);
 
 	//FAT32マスターブートレコード どのデバイスにもMBRがあるとは限らないので FIXME
 	struct mbr *mbr = (struct mbr*) buf1;
@@ -63,7 +63,7 @@ void fat32_filesystem_init(void) {
 	unsigned char *buf2 = kmalloc(0x200, 0);
 
 	//ブート可能なパーティションの最初のセクタをロード FIXME
-	ide_read_sector_via_dma(mbr->partitions[i].PT_LbaOfs, buf2, 1);
+	fs->storge->opts->dma_read(mbr->partitions[i].PT_LbaOfs, buf2, 1);
 
 	//情報を構造体へ格納
 	info.boot_sectors = (struct fat32_boot_sector*) buf2;
@@ -77,7 +77,8 @@ void fat32_filesystem_init(void) {
 	root_node.filename[0] = '/';
 	root_node.filename[1] = 0x00;
 
-	root_node.opt = &fat32_operations;
+	root_node.fs = fs;
+	root_node.fs->opt = &fat32_operations;
 
 
 	root_node.flags = FS_READONLY;
@@ -87,7 +88,7 @@ void fat32_filesystem_init(void) {
 }
 
 //ディレクトリエントリをロード パスは絶対パス
-static int read_directory_entry(const char *path, struct fat32_directory_entry *buf) {
+static int read_directory_entry(struct file_system *fs, const char *path, struct fat32_directory_entry *buf) {
 
 	//ストリングバッファ
 	char tokbuf[0x100];
@@ -111,7 +112,7 @@ static int read_directory_entry(const char *path, struct fat32_directory_entry *
 		restart:
 		//kprintf("tok = %s, lba = %X\n", tok, lba);
 		//ディレクトリエントリをロード
-		ide_read_sector_via_dma(lba, lbuf, 1);
+		fs->storge->opts->dma_read(lba, lbuf, 1);
 		struct fat32_directory_entry *entry = (struct fat32_directory_entry*) lbuf;
 
 		//ロードしたディレクトリエントリを走査して該当するものを探す
@@ -293,13 +294,13 @@ static void conv_file_name(struct fat32_directory_entry *entry, char *buf) {
 }
 
 //FAT32のファイルをfs_nodeに代入する
-struct fs_node *fat32_file_init(const char *filename) {
+static struct fs_node *fat32_file_init(struct file_system *fs, const char *filename) {
 
 	struct fs_node *node = kmalloc(sizeof(struct fs_node), 0);
 
 	//ファイル名からディレクトリエントリを取得
 	struct fat32_directory_entry file;
-	int ret = read_directory_entry(filename, &file);
+	int ret = read_directory_entry(fs, filename, &file);
 
 	//ファイルが
 	if(ret == -1) {
@@ -328,7 +329,8 @@ struct fs_node *fat32_file_init(const char *filename) {
 
 	//各種ハンドラ設定
 
-	node->opt = &fat32_operations;
+	node->fs = fs;
+	node->fs->opt = &fat32_operations;
 
 	node->flags |= FS_READONLY;
 
@@ -372,15 +374,15 @@ static int get_cluster_index(unsigned long offset) {
 	return offset / info.cluster_size;
 }
 
-static void read_block_by_lba(unsigned long lba, int sector, void *p) {
+static void read_block_by_lba(struct file_system *fs, unsigned long lba, int sector, void *p) {
 
-	ide_read_sector_via_dma(lba, p, sector);
+	fs->storge->opts->dma_read(lba, p, sector);
 }
 
-static unsigned long read_block_by_cluster(unsigned int cluster, unsigned char *p) {
+static unsigned long read_block_by_cluster(struct file_system *fs, unsigned int cluster, unsigned char *p) {
 
 	unsigned long lba = info.root_directory_entry + (cluster - 2) * info.boot_sectors->BPB_SecPerClus;
-	ide_read_sector_via_dma(lba, p, 0x20);
+	fs->storge->opts->dma_read(lba, p, 0x20);
 	//kprintf("read sector %X lba %X,      %X %X\n", p, lba, p[0], p[1]);
 	return lba;
 }
@@ -391,7 +393,7 @@ static unsigned int read_fat_entry(unsigned char *fatbuf, unsigned int fat_offse
 }
 
 //FAT領域のデータをロードしてクラスタチェインを返す キャッシュがある場合はそれを返す
-static unsigned int *read_fat(struct fat32_cluster_cache *cache, unsigned int start_cluster, unsigned long size) {
+static unsigned int *read_fat(struct file_system *fs, struct fat32_cluster_cache *cache, unsigned int start_cluster, unsigned long size) {
 
 	if(cache->clusters && !cache->dirty) {
 
@@ -404,7 +406,7 @@ static unsigned int *read_fat(struct fat32_cluster_cache *cache, unsigned int st
 	unsigned int *ret = kmalloc(0x1000, 0);
 	unsigned int before_fat_sector = fat_sector;
 	unsigned char fatbuf[0x200];
-	read_block_by_lba(fat_sector, 1, fatbuf);
+	read_block_by_lba(fs, fat_sector, 1, fatbuf);
 
 	ret[0] = start_cluster;
 
@@ -425,7 +427,7 @@ static unsigned int *read_fat(struct fat32_cluster_cache *cache, unsigned int st
 
 		if(before_fat_sector != fat_sector) {
 
-			read_block_by_lba(fat_sector, 1, fatbuf);
+			read_block_by_lba(fs, fat_sector, 1, fatbuf);
 			before_fat_sector = fat_sector;
 		}
 	}
@@ -446,18 +448,18 @@ unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int
 	//シンボリックリンクだったらリンク先をロードする
 	if(node->flags & FS_SYMLINK) {
 
-		read_directory_entry(node->ptr->filename, &file);
+		read_directory_entry(node->fs, node->ptr->filename, &file);
 		cache->dirty = 1;
 	} else {
 
-		read_directory_entry(node->filename, &file);
+		read_directory_entry(node->fs, node->filename, &file);
 	}
 
 	//ファイルのスタートクラスタ
 	unsigned int start_cluster = (file.DIR_FstClusHI << 16) | file.DIR_FstClusLO;
 
 	//クラスタを取得
-	unsigned int *clusters = read_fat(cache, start_cluster, node->length);
+	unsigned int *clusters = read_fat(node->fs, cache, start_cluster, node->length);
 
 	if(node->flags & FS_SYMLINK) {
 
@@ -484,7 +486,7 @@ unsigned int fat32_fread(struct fs_node *node, unsigned int offset, unsigned int
 		}
 
 		//クラスタ番号の領域をロード
-		read_block_by_cluster(cluster, buf);
+		read_block_by_cluster(node->fs, cluster, buf);
 		//kprintf("cluster %X, data %X, %X, %X\n", cluster, buf[0], buf[1], buf[2]);
 
 		//読込サイズを超えたら終了
@@ -536,7 +538,7 @@ unsigned int fat32_fwrite(struct fs_node *node, unsigned int offset, unsigned in
 //ファイルを見つける
 struct fs_node *fat32_finddir(struct fs_node *node, char *name) {
 
-	return fat32_file_init(name);
+	return fat32_file_init(node->fs, name);
 }
 
 

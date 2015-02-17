@@ -16,4 +16,4 @@ Created on: 2015/02/08
 
 
 
-struct fs_node *create_stderr(void);
+struct fs_node *create_stderr(struct file_system *fs);

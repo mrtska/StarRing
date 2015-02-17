@@ -89,13 +89,15 @@ void wait_type_key(unsigned int key_code) {
 
 
 //inputはキーボードのこと
-struct fs_node *create_input_device(char num) {
+struct fs_node *create_input_device(struct file_system *fs, char num) {
 
 	struct fs_node *node = kmalloc(sizeof(struct fs_node), 8);
 
 	strcpy(node->filename, "/dev/input");
 	node->filename[11] = num;
-	node->opt = &input_opeartions;
+
+	node->fs = fs;
+	node->fs->opt = &input_opeartions;
 
 	node->data = kmalloc(sizeof(struct input_device_data), 8);
 

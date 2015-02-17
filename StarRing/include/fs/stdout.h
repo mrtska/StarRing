@@ -15,4 +15,4 @@ Created on: 2015/01/29
 
 
 
-struct fs_node *create_stdout(void);
+struct fs_node *create_stdout(struct file_system *fs);

@@ -46,12 +46,13 @@ static void close_null(struct fs_node *node) {
 
 
 
-struct fs_node *create_null_device(void) {
+struct fs_node *create_null_device(struct file_system *fs) {
 
 	struct fs_node *node = kmalloc(sizeof(struct fs_node), 8);
 
 	strcpy(node->filename, "null");
-	node->opt = &null_device_oprations;
+	node->fs = fs;
+	node->fs->opt = &null_device_oprations;
 
 	return node;
 }

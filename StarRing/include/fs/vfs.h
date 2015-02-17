@@ -24,9 +24,9 @@ struct vfs_entry {
 };
 
 
-struct fs_node *create_null_device(void);
+struct fs_node *create_null_device(struct file_system *fs);
 
-
+struct file_system *alloc_file_system(void);
 
 //VFS初期化
 void vfs_init(void);

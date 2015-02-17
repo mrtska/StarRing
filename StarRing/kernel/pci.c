@@ -17,7 +17,7 @@ Created on: 2014/08/18
 
 
 //PCIデバイスのリスト
-LIST_HEAD(pci_device_list);
+static LIST_HEAD(pci_device_list);
 
 
 static void store_pci_data(unsigned short vender_id, unsigned short device_id, int device_num, int func_num, int bus, unsigned int class_code, char *device_name) {
@@ -194,5 +194,11 @@ void pci_conf_write(struct pci_device *device, int reg, unsigned int value) {
 	send_config(reg & 0xFFFFFFFC, device->device_num, device->func_num, device->bus);
 
 	outl(PCI_CONFIG_DATA_R, value);
+}
+
+
+struct list_head *get_pci_device_list(void) {
+
+	return &pci_device_list;
 }
 

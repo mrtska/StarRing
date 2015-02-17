@@ -84,12 +84,14 @@ static struct file_system_operations stdout_operations = {
 
 
 
-struct fs_node *create_stdout(void) {
+struct fs_node *create_stdout(struct file_system *fs) {
 
 	struct fs_node *node = kmalloc(sizeof(struct fs_node), 8);
 
 	strcpy(node->filename, "stdout");
-	node->opt = &stdout_operations;
+
+	node->fs = fs;
+	node->fs->opt = &stdout_operations;
 
 
 	node->flags = FS_CHARDEVICE;

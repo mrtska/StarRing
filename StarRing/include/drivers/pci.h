@@ -65,6 +65,14 @@ struct pci_config {
 	unsigned enable : 1;
 } __attribute__((packed));
 
+struct pci_classcode {
+
+	unsigned char base_class;
+	unsigned char sub_class;
+	unsigned char device;
+};
+
+
 
 //PCIデバイス情報
 //マルチファンクションデバイスの場合は別のPCIデバイスとして認識される
@@ -84,9 +92,15 @@ struct pci_device {
 };
 
 
-extern struct pci_device *device;
 
 
+
+static __inline__ void pci_pack_class_code(unsigned int class_code, struct pci_classcode *class) {
+
+	class->base_class = (class_code & 0xFF0000) >> 16;
+	class->sub_class = (class_code & 0xFF00) >> 8;
+	class->device = class_code & 0xFF;
+}
 
 
 //PCIテーブルの初期化
@@ -102,7 +116,7 @@ unsigned int pci_conf_read(struct pci_device *d, int reg);
 
 void pci_conf_write(struct pci_device *device, int reg, unsigned int value);
 
-
+struct list_head *get_pci_device_list(void);
 
 
 

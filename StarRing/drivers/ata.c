@@ -8,7 +8,7 @@ http://opensource.org/licenses/mit-license.php
 Created on: 2014/10/09
 */
 
-#include <drivers/ide.h>
+#include <drivers/ata.h>
 #include <drivers/dma.h>
 #include <drivers/pci.h>
 #include <internal/stdio.h>
@@ -18,6 +18,25 @@ Created on: 2014/10/09
 #include <apic.h>
 #include <page/page.h>
 #include <mem/alloc.h>
+
+
+static void ata_non_data(struct ata_param *param);
+static void ata_read_pio_by_param(struct ata_param *param);
+static void ata_write_sector(unsigned long lba, unsigned char *buf, unsigned long sector);
+static void ata_read_sector_via_dma(unsigned long lba, unsigned char *buf, unsigned long sector);
+static void ata_write_sector_via_dma(unsigned long lba, unsigned char *buf, unsigned long sector);
+
+
+
+static struct storage_operations ata_storage_operations = {
+
+		.pio_read = NULL,
+		.pio_write = NULL,
+		.dma_read = ata_read_sector_via_dma,
+		.dma_write = ata_write_sector_via_dma
+};
+
+
 
 
 //BUSYビットが折れるのを待つ
@@ -36,6 +55,7 @@ static void ata_ready_with_drq(void) {
 }
 
 static void ata_io_wait(void) {
+
 	inb(ATA_AL_STATUS_R);
 	inb(ATA_AL_STATUS_R);
 	inb(ATA_AL_STATUS_R);
@@ -57,10 +77,10 @@ static void device_selection(int slave) {
 }
 
 
-volatile int interrupt_wait;
+static volatile int interrupt_wait;
 
 
-void wait_interrupt() {
+void wait_interrupt(void) {
 
 	while(true) {
 
@@ -87,12 +107,12 @@ extern void ide_handler(void);
 
 
 //初期化
-void ata_init(void) {
+void ata_init(struct storage_device *storage) {
 
 	set_intr_gate(0x2C, ide_handler);	//割り込みハンドラ登録
 	io_apic_set_redirect(14, 0, 0x2C);	//IO APICに登録
 
-
+	storage->opts = &ata_storage_operations;
 
 	//---Identify Deviceコマンド---
 	struct ata_param param;
@@ -110,7 +130,7 @@ void ata_init(void) {
 
 	kprintf("param  %p\n", &param);
 	param.buf = buf;
-	ide_read_pio(&param);	//結果を取得
+	ata_read_pio_by_param(&param);	//結果を取得
 
 	//---文字列入れ替え---
 	unsigned char * ptr = (unsigned char *) &identify.model;
@@ -162,11 +182,11 @@ void ata_init(void) {
 		param_features.command = ATA_CMD_SET_FEATURES;
 
 		//SET FEATURESコマンド実行
-		ide_non_data(&param_features);
+		ata_non_data(&param_features);
 	}
 
 	//もう一度Identify Deviceコマンドを実行
-	ide_read_pio(&param);
+	ata_read_pio_by_param(&param);
 
 	uDMA = identify.uDMA_support.uDMA_union;
 
@@ -183,7 +203,7 @@ void ata_init(void) {
 }
 
 
-void ide_non_data(struct ata_param *param) {
+static void ata_non_data(struct ata_param *param) {
 
 
 	device_selection(0);
@@ -204,10 +224,25 @@ void ide_non_data(struct ata_param *param) {
 	wait_interrupt();	//割り込みが来たら終了
 }
 
+static void ata_read_pio(unsigned long lba, unsigned char *buf, unsigned long sector) {
 
+	outb(ATA_FEATURES_R, 0x00);
+	ata_ready_with_drq();
+
+	outb(ATA_LBA_LOW_R, (lba & 0xFF));
+	outb(ATA_LBA_MID_R, (lba >> 8) & 0xFF);
+	outb(ATA_LBA_HIGH_R, (lba >> 16) & 0xFF);
+	outb(ATA_DEVICE_HEAD_R, ((lba >> 24) & 0xFF) | 0x40);
+	outb(ATA_SECTOR_COUNT_R, sector);
+
+	outb(ATA_COMMAND_R, ATA_CMD_READ_PIO);
+
+	ata_ready();
+
+}
 
 //PIOリード
-void ide_read_pio(struct ata_param *param) {
+static void ata_read_pio_by_param(struct ata_param *param) {
 
 	//デバイスセレクション
 	device_selection(0);
@@ -254,7 +289,7 @@ void ide_read_pio(struct ata_param *param) {
 	}*/
 }
 
-void ide_write_sector(unsigned int lba, unsigned char *buf, int sector) {
+static void ata_write_sector(unsigned long lba, unsigned char *buf, unsigned long sector) {
 
 	//割り込み許可
 
@@ -289,7 +324,7 @@ void ide_write_sector(unsigned int lba, unsigned char *buf, int sector) {
 }
 
 //IDE/HDDからデータをDMA転送する bufは仮想アドレスのカーネル空間でなくてはならない
-void ide_read_sector_via_dma(unsigned int lba, unsigned char *buf, int sector) {
+static void ata_read_sector_via_dma(unsigned long lba, unsigned char *buf, unsigned long sector) {
 
 
 	if(sector <= 0) {
@@ -352,7 +387,7 @@ retry:
 
 }
 
-void ide_write_sector_via_dma(unsigned int lba, unsigned char *buf, int sector) {
+static void ata_write_sector_via_dma(unsigned long lba, unsigned char *buf, unsigned long sector) {
 
 }
 

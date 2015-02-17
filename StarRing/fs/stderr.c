@@ -94,12 +94,14 @@ static struct file_system_operations stderr_operations = {
 };
 
 
-struct fs_node *create_stderr(void) {
+struct fs_node *create_stderr(struct file_system *fs) {
 
 	struct fs_node *node = kmalloc(sizeof(struct fs_node), 8);
 
 	strcpy(node->filename, "stderr");
-	node->opt = &stderr_operations;
+
+	node->fs = fs;
+	node->fs->opt = &stderr_operations;
 	node->flags = FS_CHARDEVICE;
 
 	return node;

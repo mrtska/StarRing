@@ -35,7 +35,7 @@ struct input_device_data {
 
 
 void wait_type_key(unsigned int key_code);
-struct fs_node *create_input_device(char num);
+struct fs_node *create_input_device(struct file_system *fs, char num);
 
 
 

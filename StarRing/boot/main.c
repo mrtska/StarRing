@@ -40,7 +40,7 @@ Created on: 2014/04/02
 #include <drivers/hpet.h>
 #include <drivers/vbox.h>
 #include <drivers/vmware.h>
-#include <drivers/ide.h>
+#include <drivers/ata.h>
 #include <drivers/serial.h>
 #include <drivers/keyboard.h>
 #include <drivers/storage.h>
@@ -191,7 +191,7 @@ void main(unsigned long magic, unsigned long mboot) {
 
 	//キーボードドライバを初期化
 	keyboard_init();
-STOP;
+
 
 
 	//TSSを初期化
@@ -207,8 +207,11 @@ STOP;
 	hpet_init();
 
 
+	//VFS初期化
+	vfs_init();
+
 	//キーボードブロックデバイス生成
-	struct fs_node *input = create_input_device(0);
+	struct fs_node *input = create_input_device(alloc_file_system(), 0);
 	smp_table_set_input_node(0, input);
 
 	//APIC有効化
@@ -225,20 +228,15 @@ STOP;
 	bsp_ready = 1;
 
 	scan_storage_device();
-	//ATAドライバ初期化
-	ata_init();
+	STOP;
 
-	//VFS初期化
-	vfs_init();
 
-	//FAT32ファイルシステムドライバ初期化
-	fat32_filesystem_init();
 
 	//マウントポイント作成
-	vfs_mount("/dev/null", create_null_device());
-	vfs_mount("/dev/zero", create_null_device());
-	vfs_mount("/dev/stdout", create_stdout());
-	vfs_mount("/dev/stderr", create_stderr());
+	vfs_mount("/dev/null", create_null_device(alloc_file_system()));
+	vfs_mount("/dev/zero", create_null_device(alloc_file_system()));
+	vfs_mount("/dev/stdout", create_stdout(alloc_file_system()));
+	vfs_mount("/dev/stderr", create_stderr(alloc_file_system()));
 
 	environment_valiable_init();
 
@@ -296,7 +294,7 @@ void do_ap_main(void) {
 	//SMPテーブルにAPを登録
 	smp_ap_init();
 	//キーボードブロックデバイス生成
-	struct fs_node *input = create_input_device(apic_id);
+	struct fs_node *input = create_input_device(alloc_file_system(), apic_id);
 	smp_table_set_input_node(apic_id, input);
 
 	//APIC有効化

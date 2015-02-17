@@ -10,6 +10,8 @@ http://opensource.org/licenses/mit-license.php
 
 #pragma once
 
+#include <system.h>
+#include <drivers/storage.h>
 
 //ATA I/Oポート
 #define ATA_DATA_R			0x1F0	// R/W
@@ -292,9 +294,17 @@ struct ata_param {
 	unsigned char *buf;
 };
 
+static __inline__ void outsw(unsigned short port, unsigned char *data, unsigned long size) {
+
+	asmv("rep outsw" : "+S"(data), "+c"(size) : "d"(port));
+}
+
+static __inline__ void insw(unsigned short port, unsigned char * data, unsigned long size) {
+	asmv("rep insw" : "+D"(data), "+c"(size) : "d"(port) : "memory");
+}
 
 
-
+void ata_init(struct storage_device *storage);
 
 
 
