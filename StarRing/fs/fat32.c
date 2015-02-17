@@ -15,6 +15,22 @@
 #include <internal/stdio.h>
 #include <fs/vfs.h>
 
+
+static struct file_system_operations fat32_operations = {
+
+		.read = fat32_fread,
+		.write = fat32_fwrite,
+		.open = fat32_fopen,
+		.close = fat32_fclose,
+		.fstat = fat32_fstat,
+		.finddir = fat32_finddir
+};
+
+
+
+
+
+
 //FAT32の情報を格納 グローバル変数での実装は複数のFAT32デバイスに対応できないので FIXME
 struct fat32_info info;
 
@@ -60,11 +76,9 @@ void fat32_filesystem_init(void) {
 	//ルートノードを設定
 	root_node.filename[0] = '/';
 	root_node.filename[1] = 0x00;
-	root_node.open = fat32_fopen;
-	root_node.close = fat32_fclose;
-	root_node.read = fat32_fread;
-	root_node.write = fat32_fwrite;
-	root_node.finddir = fat32_finddir;
+
+	root_node.opt = &fat32_operations;
+
 
 	root_node.flags = FS_READONLY;
 
@@ -196,7 +210,7 @@ static void conv_file_name(struct fat32_directory_entry *entry, char *buf) {
 		//小文字判定
 		if(entry->DIR_NTRes & 0x08) {
 
-			//数字は判定に含まない
+			//アルファベットのみ小文字に
 			if(left_name[i] >= 'A' && left_name[i] <= 'Z') {
 
 				left_name[i] += 0x20;
@@ -313,12 +327,8 @@ struct fs_node *fat32_file_init(const char *filename) {
 	node->inode = (file.DIR_FstClusHI << 16) | file.DIR_FstClusLO;
 
 	//各種ハンドラ設定
-	node->open = fat32_fopen;
-	node->close = fat32_fclose;
-	node->read = fat32_fread;
-	node->write = fat32_fwrite;
-	node->finddir = fat32_finddir;
-	node->fstat = fat32_fstat;
+
+	node->opt = &fat32_operations;
 
 	node->flags |= FS_READONLY;
 

@@ -23,6 +23,8 @@ Created on: 2014/09/28
 //ルートファイルシステムマウントポイント
 struct tree *fs_tree;
 
+static struct kmem_cache *fs_node_cache;
+
 //FIXME PF 0xFFFF8810006AAAA8
 void vfs_init(void) {
 
@@ -35,6 +37,8 @@ void vfs_init(void) {
 
 
 	tree_set_root(fs_tree, entry);
+
+	fs_node_cache = kmem_cache_create("fs_node", sizeof(struct fs_node), 0, 0, NULL);
 }
 
 
@@ -56,12 +60,12 @@ void vfs_mount(char *path, struct fs_node *node) {
 	if(strlen(path) == 1) {
 
 		((struct vfs_entry*)fs_tree->root->value)->file = node;
-		kprintf("root %p\n", 	((struct vfs_entry*)fs_tree->root->value)->file->finddir);
+		kprintf("root %p\n", 	((struct vfs_entry*)fs_tree->root->value)->file->opt->finddir);
 		kfree(tokbuf, 0x100);
 		return;
 	}
 
-	//アンセスタノード & ペアレントノード
+	//アンセスタノード
 	struct tree_node *parent = fs_tree->root;
 	struct list_head *cur_children = &parent->children;
 
@@ -211,9 +215,9 @@ struct file_descriptor *get_file_descriptor(unsigned int fd) {
 //ファイルシステムからファイルを読み込む
 unsigned int read_fs(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer) {
 
-	if(node->read) {
+	if(node->opt->read) {
 
-		return node->read(node, offset, size, buffer);
+		return node->opt->read(node, offset, size, buffer);
 	}
 	trace();
 
@@ -228,9 +232,9 @@ unsigned int write_fs(struct fs_node *node, unsigned int offset, unsigned int si
 		return -1;
 	}
 
-	if(node->write) {
+	if(node->opt->write) {
 
-		return node->write(node, offset, size, buffer);
+		return node->opt->write(node, offset, size, buffer);
 	}
 	trace();
 	return -1;
@@ -244,9 +248,9 @@ unsigned int writev_fs(struct fs_node *node, const struct iovec* vec, unsigned l
 		return -1;
 	}
 
-	if(node->writev) {
+	if(node->opt->writev) {
 
-		return node->writev(node, vec, len);
+		return node->opt->writev(node, vec, len);
 	}
 
 	int ret = 0;
@@ -273,9 +277,9 @@ fail:
 //ファイルをオープンする
 void open_fs(struct fs_node *node, unsigned int flags) {
 
-	if(node->open) {
+	if(node->opt->open) {
 
-		node->open(node, flags);
+		node->opt->open(node, flags);
 
 
 		return;
@@ -286,9 +290,9 @@ void open_fs(struct fs_node *node, unsigned int flags) {
 //ファイルをクローズする
 void close_fs(struct fs_node *node) {
 
-	if(node->close) {
+	if(node->opt->close) {
 
-		node->close(node);
+		node->opt->close(node);
 		return;
 	}
 	trace();
@@ -297,9 +301,9 @@ void close_fs(struct fs_node *node) {
 //ファイルをサーチする
 struct fs_node *finddir_fs(struct fs_node *node, char *name) {
 
-	if(node->finddir) {
+	if(node->opt->finddir) {
 
-		return node->finddir(node, name);
+		return node->opt->finddir(node, name);
 	}
 
 	//キャラクタデバイスの場合
@@ -313,14 +317,15 @@ struct fs_node *finddir_fs(struct fs_node *node, char *name) {
 
 int fstat_fs(struct fs_node *node, struct stat *stat) {
 
-	if(node->fstat) {
+	if(node->opt->fstat) {
 
-		return node->fstat(node, stat);
+		return node->opt->fstat(node, stat);
 	}
 
 	kprintf("could not execute fstat %s\n", node->filename);
 	return -1;
 }
+
 
 
 

@@ -14,6 +14,10 @@ Created on: 2015/01/27
 #include <smp.h>
 #include <spinlock.h>
 #include <ioapic.h>
+
+
+
+
 static unsigned int read_input(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer) {
 
 	struct input_device_data *data = node->data;
@@ -49,6 +53,15 @@ static void close_input(struct fs_node *node) {
 }
 
 
+
+static struct file_system_operations input_opeartions = {
+
+		.read = read_input,
+		.write = write_input,
+		.open = open_input,
+		.close = close_input
+};
+
 void wait_type_key(unsigned int key_code) {
 
 	int apic_id = get_apic_id();
@@ -82,10 +95,7 @@ struct fs_node *create_input_device(char num) {
 
 	strcpy(node->filename, "/dev/input");
 	node->filename[11] = num;
-	node->read = read_input;
-	node->write = write_input;
-	node->open = open_input;
-	node->close = close_input;
+	node->opt = &input_opeartions;
 
 	node->data = kmalloc(sizeof(struct input_device_data), 8);
 

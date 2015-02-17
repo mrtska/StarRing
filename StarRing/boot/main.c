@@ -43,6 +43,7 @@ Created on: 2014/04/02
 #include <drivers/ide.h>
 #include <drivers/serial.h>
 #include <drivers/keyboard.h>
+#include <drivers/storage.h>
 
 #include <fs/vfs.h>
 #include <fs/fat32.h>
@@ -190,7 +191,7 @@ void main(unsigned long magic, unsigned long mboot) {
 
 	//キーボードドライバを初期化
 	keyboard_init();
-
+STOP;
 
 
 	//TSSを初期化
@@ -223,8 +224,9 @@ void main(unsigned long magic, unsigned long mboot) {
 	smp_init();
 	bsp_ready = 1;
 
-	//IDEドライバ初期化
-	ide_init();
+	scan_storage_device();
+	//ATAドライバ初期化
+	ata_init();
 
 	//VFS初期化
 	vfs_init();

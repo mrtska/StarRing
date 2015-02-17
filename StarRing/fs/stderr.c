@@ -73,18 +73,33 @@ static void close_stderr(struct fs_node *node) {
 	return;
 }
 
+static int fstat_stderr(struct fs_node *node, struct stat *stat) {
+
+
+	stat->st_ino = 0xE;
+	stat->st_mode = S_IFCHR;
+
+	return 0;
+}
+
+
+static struct file_system_operations stderr_operations = {
+
+		.read = read_stderr,
+		.write = write_stderr,
+		.writev = writev_stderr,
+		.open = open_stderr,
+		.close = close_stderr,
+		.fstat = fstat_stderr
+};
+
 
 struct fs_node *create_stderr(void) {
 
 	struct fs_node *node = kmalloc(sizeof(struct fs_node), 8);
 
 	strcpy(node->filename, "stderr");
-	node->read = read_stderr;
-	node->write = write_stderr;
-	node->writev = writev_stderr;
-	node->open = open_stderr;
-	node->close = close_stderr;
-
+	node->opt = &stderr_operations;
 	node->flags = FS_CHARDEVICE;
 
 	return node;

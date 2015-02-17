@@ -1,5 +1,5 @@
 /*
-[Module ide.c]
+[Module ata.c]
 Copyright(c) 2015 mrtska.starring
 
 This software is released under the MIT License.
@@ -87,7 +87,7 @@ extern void ide_handler(void);
 
 
 //初期化
-void ide_init(void) {
+void ata_init(void) {
 
 	set_intr_gate(0x2C, ide_handler);	//割り込みハンドラ登録
 	io_apic_set_redirect(14, 0, 0x2C);	//IO APICに登録

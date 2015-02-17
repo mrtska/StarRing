@@ -23,7 +23,7 @@ static __inline__ void insw(unsigned short port, unsigned char * data, unsigned 
 }
 
 
-void ide_init(void);
+void ata_init(void);
 
 void ide_non_data(struct ata_param *param);
 

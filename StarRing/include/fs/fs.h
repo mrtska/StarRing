@@ -70,6 +70,23 @@ typedef int (*fstat_func) (struct fs_node*, struct stat*);
 //ファイルサイズ取得関数ポインタ
 typedef int (*get_size_func) (struct fs_node*);
 
+struct file_system_operations {
+
+	//ファイルオペレーション
+	read_func read;			//unsigned int : struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer
+	write_func write;		//unsigned int : struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer
+	writev_func writev;
+	open_func open;			//void : struct fs_node *node, unsigned int flags
+	close_func close;		//void : struct fs_node *node
+	readdir_func readdir;	//
+	finddir_func finddir;	//struct fs_node* : struct fs_node *node, char *name
+	create_func create;		//
+	mkdir_func mkdir;		//
+	ioctl_func ioctl;		//
+	fstat_func fstat;		//
+	get_size_func get_size;	//
+
+};
 
 //ファイルディスクリプタ
 struct file_descriptor {
@@ -113,19 +130,7 @@ struct fs_node {
 	unsigned int mtime;		//変更タイム
 	unsigned int ctime;		//作成タイム
 
-	//ファイルオペレーション
-	read_func read;			//unsigned int : struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer
-	write_func write;		//unsigned int : struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer
-	writev_func writev;
-	open_func open;			//void : struct fs_node *node, unsigned int flags
-	close_func close;		//void : struct fs_node *node
-	readdir_func readdir;	//
-	finddir_func finddir;	//struct fs_node* : struct fs_node *node, char *name
-	create_func create;		//
-	mkdir_func mkdir;		//
-	ioctl_func ioctl;		//
-	fstat_func fstat;		//
-	get_size_func get_size;	//
+	struct file_system_operations *opt;
 
 	//シンボリックリンク用ポインタ
 	struct fs_node *ptr;

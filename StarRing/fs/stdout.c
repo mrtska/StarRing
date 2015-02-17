@@ -10,7 +10,7 @@ Created on: 2015/01/29
 
 #include <system.h>
 #include <fs/stdout.h>
-
+#include <fs/stat.h>
 
 
 static unsigned int read_stdout(struct fs_node *node, unsigned int offset, unsigned int size, unsigned char *buffer) {
@@ -63,9 +63,24 @@ static void close_stdout(struct fs_node *node) {
 	return;
 }
 
+static int fstat_stdout(struct fs_node *node, struct stat *stat) {
 
 
+	stat->st_ino = 0xD;
+	stat->st_mode = S_IFCHR;
 
+	return 0;
+}
+
+static struct file_system_operations stdout_operations = {
+
+		.read = read_stdout,
+		.write = write_stdout,
+		.writev = writev_stdout,
+		.open = open_stdout,
+		.close = close_stdout,
+		.fstat = fstat_stdout
+};
 
 
 
@@ -74,11 +89,7 @@ struct fs_node *create_stdout(void) {
 	struct fs_node *node = kmalloc(sizeof(struct fs_node), 8);
 
 	strcpy(node->filename, "stdout");
-	node->read = read_stdout;
-	node->write = write_stdout;
-	node->writev = writev_stdout;
-	node->open = open_stdout;
-	node->close = close_stdout;
+	node->opt = &stdout_operations;
 
 
 	node->flags = FS_CHARDEVICE;

@@ -132,9 +132,9 @@ static int get_next_pid(void) {
 //タスクを初期化する
 void task_init(void) {
 
-	struct fs_node *f = kopen("/init.elf", 0);
+	struct fs_node *f = kopen("/weston", 0);
 
-	create_process("/init.elf", f, 1, "", 0);
+	create_process("/weston", f, 1, "", 0);
 }
 
 int create_process(char *name, struct fs_node *node, int argc, char *cmdline, int flags) {
