@@ -98,6 +98,10 @@ static volatile unsigned char bsp_ready;
 //エントリポイント
 void main(unsigned long magic, unsigned long mboot) {
 
+
+	//BSSセクションを0初期化する
+	bss_init();
+
 	serial_init();
 
 	//マルチブート2のマジックナンバー確認
@@ -113,8 +117,6 @@ void main(unsigned long magic, unsigned long mboot) {
 	//一時的に割り込みを無効にする
 	asmv("cli");
 
-	//BSSセクションを0初期化する
-	bss_init();
 
 	//画面をクリア
 	cls();
@@ -142,7 +144,6 @@ void main(unsigned long magic, unsigned long mboot) {
 	//仮想メモリマネージャー初期化
 	vmm_allocator_init();
 
-
 	//正式なページテーブルを初期化&ロード
 	page_init(memory_size);
 
@@ -153,7 +154,6 @@ void main(unsigned long magic, unsigned long mboot) {
 		p = &ap_stack[0][0];
 		asmv("movq %0, %%rbp" : : "r"(p));
 	}
-
 	//スラブアロケーター初期化
 	init_slaballocator();
 
@@ -172,6 +172,7 @@ void main(unsigned long magic, unsigned long mboot) {
 
 	//ウェイトリスト初期化
 	wait_list_init();
+
 
 	/*
 	 kprintf("dsdt %p\n", acpi_table.dsdt);
@@ -229,7 +230,6 @@ void main(unsigned long magic, unsigned long mboot) {
 
 	scan_storage_device();
 	STOP;
-
 
 
 	//マウントポイント作成

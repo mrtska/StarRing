@@ -51,8 +51,6 @@ Created on: 2014/10/13
 #define PCI_REGISTER_INTERRUPT_PIN			0x3C
 
 
-#define PCI_CLASS_CODE_BUS_MASTER			0x01018A
-
 
 struct pci_config {
 

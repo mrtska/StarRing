@@ -20,8 +20,8 @@ Created on: 2014/10/09
 #include <mem/alloc.h>
 
 
-static void ata_non_data(struct ata_param *param);
-static void ata_read_pio_by_param(struct ata_param *param);
+static void ata_non_data(struct ata_param *param, int device);
+static void ata_read_pio_by_param(struct ata_param *param, int device);
 static void ata_write_sector(unsigned long lba, unsigned char *buf, unsigned long sector);
 static void ata_read_sector_via_dma(unsigned long lba, unsigned char *buf, unsigned long sector);
 static void ata_write_sector_via_dma(unsigned long lba, unsigned char *buf, unsigned long sector);
@@ -104,15 +104,8 @@ void do_ide_handler(void) {
 
 extern void ide_handler(void);
 
+static void ata_device_init(int device) {
 
-
-//初期化
-void ata_init(struct storage_device *storage) {
-
-	set_intr_gate(0x2C, ide_handler);	//割り込みハンドラ登録
-	io_apic_set_redirect(14, 0, 0x2C);	//IO APICに登録
-
-	storage->opts = &ata_storage_operations;
 
 	//---Identify Deviceコマンド---
 	struct ata_param param;
@@ -126,11 +119,9 @@ void ata_init(struct storage_device *storage) {
 
 	//リザルト
 	struct ata_identify identify;
-	unsigned char *buf = (unsigned char*) &identify;
 
-	kprintf("param  %p\n", &param);
-	param.buf = buf;
-	ata_read_pio_by_param(&param);	//結果を取得
+	param.buf = (unsigned char*) &identify;
+	ata_read_pio_by_param(&param, device);	//結果を取得
 
 	//---文字列入れ替え---
 	unsigned char * ptr = (unsigned char *) &identify.model;
@@ -143,8 +134,8 @@ void ata_init(struct storage_device *storage) {
 	memset(&identify.model[39], 0x00, 1);	//最終文字にヌル文字を代入しておく
 	//------
 
-	kprintf("ATA FIRM = %s\n", identify.model);
-	kprintf("MAX sectors %X, %X, head = %X\n", identify.sectors_28, identify.sectors_48, identify.heads);
+	//kprintf("ATA FIRM = %s\n", identify.model);
+	//kprintf("MAX sectors %X, %X, head = %X\n", identify.sectors_28, identify.sectors_48, identify.heads);
 
 	//uDMAをサポートしているかどうかのフィールド
 	unsigned short uDMA = identify.uDMA_support.uDMA_union;
@@ -182,11 +173,11 @@ void ata_init(struct storage_device *storage) {
 		param_features.command = ATA_CMD_SET_FEATURES;
 
 		//SET FEATURESコマンド実行
-		ata_non_data(&param_features);
+		ata_non_data(&param_features, device);
 	}
 
 	//もう一度Identify Deviceコマンドを実行
-	ata_read_pio_by_param(&param);
+	ata_read_pio_by_param(&param, device);
 
 	uDMA = identify.uDMA_support.uDMA_union;
 
@@ -197,16 +188,34 @@ void ata_init(struct storage_device *storage) {
 	}
 	kprintf("Current uDMA version = %d\n", i);
 
+}
 
+
+//初期化
+void ata_init(struct storage_device *storage) {
+
+
+	unsigned int intr = (pci_conf_read(storage->pci_device, PCI_REGISTER_INTERRUPT_PIN));
+
+	kprintf("ata interrupt %s, %d\n", storage->pci_device->vender_name, intr);
+	STOP;
+
+	set_intr_gate(0x2C, ide_handler);	//割り込みハンドラ登録
+	io_apic_set_redirect(14, 0, 0x2C);	//IO APICに登録
+
+	storage->opts = &ata_storage_operations;
+
+	ata_device_init(0);
+	ata_device_init(1);
 	//バスマスターDMA初期化
 	dma_init();
 }
 
 
-static void ata_non_data(struct ata_param *param) {
+static void ata_non_data(struct ata_param *param, int device) {
 
 
-	device_selection(0);
+	device_selection(device);
 
 	//---レジスタにパラメーターを設定---
 	outb(ATA_DEVICE_CTRL_R, 0);
@@ -214,7 +223,7 @@ static void ata_non_data(struct ata_param *param) {
 	outb(ATA_LBA_LOW_R, param->sector_number);
 	outb(ATA_LBA_MID_R, param->cylinder_low);
 	outb(ATA_LBA_HIGH_R, param->cylinder_high);
-	outb(ATA_DEVICE_HEAD_R, param->device_head);
+	outb(ATA_DEVICE_HEAD_R, param->device_head | device << 4);
 	outb(ATA_SECTOR_COUNT_R, param->sector_count);
 	outb(ATA_COMMAND_R, param->command);
 	//------
@@ -242,10 +251,10 @@ static void ata_read_pio(unsigned long lba, unsigned char *buf, unsigned long se
 }
 
 //PIOリード
-static void ata_read_pio_by_param(struct ata_param *param) {
+static void ata_read_pio_by_param(struct ata_param *param, int device) {
 
 	//デバイスセレクション
-	device_selection(0);
+	device_selection(device);
 	unsigned char *buf = param->buf;
 	//---レジスタにパラメーターを設定---
 	outb(ATA_DEVICE_CTRL_R, 0);
@@ -253,7 +262,7 @@ static void ata_read_pio_by_param(struct ata_param *param) {
 	outb(ATA_LBA_LOW_R, param->sector_number);
 	outb(ATA_LBA_MID_R, param->cylinder_low);
 	outb(ATA_LBA_HIGH_R, param->cylinder_high);
-	outb(ATA_DEVICE_HEAD_R, param->device_head);
+	outb(ATA_DEVICE_HEAD_R, param->device_head | device << 4);
 	outb(ATA_SECTOR_COUNT_R, param->sector_count);
 	outb(ATA_COMMAND_R, param->command);
 	//------

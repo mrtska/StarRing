@@ -25,9 +25,6 @@ void vmm_allocator_init() {
 
 
 
-	kprintf("vmm = %p\n", &vmm.base[0x1000]);
-
-
 }
 
 void vmm_allocator_post_init(void) {
@@ -43,6 +40,7 @@ void *vmm_page_table_alloc(void) {
 
 		if(!vmm.base[i]) {
 
+			memset(&vmm.base[i], 0x00, 0x1000);
 			vmm.base[i] = 0x40;
 			return &vmm.base[i];
 		}

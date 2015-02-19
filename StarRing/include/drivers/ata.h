@@ -280,6 +280,19 @@ struct ata_identify {
 
 } __attribute__((packed));
 
+
+struct ata_device {
+
+	struct ata_identify identify;
+
+
+
+
+
+
+};
+
+
 //コマンドパラメーター
 struct ata_param {
 

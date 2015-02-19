@@ -89,7 +89,7 @@ void tag_parse(unsigned long addr) {
 			kprintf("Module at 0x%x-0x%x. Command line %s\n", ((struct multiboot_tag_module*) tag)->mod_start, ((struct multiboot_tag_module*) tag)->mod_end, ((struct multiboot_tag_module*) tag)->cmdline);
 			break;
 		case MULTIBOOT_TAG_TYPE_BOOTDEV:
-			kprintf("Boot device 0x%x, %u, %u\n", ((struct multiboot_tag_bootdev*) tag)->biosdev, ((struct multiboot_tag_bootdev*) tag)->slice, ((struct multiboot_tag_bootdev*) tag)->part);
+			kprintf("Boot device 0x%X, partition %X, sub-partition %X\n", ((struct multiboot_tag_bootdev*) tag)->biosdev, ((struct multiboot_tag_bootdev*) tag)->slice, ((struct multiboot_tag_bootdev*) tag)->part);
 			break;
 		case MULTIBOOT_TAG_TYPE_MMAP: {
 

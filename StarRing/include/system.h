@@ -43,7 +43,7 @@ typedef _Bool bool;
 #define STOP while(1) asmv("hlt")
 
 
-#define trace() kprintf("[%s]\n", __FUNCTION__)
+#define trace() kprintf("[%s] file %s line %u\n", __FUNCTION__, __FILE__, __LINE__)
 #define lfence() asmv("lfence":::"memory")
 #define sfence() asmv("sfence":::"memory")
 #define mfence() asmv("mfence":::"memory")

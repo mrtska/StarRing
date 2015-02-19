@@ -1,5 +1,5 @@
 #ブート時
-FILE := keyboard.o hpet.o vbox.o vmware.o ata.o beep.o dma.o serial.o storage.o
+FILE := keyboard.o hpet.o vbox.o vmware.o ata.o beep.o dma.o serial.o storage.o ahci.o
 TARGET := drivers.sys
 
 

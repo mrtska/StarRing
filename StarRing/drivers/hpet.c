@@ -79,7 +79,6 @@ void hpet_init(void) {
 	int num;
 	int pa;
 
-	kprintf("HPET = %p\n", addr);
 
 	if((void*)addr == NULL) {
 

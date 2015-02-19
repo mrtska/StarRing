@@ -222,12 +222,10 @@ void acpi_init(void) {
 		trace();
 		return;
 	}
-	kprintf("RSDP = %p value = %p\n", r, *(unsigned long*) (r));
 
 	acpi_table.rsdp = r;
 	acpi_table.rsdt = PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(ACPI_R32(r, 16));
 
-	kprintf("RSDT = %p\n", acpi_table.rsdt);
 
 	acpi_table.xsdt = PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(ACPI_R64(r, 24));
 

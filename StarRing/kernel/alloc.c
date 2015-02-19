@@ -175,12 +175,8 @@ void allocator_init(unsigned long memory_size) {
 	kprintf("memory blocks = %p\n", phys_memory.bit_map);
 
 	memory_allocate_and_free();							//メモリマップをビットマップに反映する
-
 	//メモリマップをパースする
 	parse_mmap();
-
-
-
 }
 
 

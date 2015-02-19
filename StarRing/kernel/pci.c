@@ -20,7 +20,7 @@ Created on: 2014/08/18
 static LIST_HEAD(pci_device_list);
 
 
-static void store_pci_data(unsigned short vender_id, unsigned short device_id, int device_num, int func_num, int bus, unsigned int class_code, char *device_name) {
+static void store_pci_data(unsigned short vender_id, unsigned short device_id, int device_num, int func_num, int bus, unsigned int class_code, char *vendor_name, char *device_name) {
 
 	struct pci_device *device = kmalloc(sizeof(struct pci_device), 0x8);
 
@@ -29,6 +29,7 @@ static void store_pci_data(unsigned short vender_id, unsigned short device_id, i
 	device->device_num = device_num;
 	device->func_num = func_num;
 	device->bus = bus;
+	device->vender_name = vendor_name;
 	device->device_name = device_name;
 	device->class_code = class_code;
 
@@ -73,11 +74,22 @@ void pci_init(void) {
 				vendor_id = result & 0xFFFF;
 				device_id = (result >> 16) & 0xFFFF;
 
-				for(j = 0; j < sizeof(PciDevTable) / sizeof(PCI_DEVTABLE); j++) {
+				for(j = 0; j < PCI_DEVTABLE_LEN; j++) {
 
 					if(PciDevTable[j].VenId == vendor_id && PciDevTable[j].DevId == device_id) {
 
-						store_pci_data(vendor_id, device_id, device_num, func_num, bus, class_code, PciDevTable[j].ChipDesc);	//データを格納
+						void *p = 0;
+						int k;
+						for(k = 0; k < PCI_VENTABLE_LEN; k++) {
+
+							if(PciVenTable[k].VenId == vendor_id) {
+
+								p = PciVenTable[k].VenFull;
+								break;
+							}
+						}
+
+						store_pci_data(vendor_id, device_id, device_num, func_num, bus, class_code, p, PciDevTable[j].ChipDesc);	//データを格納
 						goto tail;
 					}
 				}

@@ -11,6 +11,8 @@ Created on: 2015/02/17
 
 #pragma once
 
+#include <drivers/pci.h>
+
 typedef void (*read_storage) (unsigned long lba, unsigned char* buffer, unsigned long sector);
 typedef void (*write_storage) (unsigned long lba, unsigned char* buffer, unsigned long sector);
 
@@ -27,15 +29,27 @@ struct storage_operations {
 
 struct storage_device {
 
+#define STORAGE_TYPE_PATA 1
 
+	unsigned int type;
 	unsigned int classcode;			//PCIクラスコード
 	unsigned int num;				//番号
+
+
+	struct pci_device *pci_device;
+
+
 
 	struct storage_operations *opts;//ストレージ処理
 
 
 	//ストレージごとにバッファとなるメモリを与える
 	void *storage_buffer;
+
+
+
+
+	void *device;
 };
 
 

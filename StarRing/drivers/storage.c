@@ -45,6 +45,7 @@ void scan_storage_device(void) {
 
 		struct storage_device *storage_device = &storage[index++];
 		storage_device->classcode = device->class_code;
+		storage_device->pci_device = device;
 		storage_device->storage_buffer = alloc_memory_block();
 
 		switch(class.sub_class) {

@@ -24,9 +24,6 @@ unsigned long *kernel_pml4;
 void page_init(unsigned long memory_max) {
 
 	kernel_pml4 = vmm_page_table_alloc();
-
-	kprintf("kernel %p\n", kernel_pml4);
-
 	//物理メモリ ストレートマッピング
 	unsigned long i;
 	for(i = 0; i < memory_max; i += 0x40000000) {
@@ -37,7 +34,6 @@ void page_init(unsigned long memory_max) {
 	//カーネルテキスト
 	map_page(0xFFFFFFFF80000000, 0x00000000, kernel_pml4, FLAGS_WRITABLE_PAGE | FLAGS_LARGE_PAGE | FLAGS_ALLOC_512MB);
 
-	kprintf("pml4 %p\n", kernel_pml4[0x110]);
 	write_cr3((unsigned long) VIRTUAL_ADDRESS_TO_PHYSICAL_ADDRESS(kernel_pml4));
 }
 
@@ -138,7 +134,7 @@ void map_pd(unsigned long virt, unsigned long phys, unsigned long *pd, int flags
 				pd[i] = phys | (page_flags);
 			}
 
-			//kprintf("map_pd %p, %p\n", p[i], virt);
+			//kprintf("map_pd %p, %p\n", pd[i], virt);
 		} else {
 
 			pd[pde] = phys | (page_flags);
@@ -269,12 +265,10 @@ void map_pml4(unsigned long virt, unsigned long phys, unsigned long *pml4, int f
 	map_pdpt(virt, phys, (unsigned long*) p, flags);
 }
 
-// map_page(0xFFFFFFFFC0000000, 0x2000000, NULL, 0);
-
 //ページをマップする cr3は仮想アドレスを指定する
 void map_page(unsigned long virt, unsigned long phys, unsigned long *cr3, int flags) {
 
-	kprintf("[kernel/map_page] %p\n", virt);
+	//kprintf("[kernel/map_page] %p\n", virt);
 	map_pml4(virt, phys, cr3, flags);
 }
 
