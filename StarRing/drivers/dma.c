@@ -22,7 +22,7 @@ int dma_base_port;
 unsigned long prdt_pointer;
 
 void dma_init(void) {
-
+/*
 	//PCIバスマスタのクラスコードを持つデバイスを探す
 	struct pci_device *device = pci_find_device_by_class_code(PCI_CLASS_CODE_BUS_MASTER);
 
@@ -40,6 +40,6 @@ void dma_init(void) {
 	prdt_pointer = PHYSICAL_ADDRESS_TO_VIRTUAL_ADDRESS(0x500);
 
 	//PRDTの物理アドレスを設定
-	outl(port + DMA_PRIMARY_PRDT_R, 0x500);
+	outl(port + DMA_PRIMARY_PRDT_R, 0x500);*/
 
 }

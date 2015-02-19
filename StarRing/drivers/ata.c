@@ -195,7 +195,7 @@ static void ata_device_init(int device) {
 void ata_init(struct storage_device *storage) {
 
 
-	unsigned int intr = (pci_conf_read(storage->pci_device, PCI_REGISTER_INTERRUPT_PIN));
+	unsigned int intr = (pci_conf_read(storage->pci_device, PCI_REGISTER_INTERRUPT_INFORMATION));
 
 	kprintf("ata interrupt %s, %d\n", storage->pci_device->vender_name, intr);
 	STOP;

@@ -30,11 +30,8 @@ struct storage_operations {
 struct storage_device {
 
 #define STORAGE_TYPE_PATA 1
-
+#define STORAGE_TYPE_AHCI 2
 	unsigned int type;
-	unsigned int classcode;			//PCIクラスコード
-	unsigned int num;				//番号
-
 
 	struct pci_device *pci_device;
 

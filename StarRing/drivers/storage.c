@@ -16,6 +16,7 @@ Created on: 2015/02/17
 #include <drivers/storage.h>
 #include <drivers/pci.h>
 #include <drivers/ata.h>
+#include <drivers/ahci.h>
 #include <list.h>
 
 
@@ -44,17 +45,24 @@ void scan_storage_device(void) {
 
 
 		struct storage_device *storage_device = &storage[index++];
-		storage_device->classcode = device->class_code;
 		storage_device->pci_device = device;
 		storage_device->storage_buffer = alloc_memory_block();
 
 		switch(class.sub_class) {
 
-		//IDE
+		//PATA
 		case 1:
 
-			//ATAドライバ初期化
+			//PATAドライバ初期化
+			storage_device->type = STORAGE_TYPE_PATA;
 			ata_init(storage_device);
+			break;
+		//AHCI
+		case 6:
+
+			//AHCIドライバ初期化
+			storage_device->type = STORAGE_TYPE_AHCI;
+			ahci_init(storage_device);
 			break;
 		default:
 

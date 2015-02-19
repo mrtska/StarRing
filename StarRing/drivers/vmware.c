@@ -295,7 +295,7 @@ void vmware_graphics_init(unsigned int x, unsigned int y) {
 
 	if(svga_device.capabilities & VMWARE_SVGA_CAP_IRQMASK) {
 
-		unsigned int irq = pci_conf_read(device, PCI_REGISTER_INTERRUPT_PIN) & 0xFF;
+		unsigned int irq = pci_conf_read(device, PCI_REGISTER_INTERRUPT_INFORMATION) & 0xFF;
 
 		svga_write_value(SVGA_REG_IRQMASK, 0);
 
