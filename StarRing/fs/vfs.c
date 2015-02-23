@@ -44,6 +44,11 @@ void vfs_init(void) {
 }
 
 
+struct fs_node *alloc_fs_node(void) {
+
+	return kmem_cache_alloc(fs_node_cache, 0);
+}
+
 //ファイルシステムを管理する構造体のメモリを確保する
 struct file_system *alloc_file_system(void) {
 
