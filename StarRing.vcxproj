@@ -62,8 +62,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeOutput>StarRing.exe</NMakeOutput>
+    <NMakeOutput>
+    </NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeBuildCommandLine>"E:\SoftWare Files\cygwin\bin\make.exe" all install</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>"E:\SoftWare Files\cygwin\bin\make.exe" all install clean</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>"E:\SoftWare Files\cygwin\bin\make.exe" clean</NMakeCleanCommandLine>
+    <IncludePath>E:\Development\StarRing\StarRing\StarRing\StarRing\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>StarRing.exe</NMakeOutput>
@@ -73,6 +78,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="LICENSE" />
+    <None Include="Makefile" />
+    <None Include="README.md" />
+    <None Include="StarRing\.gitignore" />
+    <None Include="StarRing\acpica\Makefile" />
+    <None Include="StarRing\boot\Makefile" />
+    <None Include="StarRing\linkerscript" />
+    <None Include="StarRing\Makefile" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -17,4 +17,16 @@
   <ItemGroup>
     <Text Include="readme.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="StarRing\Makefile" />
+    <None Include="StarRing\linkerscript" />
+    <None Include="StarRing\.gitignore" />
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="LICENSE" />
+    <None Include="README.md" />
+    <None Include="StarRing\acpica\Makefile" />
+    <None Include="StarRing\boot\Makefile" />
+    <None Include="Makefile" />
+  </ItemGroup>
 </Project>
