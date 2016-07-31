@@ -1,12 +1,13 @@
 #ブート時
-FILE := string.o idt.o gdt.o apic.o ioapic.o syscall.o trap.o page.o spinlock.o alloc.o page_fault.o cpuid.o slab.o acpi.o pci.o smp.o wait.o task.o systemcall.o elf.o ipi.o vmm.o ioctl.o
-FILE += prctl.o sys.o env.o
+FILE := string.o printf.o #idt.o gdt.o apic.o ioapic.o syscall.o trap.o page.o spinlock.o alloc.o page_fault.o cpuid.o slab.o acpi.o pci.o smp.o wait.o task.o systemcall.o elf.o ipi.o vmm.o ioctl.o
+#FILE += prctl.o sys.o env.o
 
 TARGET := kernel.sys
 
 
-.c.o:
-	$(CC) -mcmodel=kernel -I../$(INCLUDE) -include ../acpica/include/platform/acstarring.h -ffreestanding -nostdlib -mno-red-zone -Wall -c $< -o $@
+.cpp.o:
+	#$(CC) -mcmodel=kernel -I../$(INCLUDE) -include ../acpica/include/platform/acstarring.h -ffreestanding -nostdlib -mno-red-zone -Wall -c $< -o $@
+	$(CC) -mcmodel=kernel -I../$(INCLUDE) -ffreestanding -nostdlib -mno-red-zone -Wall -c $< -o $@
 
 .S.o:
 	$(CC) -mcmodel=kernel -I../$(INCLUDE) -ffreestanding -nostdlib -mno-red-zone -Wall -c $< -o $@

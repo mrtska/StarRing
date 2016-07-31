@@ -28,5 +28,46 @@
     <None Include="StarRing\acpica\Makefile" />
     <None Include="StarRing\boot\Makefile" />
     <None Include="Makefile" />
+    <None Include="StarRing\drivers\Makefile" />
+    <None Include="StarRing\fs\Makefile" />
+    <None Include="StarRing\internal\Makefile" />
+    <None Include="StarRing\kernel\Makefile" />
+    <None Include="StarRing\boot\boot.S" />
+    <None Include="Z:\StarRing-2014\StarRing-2014\StarRing\boot\bootlinker.ld" />
+    <None Include="StarRing\boot\bootlinker.ld" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StarRing\boot\main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="StarRing\kernel\printf.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="StarRing\kernel\string.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="StarRing\include\system.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRing\include\stdarg.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRing\include\stddef.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRing\include\string.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRing\include\spinlock.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRing\include\stdio.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRing\include\idt.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

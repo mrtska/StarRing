@@ -65,10 +65,12 @@
     <NMakeOutput>
     </NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <NMakeBuildCommandLine>"E:\SoftWare Files\cygwin\bin\make.exe" all install</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>"E:\SoftWare Files\cygwin\bin\make.exe" all install clean</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>"E:\SoftWare Files\cygwin\bin\make.exe" clean</NMakeCleanCommandLine>
-    <IncludePath>E:\Development\StarRing\StarRing\StarRing\StarRing\include;$(IncludePath)</IncludePath>
+    <NMakeBuildCommandLine>build.bat all install</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>build.bat clean all install </NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>build.bat clean</NMakeCleanCommandLine>
+    <IncludePath>E:\Development\StarRing\StarRing\StarRing\StarRing\include</IncludePath>
+    <LibraryPath />
+    <LibraryWPath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeOutput>StarRing.exe</NMakeOutput>
@@ -87,9 +89,30 @@
     <None Include="README.md" />
     <None Include="StarRing\.gitignore" />
     <None Include="StarRing\acpica\Makefile" />
+    <None Include="StarRing\boot\boot.S" />
+    <None Include="StarRing\boot\bootlinker.ld" />
     <None Include="StarRing\boot\Makefile" />
+    <None Include="StarRing\drivers\Makefile" />
+    <None Include="StarRing\fs\Makefile" />
+    <None Include="StarRing\internal\Makefile" />
+    <None Include="StarRing\kernel\Makefile" />
     <None Include="StarRing\linkerscript" />
     <None Include="StarRing\Makefile" />
+    <None Include="Z:\StarRing-2014\StarRing-2014\StarRing\boot\bootlinker.ld" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="StarRing\boot\main.cpp" />
+    <ClCompile Include="StarRing\kernel\printf.cpp" />
+    <ClCompile Include="StarRing\kernel\string.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="StarRing\include\idt.h" />
+    <ClInclude Include="StarRing\include\spinlock.h" />
+    <ClInclude Include="StarRing\include\stdarg.h" />
+    <ClInclude Include="StarRing\include\stddef.h" />
+    <ClInclude Include="StarRing\include\stdio.h" />
+    <ClInclude Include="StarRing\include\string.h" />
+    <ClInclude Include="StarRing\include\system.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

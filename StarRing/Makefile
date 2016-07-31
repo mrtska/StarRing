@@ -3,7 +3,7 @@ export LANG=C
 #定義群
 HOME_DIR	= "$(CURDIR)"
 
-CC		:= x86_64-pc-linux-gnu-gcc -pipe -O2 -g
+CC		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11
 LD		:= x86_64-pc-linux-gnu-ld
 AS		:= x86_64-pc-linux-gnu-as
 OBJCOPY	:= x86_64-pc-linux-gnu-objcopy
@@ -26,22 +26,22 @@ export MAKE
 export INCLUDE
 
 
-OBJECTS := boot/boot.sys internal/internal.sys kernel/kernel.sys acpica/acpica.sys fs/fs.sys drivers/drivers.sys
+OBJECTS := boot/boot.sys kernel/kernel.sys #acpica/acpica.sys fs/fs.sys drivers/drivers.sys
 
 .PHONY: all
 all: compile
 
 .PHONY: compile
 compile:
-	nasm -f bin -o boot/ap_boot.o boot/ap_boot.S
-	touch ./boot/boot.S
+#	nasm -f bin -o boot/ap_boot.o boot/ap_boot.S
+#	touch ./boot/boot.S
 	
 	$(CD) boot;$(MAKE) 		#ブート時処理をコンパイル
-	$(CD) internal;$(MAKE)	#内部処理をコンパイル
+#	$(CD) internal;$(MAKE)	#内部処理をコンパイル
 	$(CD) kernel;$(MAKE)	#カーネル本体をコンパイル
-	$(CD) acpica;$(MAKE)	#ACPICA
-	$(CD) fs;$(MAKE)		#ファイルシステム関連
-	$(CD) drivers;$(MAKE)	#ドライバ
+#	$(CD) acpica;$(MAKE)	#ACPICA
+#	$(CD) fs;$(MAKE)		#ファイルシステム関連
+#	$(CD) drivers;$(MAKE)	#ドライバ
 
 
 .PHONY: install
@@ -54,11 +54,11 @@ install:
 .PHONY: clean
 clean:
 	$(CD) boot;$(MAKE) clean
-	$(CD) internal;$(MAKE) clean
+#	$(CD) internal;$(MAKE) clean
 	$(CD) kernel;$(MAKE) clean
-	$(CD) acpica;$(MAKE) clean
-	$(CD) fs;$(MAKE) clean
-	$(CD) drivers;$(MAKE) clean
+#	$(CD) acpica;$(MAKE) clean
+#	$(CD) fs;$(MAKE) clean
+#	$(CD) drivers;$(MAKE) clean
 	
 .PHONY: test
 test:

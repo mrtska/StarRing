@@ -3,7 +3,7 @@ FILE := boot.o main.o
 TARGET := boot.sys
 
 
-.c.o:
+.cpp.o:
 
 	$(CC) -mcmodel=kernel -I../$(INCLUDE) -ffreestanding -nostdlib -mno-red-zone -Wall -c $< -o $@
 
