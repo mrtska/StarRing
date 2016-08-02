@@ -131,6 +131,7 @@ ENTRYPOINT:
 .code64
 .align 8
 .extern main
+.extern ctors
 //ロングモード
 long_mode:
 
@@ -145,6 +146,16 @@ high:
 	//仮のスタックを設定
 	movq $((0x4000) + 0xFFFFFFFF80000000), %rax
 	movq %rax, %rsp
+
+	pushq %rsi
+	pushq %rdi
+
+	movq ctors, %rax
+	call *%rax
+
+	popq %rdi
+	popq %rsi
+
 
 	//main.c#mainを呼び出し
 	call main

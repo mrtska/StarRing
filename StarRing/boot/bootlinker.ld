@@ -24,15 +24,27 @@ SECTIONS {
 
 	. += VIRT_BASE;
 
+	ctors  = .;
+	.ctors ALIGN(0x1000) : AT(ADDR(.ctors) - VIRT_BASE) {
+		*(.ctors)
+	}
+	. = ALIGN(0x1000);
+
 	.text ALIGN(0x1000) : AT(ADDR(.text) - VIRT_BASE) {
 		*(.text)
 		*(.gnu.linkonce.t*)
 	}
 
+	. = ALIGN(0x1000);
+	interrupt_descripter_table = .;
+	. += 0x1000;
+
 	.data ALIGN(0x1000) : AT(ADDR(.data) - VIRT_BASE) {
 		*(.data)
 		*(.gnu.linkonce.d*)
 	}
+
+	. = ALIGN(0x1000);
 
 	.rodata ALIGN(0x1000) : AT(ADDR(.rodata) - VIRT_BASE) {
 		*(.rodata*)

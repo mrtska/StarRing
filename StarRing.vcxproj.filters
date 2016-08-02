@@ -35,6 +35,9 @@
     <None Include="StarRing\boot\boot.S" />
     <None Include="Z:\StarRing-2014\StarRing-2014\StarRing\boot\bootlinker.ld" />
     <None Include="StarRing\boot\bootlinker.ld" />
+    <None Include="build.bat">
+      <Filter>ソース ファイル</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StarRing\boot\main.cpp">
@@ -44,6 +47,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="StarRing\kernel\string.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="StarRing\kernel\idt.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -67,6 +73,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="StarRing\include\idt.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="StarRing\include\multiboot2.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

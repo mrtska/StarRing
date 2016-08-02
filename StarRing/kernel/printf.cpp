@@ -252,8 +252,7 @@ void resetPos(void) {
 #define SPECIAL	64		// 0x
 
 #define __do_div(n, base) ({ 						\
-	int __res;										\
-	__res = ((unsigned long) n) % (unsigned) base; 	\
+	int __res = ((unsigned long) n) % (unsigned) base; 	\
 	n = ((unsigned long) n) / (unsigned) base; 		\
 	__res;											\
 })
@@ -261,7 +260,7 @@ void resetPos(void) {
 
 
 //•¶Žš‚ª”Žš‚¾‚Á‚½‚çtrue
-static __inline__ int isdigit(int ch) {
+static inline int isdigit(int ch) {
 
 	return (ch >= '0') && (ch <= '9');
 }
@@ -394,7 +393,8 @@ int vsprintf(char *buf, const char *format, va_list args) {
 			continue;
 		}
 		flags = 0;
-	reqeat: ++format;
+	reqeat:
+		++format;
 		switch (*format) {
 		case '-':
 			flags |= LEFT;

@@ -84,6 +84,7 @@
   <ItemGroup>
     <None Include=".gitattributes" />
     <None Include=".gitignore" />
+    <None Include="build.bat" />
     <None Include="LICENSE" />
     <None Include="Makefile" />
     <None Include="README.md" />
@@ -102,11 +103,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StarRing\boot\main.cpp" />
+    <ClCompile Include="StarRing\kernel\idt.cpp" />
     <ClCompile Include="StarRing\kernel\printf.cpp" />
     <ClCompile Include="StarRing\kernel\string.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StarRing\include\idt.h" />
+    <ClInclude Include="StarRing\include\multiboot2.h" />
     <ClInclude Include="StarRing\include\spinlock.h" />
     <ClInclude Include="StarRing\include\stdarg.h" />
     <ClInclude Include="StarRing\include\stddef.h" />

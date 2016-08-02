@@ -1,7 +1,7 @@
 
 #include <system.h>
 #include <stdio.h>
-
+#include <idt.h>
 
 
 //ƒŒƒKƒV[PIC‚ğ–³Œø‰»
@@ -26,10 +26,16 @@ static void disable_legacy_pic(void) {
 void main(unsigned long magic, unsigned long mboot) {
 
 
+	kprintf("Hello,World.\n");
 	kprintf("magic: %p, mboot: %p\n", magic, mboot);
 
 	disable_legacy_pic();
 
+	idt.idt_init();
+
+
+
+	kprintf("return\n");
 	return;
 	
 }

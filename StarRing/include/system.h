@@ -19,11 +19,16 @@
 #define mfence() asmv("mfence":::"memory")
 
 
+#ifdef __GNUC__
 
 //インラインアセンブラ
 #define asmv __asm__ __volatile__
 
+#else
 
+#define asmv()
+
+#endif
 //OUT命令 オペランドサイズ可変
 static inline void outb(int port, unsigned char value) {
 
