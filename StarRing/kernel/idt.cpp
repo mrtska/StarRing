@@ -4,14 +4,14 @@
 #include <system.h>
 
 
-//ƒŠƒ“ƒJƒXƒNƒŠƒvƒg‚É‘‚¢‚½•¨‚ðŽg‚¤
+//ãƒªãƒ³ã‚«ã‚¹ã‚¯ãƒªãƒ—ãƒˆã«æ›¸ã„ãŸç‰©ã‚’ä½¿ã†
 extern void *interrupt_descripter_table;
 
-//Š„‚èž‚Ýƒnƒ“ƒhƒ‰‚ðŠÇ—‚·‚éƒNƒ‰ƒX
+//ãƒªãƒ³ã‚«ã‚¹ã‚¯ãƒªãƒ—ãƒˆã«æ›¸ã„ãŸç‰©ã‚’ä½¿ã†
 class idt idt(reinterpret_cast<void*>(&interrupt_descripter_table));
 
 idt::idt(void *p) {
-	
+
 	idt_pointer = p;
 	kprintf("idt#constructer %p\n", p);
 }
@@ -26,14 +26,13 @@ void idt::load_idtr() {
 
 
 	idtr.limit = 0;
-	idtr.base = reinterpret_cast<unsigned long>(&idt_pointer);
+	idtr.base = reinterpret_cast<unsigned long>(idt_pointer);
 
 	kprintf("idtr %p\n", idtr.base);
 	asmv("lidt %0" :: "m"(idtr));
 }
 
 void idt::idt_init() {
-	idt idt(reinterpret_cast<void*>(&interrupt_descripter_table));
 	load_idtr();
 
 }

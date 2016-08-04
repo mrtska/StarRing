@@ -1,6 +1,6 @@
 export LANG=C
 
-#定義群
+#螳夂ｾｩ鄒､
 HOME_DIR	= "$(CURDIR)"
 
 CC		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11 -g
@@ -36,12 +36,12 @@ compile:
 #	nasm -f bin -o boot/ap_boot.o boot/ap_boot.S
 #	touch ./boot/boot.S
 	
-	$(CD) boot;$(MAKE) 		#ブート時処理をコンパイル
-#	$(CD) internal;$(MAKE)	#内部処理をコンパイル
-	$(CD) kernel;$(MAKE)	#カーネル本体をコンパイル
+	$(CD) boot;$(MAKE) 		#繝悶�ｼ繝域凾蜃ｦ逅�繧偵さ繝ｳ繝代う繝ｫ
+#	$(CD) internal;$(MAKE)	#蜀�驛ｨ蜃ｦ逅�繧偵さ繝ｳ繝代う繝ｫ
+	$(CD) kernel;$(MAKE)	#繧ｫ繝ｼ繝阪Ν譛ｬ菴薙ｒ繧ｳ繝ｳ繝代う繝ｫ
 #	$(CD) acpica;$(MAKE)	#ACPICA
-#	$(CD) fs;$(MAKE)		#ファイルシステム関連
-#	$(CD) drivers;$(MAKE)	#ドライバ
+#	$(CD) fs;$(MAKE)		#繝輔ぃ繧､繝ｫ繧ｷ繧ｹ繝�繝�髢｢騾｣
+#	$(CD) drivers;$(MAKE)	#繝峨Λ繧､繝�
 
 
 .PHONY: install

@@ -259,7 +259,7 @@ void resetPos(void) {
 
 
 
-//•¶Žš‚ª”Žš‚¾‚Á‚½‚çtrue
+//æ–‡å­—ãŒæ•°å­—ã ã£ãŸã‚‰true
 static inline int isdigit(int ch) {
 
 	return (ch >= '0') && (ch <= '9');
@@ -386,7 +386,7 @@ int vsprintf(char *buf, const char *format, va_list args) {
 
 	int qualifier;
 
-	//ƒtƒH[ƒ}ƒbƒgŽw’èŽqƒp[ƒXˆ—
+	//ãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆæŒ‡å®šå­ãƒ‘ãƒ¼ã‚¹å‡¦ç†
 	for (str = buf; *format; ++format) {
 		if (*format != '%') {
 			*str++ = *format;
@@ -433,7 +433,7 @@ int vsprintf(char *buf, const char *format, va_list args) {
 			}
 			else if (*format == '*') {
 				++format;
-				//ŽŸ‚ÌƒtƒH[ƒ}ƒbƒgŽw’èŽq‚ÉˆÚ‚é
+				//æ¬¡ã®ãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆæŒ‡å®šå­ã«ç§»ã‚‹
 				precision = va_arg(args, int);
 			}
 			if (precision < 0) {
@@ -447,7 +447,7 @@ int vsprintf(char *buf, const char *format, va_list args) {
 			++format;
 		}
 		base = 10;
-		//%x‚Ìx‚Ì•”•ª‚Ìˆ—
+		//%xã®xã®éƒ¨åˆ†ã®å‡¦ç†
 		switch (*format) {
 		case 'b':
 
@@ -559,7 +559,7 @@ int vvsprintf(char *buf, const char *format, void **args) {
 	int qualifier;
 
 
-	//ƒtƒH[ƒ}ƒbƒgŽw’èŽqƒp[ƒXˆ—
+	//ãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆæŒ‡å®šå­ãƒ‘ãƒ¼ã‚¹å‡¦ç†
 	for (str = buf; *format; ++format) {
 		if (*format != '%') {
 			*str++ = *format;
@@ -605,7 +605,7 @@ int vvsprintf(char *buf, const char *format, void **args) {
 			}
 			else if (*format == '*') {
 				++format;
-				//ŽŸ‚ÌƒtƒH[ƒ}ƒbƒgŽw’èŽq‚ÉˆÚ‚é
+				//æ¬¡ã®ãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆæŒ‡å®šå­ã«ç§»ã‚‹
 				precision = *(int*)*args++;
 			}
 			if (precision < 0) {
@@ -619,7 +619,7 @@ int vvsprintf(char *buf, const char *format, void **args) {
 			++format;
 		}
 		base = 10;
-		//%x‚Ìx‚Ì•”•ª‚Ìˆ—
+		//%xã®xã®éƒ¨åˆ†ã®å‡¦ç†
 		switch (*format) {
 		case 'b':
 

@@ -8,7 +8,7 @@
 
 
 
-//MEMBER‚ÌƒIƒtƒZƒbƒg‚ðŒvŽZ‚·‚é GCC‚Ì‚à‚Ì‚ðŽg‚¤
+//MEMBERã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’è¨ˆç®—ã™ã‚‹ GCCã®ã‚‚ã®ã‚’ä½¿ã†
 #ifndef offsetof
 #define offsetof(TYPE, MEMBER) \
 	((size_t) ((char*)&((TYPE *)(0))->MEMBER - (char*)0))
@@ -19,7 +19,7 @@
 
 
 
-//\‘¢‘Ì‚ÌƒtƒB[ƒ‹ƒh‚ÌƒIƒtƒZƒbƒg‚ðŒvŽZ‚·‚é
+//æ§‹é€ ä½“ã®ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®ã‚ªãƒ•ã‚»ãƒƒãƒˆã‚’è¨ˆç®—ã™ã‚‹
 #define container_of(ptr, type, member) ({						\
 		const typeof(((type*)0)->member) *__mptr = (ptr);		\
 		(type*)((char*)__mptr - offsetof(type, member));})		\

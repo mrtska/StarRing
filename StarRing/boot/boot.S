@@ -4,33 +4,33 @@
 
 .section .multibootheader
 
-#define PG_PRESENT      (1<<0)	//ƒy[ƒW‚ª—LŒø‚©
-#define PG_WRITE        (1<<1)		//ƒy[ƒW‚ª‘‚«ž‚Ý‰Â”\‚©
-#define PG_USER         (1<<2)		//ƒy[ƒW‚ªƒ†[ƒU[ƒy[ƒW‚©‚Ç‚¤‚©
-#define PG_PWT          (1<<3)		//ƒ‰ƒCƒgƒXƒ‹[‚©
-#define PG_NOCACHE      (1<<4)	//ƒLƒƒƒbƒVƒ…‚·‚é‚©
-#define PG_ACCESSED     (1<<5)	//ƒ\ƒtƒgƒEƒFƒA‚ÉƒAƒNƒZƒX‚³‚ê‚½‚©
-#define PG_DIRTY        (1<<6)		//ƒ\ƒtƒgƒEƒFƒA‚É‘‚«ž‚Ü‚ê‚½‚©
-#define PG_LARGE        (1<<7)		//ƒ‰[ƒWƒy[ƒW‚©
-#define PG_GLOBAL       (1<<8)		//ƒOƒ[ƒoƒ‹ƒy[ƒW‚©
+#define PG_PRESENT      (1<<0)	//ãƒšãƒ¼ã‚¸ãŒæœ‰åŠ¹ã‹
+#define PG_WRITE        (1<<1)		//ãƒšãƒ¼ã‚¸ãŒæ›¸ãè¾¼ã¿å¯èƒ½ã‹
+#define PG_USER         (1<<2)		//ãƒšãƒ¼ã‚¸ãŒãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒšãƒ¼ã‚¸ã‹ã©ã†ã‹
+#define PG_PWT          (1<<3)		//ãƒ©ã‚¤ãƒˆã‚¹ãƒ«ãƒ¼ã‹
+#define PG_NOCACHE      (1<<4)	//ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã™ã‚‹ã‹
+#define PG_ACCESSED     (1<<5)	//ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã«ã‚¢ã‚¯ã‚»ã‚¹ã•ã‚ŒãŸã‹
+#define PG_DIRTY        (1<<6)		//ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã«æ›¸ãè¾¼ã¾ã‚ŒãŸã‹
+#define PG_LARGE        (1<<7)		//ãƒ©ãƒ¼ã‚¸ãƒšãƒ¼ã‚¸ã‹
+#define PG_GLOBAL       (1<<8)		//ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒšãƒ¼ã‚¸ã‹
 
 
-//ƒ}ƒ‹ƒ`ƒu[ƒg2ƒ}ƒWƒbƒN
+//ãƒžãƒ«ãƒãƒ–ãƒ¼ãƒˆ2ãƒžã‚¸ãƒƒã‚¯
 #define MAGIC 0xE85250D6
 #define ARCH 0
 
 HEADER:
 
-	//ƒ}ƒWƒbƒN
+	//ãƒžã‚¸ãƒƒã‚¯
 	.long MAGIC
-	//ƒA[ƒLƒeƒNƒ`ƒƒ
+	//ã‚¢ãƒ¼ã‚­ãƒ†ã‚¯ãƒãƒ£
 	.long ARCH
-	//ƒIƒtƒZƒbƒg
+	//ã‚ªãƒ•ã‚»ãƒƒãƒˆ
 	.long HEADER_END - HEADER
-	//ƒ`ƒFƒbƒNƒTƒ€
+	//ãƒã‚§ãƒƒã‚¯ã‚µãƒ 
 	.long -(MAGIC + ARCH + (HEADER_END - HEADER))
 
-	//ƒwƒbƒ_I—¹
+	//ãƒ˜ãƒƒãƒ€çµ‚äº†
 	.long 0
 	.long 8
 
@@ -40,22 +40,22 @@ HEADER_END:
 .section .boot
 ENTRYPOINT:
 
-	//Š„‚èž‚Ý–³Œø
+	//å‰²ã‚Šè¾¼ã¿ç„¡åŠ¹
 	cli
 
-	//ƒu[ƒgî•ñ‚ð‘Þ”ð
+	//ãƒ–ãƒ¼ãƒˆæƒ…å ±ã‚’é€€é¿
 	movl %eax, %edi
 	movl %ebx, %esi
 
-	//EFLAGS‰Šú‰»
+	//EFLAGSåˆæœŸåŒ–
 	push	$0
 	popf
 
-	
-	//PML4ƒZƒbƒgƒAƒbƒv
+
+	//PML4ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
 	movl $(_boot_pdpt) + (PG_PRESENT | PG_WRITE), (_boot_pml4)
 
-	//PDPTƒZƒbƒgƒAƒbƒv
+	//PDPTã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
 	movl $(_boot_pd) + (PG_PRESENT | PG_WRITE), (_boot_pdpt)
 
 	//0xFFFFFFFF80000000~
@@ -67,14 +67,14 @@ ENTRYPOINT:
 	//0xFFFFFFFF80000000~
 	movl $(_boot_pd) + (PG_PRESENT | PG_WRITE), (_boot_pdpt) + 0xFF0
 
-	//ƒy[ƒWƒfƒBƒŒƒNƒgƒŠ‚ðÝ’è
+	//ãƒšãƒ¼ã‚¸ãƒ‡ã‚£ãƒ¬ã‚¯ãƒˆãƒªã‚’è¨­å®š
 	movl $(_boot_pd), %ebx
 	movl $(PG_PRESENT | PG_WRITE | PG_LARGE | PG_GLOBAL), %eax
 	movl %eax, (%ebx)
 	movl $0, 4(%ebx)
 
-	
-	//‰¼‘zƒAƒhƒŒƒX‚Æ•¨—ƒAƒhƒŒƒX‚ðƒXƒgƒŒ[ƒgƒ}ƒbƒsƒ“ƒO
+
+	//ä»®æƒ³ã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ç‰©ç†ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ã‚¹ãƒˆãƒ¬ãƒ¼ãƒˆãƒžãƒƒãƒ”ãƒ³ã‚°
 	add	$8, %ebx
     addl $0x200000, %eax // 2MB : 0x200000
     movl %eax, (%ebx)
@@ -95,7 +95,7 @@ ENTRYPOINT:
     movl %eax, (%ebx)
     movl $0, 4(%ebx)
 
-	//PAE‚ð—LŒø‰»
+	//PAEã‚’æœ‰åŠ¹åŒ–
 	movl %cr4, %eax
 	bts  $5, %eax
 	bts  $8, %eax
@@ -103,28 +103,28 @@ ENTRYPOINT:
 	bts  $10, %eax
 	movl %eax, %cr4
 
-	//ƒy[ƒWƒe[ƒuƒ‹‚ðÝ’è
+	//ãƒšãƒ¼ã‚¸ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’è¨­å®š
 	movl $(_boot_pml4), %eax
 	movl %eax, %cr3
 
-	//MSR.LMEƒrƒbƒg‚ðŒš‚ÄAƒƒ“ƒOƒ‚[ƒh‚Ö
+	//MSR.LMEãƒ“ãƒƒãƒˆã‚’å»ºã¦ã€ãƒ­ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã¸
 	movl $0xC0000080, %ecx
 	rdmsr
 	bts  $8, %eax
 	bts  $0, %eax
 	wrmsr
 
-	//ƒy[ƒWƒ“ƒO—LŒø‰»
+	//ãƒšãƒ¼ã‚¸ãƒ³ã‚°æœ‰åŠ¹åŒ–
 	movl %cr0, %eax
 	bts  $31, %eax
 	bts  $1, %eax
 	movl %eax, %cr0
 
-	//ˆê‚Â–Ú‚ÌGDT‚ðƒ[ƒh
+	//ä¸€ã¤ç›®ã®GDTã‚’ãƒ­ãƒ¼ãƒ‰
 	movl $(_lmode_gdt_start), (_boot_gdtr) + 0x2
 	lgdt (_boot_gdtr)
 
-	//CPUƒpƒCƒvƒ‰ƒCƒ“‰Šú‰»
+	//CPUãƒ‘ã‚¤ãƒ—ãƒ©ã‚¤ãƒ³åˆæœŸåŒ–
 	ljmp $0x8, $(long_mode)
 
 
@@ -132,35 +132,61 @@ ENTRYPOINT:
 .align 8
 .extern main
 .extern ctors
-//ƒƒ“ƒOƒ‚[ƒh
+//ãƒ­ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰
 long_mode:
 
-	//high‚Ö‘Š‘ÎƒWƒƒƒ“ƒv
+	//highã¸ç›¸å¯¾ã‚¸ãƒ£ãƒ³ãƒ—
 	movq $high, %rax
 	jmp  *%rax
 
 high:
-	//ƒfƒBƒŒƒNƒVƒ‡ƒ“ƒtƒ‰ƒO‚ðƒNƒŠƒA
+	//ãƒ‡ã‚£ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³ãƒ•ãƒ©ã‚°ã‚’ã‚¯ãƒªã‚¢
 	cld
 
-	//‰¼‚ÌƒXƒ^ƒbƒN‚ðÝ’è
+	//ä»®ã®ã‚¹ã‚¿ãƒƒã‚¯ã‚’è¨­å®š
 	movq $((0x4000) + 0xFFFFFFFF80000000), %rax
 	movq %rax, %rsp
 
 	pushq %rsi
 	pushq %rdi
+	pushq %rdx
 
-	movq ctors, %rax
+
+
+	movq $ctors, %rdx
+
+construct:
+
+	movq (%rdx), %rax
+
+
+	cmpq $0, %rax
+
+    je constructed
+
+	pushq %rdx
+
+
 	call *%rax
 
+	popq %rdx
+
+	addq $8, %rdx
+
+	jmp construct
+
+constructed:
+
+
+    popq %rdx
 	popq %rdi
 	popq %rsi
 
 
-	//main.c#main‚ðŒÄ‚Ño‚µ
+	//main.c#mainã‚’å‘¼ã³å‡ºã—
 	call main
 
-	//–ß‚Á‚Ä‚«‚½‚çƒoƒO
+	//æˆ»ã£ã¦ããŸã‚‰ãƒã‚°
 	cli
 1:
 hlt
@@ -187,7 +213,7 @@ _boot_gdtr:
 
 .section .page_table
 
-//ƒu[ƒgŽžƒy[ƒWƒe[ƒuƒ‹
+//ãƒ–ãƒ¼ãƒˆæ™‚ãƒšãƒ¼ã‚¸ãƒ†ãƒ¼ãƒ–ãƒ«
 .align 0x1000
 .globl _boot_pml4, _boot_pdpt, _boot_pd
 _boot_pml4:

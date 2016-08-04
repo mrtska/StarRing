@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <idt.h>
 
+#include <physicalmemory.h>
 
-//ÉåÉKÉVÅ[PICÇñ≥å¯âª
+//„É¨„Ç¨„Ç∑„ÉºPIC„ÇíÁÑ°ÂäπÂåñ
 static void disable_legacy_pic(void) {
 
 	asmv("cli");
@@ -26,18 +27,21 @@ static void disable_legacy_pic(void) {
 void main(unsigned long magic, unsigned long mboot) {
 
 
-	kprintf("Hello,World.\n");
+	kprintf("Hello,Eclipse.\n");
 	kprintf("magic: %p, mboot: %p\n", magic, mboot);
 
 	disable_legacy_pic();
 
 	idt.idt_init();
 
+	physical_memory.physical_memory_init(mboot);
+
+
 
 
 	kprintf("return\n");
 	return;
-	
+
 }
 
 

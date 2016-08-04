@@ -28,6 +28,7 @@ SECTIONS {
 	.ctors ALIGN(0x1000) : AT(ADDR(.ctors) - VIRT_BASE) {
 		*(.ctors)
 	}
+	ctors_end = .;
 	. = ALIGN(0x1000);
 
 	.text ALIGN(0x1000) : AT(ADDR(.text) - VIRT_BASE) {

@@ -2,7 +2,7 @@
 
 #include <stdarg.h>
 
-//‚¨‚È‚¶‚İ‚ÌŠÖ” ƒJ[ƒlƒ‹”Å
+//ãŠãªã˜ã¿ã®é–¢æ•° ã‚«ãƒ¼ãƒãƒ«ç‰ˆ
 int kkprintf(const char *format, ...);
 int kprintf(const char *format, ...);
 int sprintf(char *data, const char *format, ...);
@@ -11,5 +11,5 @@ int vprintf(const char *format, va_list args);
 int vvprintf(const char *format, void **args);
 int vsprintf(char *buf, const char *format, va_list args);
 int vvsprintf(char *buf, const char *format, void **args);
-//ƒJ[ƒ\ƒ‹‚ğ‚à‚Æ‚ÉˆÊ’u‚É–ß‚·
+//ã‚«ãƒ¼ã‚½ãƒ«ã‚’ã‚‚ã¨ã«ä½ç½®ã«æˆ»ã™
 void resetPos(void);

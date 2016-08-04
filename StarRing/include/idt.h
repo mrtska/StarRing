@@ -3,7 +3,7 @@
 
 
 
-//Š„‚èž‚ÝƒfƒBƒXƒNƒŠƒvƒ^
+//å‰²ã‚Šè¾¼ã¿ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿
 union interrupt_descripter {
 
 	struct {
@@ -53,10 +53,10 @@ public:
 
 	idt(void *idt_pointer);
 
-	//Š„‚èž‚ÝƒxƒNƒ^‚ð‰Šú‰»‚·‚é
+	//å‰²ã‚Šè¾¼ã¿ãƒ™ã‚¯ã‚¿ã‚’åˆæœŸåŒ–ã™ã‚‹
 	void idt_init();
 
-	//Š„‚èž‚Ý‚ð“o˜^‚·‚é
+	//å‰²ã‚Šè¾¼ã¿ã‚’ç™»éŒ²ã™ã‚‹
 	void register_interrupt(int id, union interrupt_descripter desc);
 
 	void load_idtr();

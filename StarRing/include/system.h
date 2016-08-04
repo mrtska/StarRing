@@ -19,17 +19,10 @@
 #define mfence() asmv("mfence":::"memory")
 
 
-#ifdef __GNUC__
-
-//ƒCƒ“ƒ‰ƒCƒ“ƒAƒZƒ“ƒuƒ‰
+//ã‚¤ãƒ³ãƒ©ã‚¤ãƒ³ã‚¢ã‚»ãƒ³ãƒ–ãƒ©
 #define asmv __asm__ __volatile__
 
-#else
-
-#define asmv()
-
-#endif
-//OUT–½—ß ƒIƒyƒ‰ƒ“ƒhƒTƒCƒY‰Â•Ï
+//OUTå‘½ä»¤ ã‚ªãƒšãƒ©ãƒ³ãƒ‰ã‚µã‚¤ã‚ºå¯å¤‰
 static inline void outb(int port, unsigned char value) {
 
 	asmv("outb %b0, %w1" : : "a"(value), "Nd"(port));
@@ -43,7 +36,7 @@ static inline void outl(int port, unsigned int value) {
 	asmv("outl %0, %w1" : : "a"(value), "Nd"(port));
 }
 
-//IN–½—ß ƒIƒyƒ‰ƒ“ƒhƒTƒCƒY‰Â•Ï
+//INå‘½ä»¤ ã‚ªãƒšãƒ©ãƒ³ãƒ‰ã‚µã‚¤ã‚ºå¯å¤‰
 static inline unsigned char inb(int port) {
 
 	unsigned char value;

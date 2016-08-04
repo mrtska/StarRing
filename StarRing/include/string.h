@@ -1,13 +1,13 @@
 #pragma once
 
 
-//‚Ê‚é‚Û
+//ã¬ã‚‹ã½
 #define NULL ((void*)0)
 
-//ƒƒ‚ƒŠƒTƒCƒY
+//ãƒ¡ãƒ¢ãƒªã‚µã‚¤ã‚º
 typedef unsigned long size_t;
 
-//ƒƒ‚ƒŠ‘€ì
+//ãƒ¡ãƒ¢ãƒªæ“ä½œ
 void *memcpy(void *s1, const void *s2, size_t n);
 void *memmove(void *s1, const void *s2, size_t n);
 int memcmp(const void *s1, const void *s2, size_t n);
@@ -15,7 +15,7 @@ void *memchr(const void *s, int c, size_t n);
 void *memset(void *s, int c, size_t n);
 //-----
 
-//•¶š—ñ‘€ì
+//æ–‡å­—åˆ—æ“ä½œ
 char *strcpy(char *s1, const char *s2);
 char *strncpy(char *s1, const char *s2, size_t n);
 char *strcat(char *s1, const char *s2);

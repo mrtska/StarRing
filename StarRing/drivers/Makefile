@@ -1,4 +1,4 @@
-#ブート時
+#繝悶�ｼ繝域凾
 FILE := keyboard.o hpet.o vbox.o vmware.o ata.o beep.o dma.o serial.o storage.o ahci.o
 TARGET := drivers.sys
 
@@ -9,19 +9,19 @@ TARGET := drivers.sys
 .S.o:
 	$(CC) -mcmodel=kernel -I../$(INCLUDE) -ffreestanding -nostdlib -mno-red-zone -Wall -c $< -o $@
 
-#コンパイル
+#繧ｳ繝ｳ繝代う繝ｫ
 compile: $(TARGET)
 $(TARGET):$(FILE)
 
 	$(LD) -r -Map $(TARGET).map -o $(TARGET) $(FILE)
 
 
-#バイナリ消去
+#繝舌う繝翫Μ豸亥悉
 clean:
 	$(RM) -f $(FILE) $(TARGET)
 
 
-#テストコード
+#繝�繧ｹ繝医さ繝ｼ繝�
 test:
 	$(CC) -S -I../$(INCLUDE) -o test.S page.c
 
