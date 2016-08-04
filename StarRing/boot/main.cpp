@@ -28,13 +28,15 @@ void main(unsigned long magic, unsigned long mboot) {
 
 
 	kprintf("Hello,Eclipse.\n");
-	kprintf("magic: %p, mboot: %p\n", magic, mboot);
 
 	disable_legacy_pic();
 
+	//IDT初期化
 	idt.idt_init();
 
+	//物理メモリ管理初期化
 	physical_memory.physical_memory_init(mboot);
+
 
 
 

@@ -13,7 +13,6 @@ class idt idt(reinterpret_cast<void*>(&interrupt_descripter_table));
 idt::idt(void *p) {
 
 	idt_pointer = p;
-	kprintf("idt#constructer %p\n", p);
 }
 
 void idt::load_idtr() {

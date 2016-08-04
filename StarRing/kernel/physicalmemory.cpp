@@ -10,8 +10,8 @@ class physical_memory physical_memory;
 
 physical_memory::physical_memory() {
 
+	memset(this->physical_memory_map, 0, sizeof(unsigned long) * 1000);
 
-	kprintf("phys memory constructed.\n");
 }
 
 static const char *get_mmap_type(unsigned int type) {
@@ -116,7 +116,8 @@ void physical_memory::parse_multiboot_header(void *addr) {
 					break;
 				}
 
-				kprintf("addr: %p, end: %p type: %s\n", entry.address, entry.address + entry.length, get_mmap_type(entry.type));
+				//kprintf("addr: %p, end: %p type: %s\n", entry.address, entry.address + entry.length, get_mmap_type(entry.type));
+				this->max_memory_address = entry.address + entry.length;
 			}
 
 			break;
@@ -174,32 +175,134 @@ void physical_memory::parse_multiboot_header(void *addr) {
 			kprintf("MULTIBOOT_TAG_TYPE_NETWORK\n");
 			break;
 		}
-
-		default:
-
-			kprintf("tag %p, type:%d\n", tag, tag->type);
-			break;
 		}
 	}
 
 }
 
 
-
-
+//物理メモリ管理を初期化する
 void physical_memory::physical_memory_init(unsigned long addr) {
 
 
+	//ブートローダからの情報をいただく
 	parse_multiboot_header(reinterpret_cast<void*>(addr));
 
 
 
 
+	for(auto entry : this->mmap_entry) {
+
+		if(entry.type == 0) {
+
+			break;
+		}
+
+		//使用中の物を登録するのでAVAILABLEは無視
+		if(entry.type == MULTIBOOT_MEMORY_AVAILABLE) {
+
+			continue;
+		}
+
+		//AVAILABLE以外を使用中にする
+		set_physical_memory_bit(entry.address, entry.length);
 
 
 
-
-
+		//kprintf("addr: %p, end: %p type: %s\n", entry.address, entry.address + entry.length, get_mmap_type(entry.type));
+	}
 }
+
+unsigned long physical_memory::alloc_physical_memory() {
+
+
+	for(int i = 0; i < 1000; i++) {
+
+		if(this->physical_memory_map[i] == 0xFFFFFFFFFFFFFFFFUL) {
+
+			continue;
+		}
+
+		for(int j = 0; j < 64; j++) {
+
+			unsigned long shift = i * 64 + j;
+
+			if((this->physical_memory_map[shift / 64] & (1 << (shift % 64))) == 0) {
+
+				unsigned long long addr = shift * 0x200000;
+
+				if(addr >= this->max_memory_address) {
+
+					kprintf("[physical_memory] out of memory\nkernel panic.\n");
+					STOP;
+				}
+
+				this->physical_memory_map[shift / 64] |= (1 << (shift % 64));
+				return addr;
+			}
+
+		}
+	}
+
+	//ここに到達するということは1TBのメモリを積んでいてかつ使いきったということ
+	kprintf("[physical_memory] cannot allocate physical memory.\n");
+	STOP;
+	return 0;
+}
+
+void physical_memory::release_physical_memory(unsigned long addr) {
+
+	int shift = addr / 0x200000;
+
+	physical_memory_map[shift / 64] &= ~(1 << (shift % 64));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

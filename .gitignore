@@ -249,3 +249,5 @@ ModelManifest.xml
 .fake/
 /.metadata
 /RemoteSystemsTempFiles
+/.cproject
+/.project
