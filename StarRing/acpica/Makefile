@@ -22,7 +22,7 @@ TARGET := acpica.sys
 .S.o:
 	$(CC) -mcmodel=kernel -I../$(INCLUDE) -ffreestanding -nostdlib -mno-red-zone -Wall -c $< -o $@
 
-#繧ｳ繝ｳ繝代う繝ｫ
+#コンパイル
 compile: $(TARGET)
 
 
@@ -31,7 +31,7 @@ $(TARGET):$(FILE)
 	$(LD) -r -Map $(TARGET).map -o $(TARGET) $(FILE)
 
 
-#繝舌う繝翫Μ豸亥悉
+#バイナリ消去
 clean:
 	#$(RM) -f $(FILE) $(TARGET)
 
