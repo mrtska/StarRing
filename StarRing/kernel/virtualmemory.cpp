@@ -148,7 +148,7 @@ void virtual_memory::map_virtual_memory(unsigned long addr, unsigned long phys, 
 	kprintf("pml4e %p %d pml4 address %p\n", pml4, pml4e, pml4->data);
 	kprintf("pdpt  %p %d pdpt address %p\n", pdpt, pdpte, pdpt->data);
 	kprintf("pd    %p %d pd   address %p\n", pd, pde, pd->data);
-	kprintf("sizeof %X\n", sizeof(union pde));
+	kprintf("sizeof %X\n", sizeof(union pml4e));
 
 }
 

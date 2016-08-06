@@ -3,7 +3,7 @@ export LANG=C
 #螳夂ｾｩ鄒､
 HOME_DIR	= "$(CURDIR)"
 
-CC		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11 -g
+CC		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11
 LD		:= x86_64-pc-linux-gnu-ld
 AS		:= x86_64-pc-linux-gnu-as
 OBJCOPY	:= x86_64-pc-linux-gnu-objcopy

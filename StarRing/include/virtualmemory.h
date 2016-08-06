@@ -15,15 +15,15 @@ union pml4e {
 
 	struct {
 
-		bool present;	//プレゼントフラグ
-		bool rw;		//書き込み可能か
-		bool us;		//ユーザーがアクセス可能か
-		bool pwt;		//ライトスルーか
-		bool pcd;		//キャッシュが無効か
-		bool a;			//ユーザーにそのページがアクセスされたか
-		bool ignored0;
-		bool reserved0;
-		unsigned char ignored1: 4;
+		unsigned long present:1;	//プレゼントフラグ
+		unsigned long rw:1;		//書き込み可能か
+		unsigned long us:1;		//ユーザーがアクセス可能か
+		unsigned long pwt:1;		//ライトスルーか
+		unsigned long pcd:1;		//キャッシュが無効か
+		unsigned long a:1;			//ユーザーにそのページがアクセスされたか
+		unsigned long ignored0:1;
+		unsigned long reserved0:1;
+		unsigned long ignored1: 4;
 
 		unsigned long address: 40;	//物理アドレス
 
@@ -32,7 +32,7 @@ union pml4e {
 		unsigned short ignroed2:11;
 
 
-		bool xd;
+		unsigned long xd:1;
 	} __attribute__((packed));
 
 
@@ -46,47 +46,47 @@ union pdpte {
 
 	struct {
 
-		bool present;	//プレゼントフラグ
-		bool rw;		//書き込み可能か
-		bool us;		//ユーザーがアクセス可能か
-		bool pwt;		//ライトスルーか
-		bool pcd;		//キャッシュが無効か
-		bool a;			//ユーザーにそのページがアクセスされたか
-		bool d;			//ユーザーにそのページが書き込まれたか
-		bool one;		//1GBページかどうか
-		bool g;			//グローバルかどうか
-		unsigned char ignored1: 3;
-		bool pat;		//attributeタイプ
-		unsigned int reserved: 17;
+		unsigned long present:1;	//プレゼントフラグ
+		unsigned long rw:1;		//書き込み可能か
+		unsigned long us:1;		//ユーザーがアクセス可能か
+		unsigned long pwt:1;		//ライトスルーか
+		unsigned long pcd:1;		//キャッシュが無効か
+		unsigned long a:1;			//ユーザーにそのページがアクセスされたか
+		unsigned long d:1;			//ユーザーにそのページが書き込まれたか
+		unsigned long one:1;		//1GBページかどうか
+		unsigned long g:1;			//グローバルかどうか
+		unsigned long ignored1: 3;
+		unsigned long pat:1;		//attributeタイプ
+		unsigned long reserved: 17;
 
-		unsigned int address: 22;	//物理アドレス
+		unsigned long address: 22;	//物理アドレス
 
-		unsigned short ignroed2:11;
+		unsigned long ignroed2:11;
 
 
-		bool xd;		//実行不可なページか
+		unsigned long xd:1;		//実行不可なページか
 	} page1gb __attribute__((packed));
 
 	struct {
 
-		bool present;	//プレゼントフラグ
-		bool rw;		//書き込み可能か
-		bool us;		//ユーザーがアクセス可能か
-		bool pwt;		//ライトスルーか
-		bool pcd;		//キャッシュが無効か
-		bool a;			//ユーザーにそのページがアクセスされたか
-		bool ignored0;
-		bool zero;		//1GBページかどうか
-		unsigned char ignored1: 4;
+		unsigned long present:1;	//プレゼントフラグ
+		unsigned long rw:1;		//書き込み可能か
+		unsigned long us:1;		//ユーザーがアクセス可能か
+		unsigned long pwt:1;		//ライトスルーか
+		unsigned long pcd:1;		//キャッシュが無効か
+		unsigned long a:1;			//ユーザーにそのページがアクセスされたか
+		unsigned long ignored0:1;
+		unsigned long zero:1;		//1GBページかどうか
+		unsigned long ignored1: 4;
 
 		unsigned long address: 40;	//物理アドレス
 
 
 
-		unsigned short ignroed2:11;
+		unsigned long ignroed2:11;
 
 
-		bool xd;		//実行不可なページか
+		unsigned long xd:1;		//実行不可なページか
 	} normal __attribute__((packed));
 
 
@@ -103,53 +103,47 @@ union pde {
 
 	struct {
 
-		unsigned char present:1;	//プレゼントフラグ
-		unsigned char rw:1;		//書き込み可能か
-		unsigned char us:1;		//ユーザーがアクセス可能か
-		unsigned char pwt:1;		//ライトスルーか
-		unsigned char pcd:1;		//キャッシュが無効か
-		unsigned char a:1;			//ユーザーにそのページがアクセスされたか
-		unsigned char d:1;			//ユーザーにそのページが書き込まれたか
-		unsigned char one:1;		//1GBページかどうか
-		unsigned char g:1;			//グローバルかどうか
-		unsigned char charignored1: 3;
-		unsigned char pat:1;		//attributeタイプ
-		unsigned char reserved:8;
+		unsigned long present:1;	//プレゼントフラグ
+		unsigned long rw:1;		//書き込み可能か
+		unsigned long us:1;		//ユーザーがアクセス可能か
+		unsigned long pwt:1;		//ライトスルーか
+		unsigned long pcd:1;		//キャッシュが無効か
+		unsigned long a:1;			//ユーザーにそのページがアクセスされたか
+		unsigned long d:1;			//ユーザーにそのページが書き込まれたか
+		unsigned long one:1;		//1GBページかどうか
+		unsigned long g:1;			//グローバルかどうか
+		unsigned long longignored1: 3;
+		unsigned long pat:1;		//attributeタイプ
+		unsigned long reserved:8;
 
-		unsigned int address: 31;	//物理アドレス
+		unsigned long address: 31;	//物理アドレス
 
-		unsigned short ignroed2:11;
+		unsigned long ignroed2:11;
 
-		unsigned char xd:1;		//実行不可なページか
+		unsigned long xd:1;		//実行不可なページか
 	} page2mb __attribute__((packed));
 
 	struct {
 
-		unsigned char present:1;	//プレゼントフラグ
-		unsigned char rw:1;		//書き込み可能か
-		unsigned char us:1;		//ユーザーがアクセス可能か
-		unsigned char pwt:1;		//ライトスルーか
-		unsigned char pcd:1;		//キャッシュが無効か
-		unsigned char a:1;			//ユーザーにそのページがアクセスされたか
-		unsigned char ignored0:1;
-		unsigned char zero:1;		//2MBページかどうか
-		unsigned char ignored1: 4;
+		unsigned long present:1;	//プレゼントフラグ
+		unsigned long rw:1;		//書き込み可能か
+		unsigned long us:1;		//ユーザーがアクセス可能か
+		unsigned long pwt:1;		//ライトスルーか
+		unsigned long pcd:1;		//キャッシュが無効か
+		unsigned long a:1;			//ユーザーにそのページがアクセスされたか
+		unsigned long ignored0:1;
+		unsigned long zero:1;		//2MBページかどうか
+		unsigned long ignored1: 4;
 
 		unsigned long address: 40;	//物理アドレス
 
-		unsigned short ignroed2:11;
+		unsigned long ignroed2:11;
 
-		unsigned char xd:1;		//実行不可なページか
+		unsigned long xd:1;		//実行不可なページか
 	} normal __attribute__((packed));
 
 } __attribute__((packed));
 
-
-struct a{
-
-	unsigned long data:64;
-
-} __attribute__((packed));
 
 //page table entry
 union pte {
@@ -158,22 +152,22 @@ union pte {
 
 	struct {
 
-		bool present;	//プレゼントフラグ
-		bool rw;		//書き込み可能か
-		bool us;		//ユーザーがアクセス可能か
-		bool pwt;		//ライトスルーか
-		bool pcd;		//キャッシュが無効か
-		bool a;			//ユーザーにそのページがアクセスされたか
-		bool d;			//ユーザーにそのページが書き込まれたか
-		bool pat;		//attributeタイプ
-		bool g;			//グローバルかどうか
-		unsigned char ignored1: 3;
+		unsigned long present:1;	//プレゼントフラグ
+		unsigned long rw:1;		//書き込み可能か
+		unsigned long us:1;		//ユーザーがアクセス可能か
+		unsigned long pwt:1;		//ライトスルーか
+		unsigned long pcd:1;		//キャッシュが無効か
+		unsigned long a:1;			//ユーザーにそのページがアクセスされたか
+		unsigned long d:1;			//ユーザーにそのページが書き込まれたか
+		unsigned long pat:1;		//attributeタイプ
+		unsigned long g:1;			//グローバルかどうか
+		unsigned long ignored1: 3;
 
 		unsigned long address: 40;	//物理アドレス
 
-		unsigned short ignroed2:11;
+		unsigned long ignroed2:11;
 
-		bool xd;		//実行不可なページか
+		unsigned long xd:1;		//実行不可なページか
 	} __attribute__((packed));
 } __attribute__((packed));
 
