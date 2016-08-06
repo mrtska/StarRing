@@ -8,6 +8,23 @@ class virtual_memory virtual_memory;
 
 
 
+
+void *virtual_memory::alloc_kernel_page() {
+
+	if(kernel_page_tables == nullptr) {
+
+		kprintf("[virtual_memory] cannot allocate kernel page.\n");
+	}
+
+	void *addr = reinterpret_cast<void*>(reinterpret_cast<unsigned long>(kernel_page_tables) + offset);
+	offset += 0x1000;
+
+
+
+	kprintf("[virtual_memory] allocate %p\n", addr);
+
+	return addr;
+}
 void virtual_memory::virtual_memory_init() {
 
 
@@ -21,50 +38,51 @@ void virtual_memory::virtual_memory_init() {
 	this->kernel_page_tables = reinterpret_cast<unsigned long*>(kernel_tables);
 
 	//カーネルページを割り当てるアドレスを現在のページテーブルにマッピングする
-	map_virtual_memory(kernel_tables, kernel_tables, PRESENT | WRITE, true);
+	map_virtual_memory(kernel_tables, kernel_tables, PRESENT | WRITE | GLOBAL, true);
 
-STOP;
-	kprintf("page fault test %p\n", *(reinterpret_cast<unsigned long*>(0x200000)));
 
-STOP;
+	//新しくCR3に代入するベースアドレス
+	unsigned long new_base_address = physical_memory.alloc_physical_memory();
+
+	map_virtual_memory(new_base_address, new_base_address, PRESENT | WRITE | GLOBAL, true);
 
 	//新しいカーネルページの場所
-	this->physical_base_address = physical_memory.alloc_physical_memory();
+	this->physical_base_address = new_base_address;
 
 
+	//新しいページテーブルにもここだけストレートマッピング
+	map_virtual_memory(kernel_tables, kernel_tables, PRESENT | WRITE | GLOBAL, true);
+	map_virtual_memory(new_base_address, new_base_address, PRESENT | WRITE | GLOBAL, true);
+
+
+	//FFFFFFFF80000000から512MB分ストレートマッピングする
+	for(unsigned long addr = 0xFFFFFFFF80000000, phys = 0; addr < 0xFFFFFFFFA0000000; addr += MEMORY_BLOCK_SIZE, phys += MEMORY_BLOCK_SIZE) {
+
+		map_virtual_memory(addr, phys, PRESENT | WRITE | GLOBAL, true);
+	}
 
 
 	//FFFF800000000000に物理アドレスを実装している容量全てストレートマッピングする
 	for(unsigned long addr = 0xFFFF800000000000, phys = 0; addr < physical_memory.get_max_memory_address(); addr += MEMORY_BLOCK_SIZE, phys += MEMORY_BLOCK_SIZE) {
 
-		map_virtual_memory(addr, phys, PRESENT | WRITE, true);
+		map_virtual_memory(addr, phys, PRESENT | WRITE | GLOBAL, true);
 	}
 
 
-
-
-
+	this->write_cr3(this->physical_base_address);
 }
 
-
-void virtual_memory::map_virtual_memory(unsigned long addr, unsigned long flags, bool is2MB) {
-
-
-
-
-}
-
-void map_pml4(unsigned long addr, unsigned long phys, unsigned long flags, bool is2MB) {
-
-
-
-}
 
 //物理アドレスを仮想アドレスを云々
+void virtual_memory::map_virtual_memory(unsigned long addr, unsigned long flags, bool is2MB) {
+
+	this->map_virtual_memory(addr, physical_memory.alloc_physical_memory(), flags, is2MB);
+}
+
 void virtual_memory::map_virtual_memory(unsigned long addr, unsigned long phys, unsigned long flags, bool is2MB) {
 
 
-	kprintf("[virtual_memory] mapping: virtual:%p, phys:%p\n", addr, phys);
+	//kprintf("[virtual_memory] mapping: virtual:%p, phys:%p\n", addr, phys);
 
 	if(phys & 0x1FFFFF) {
 
@@ -91,51 +109,49 @@ void virtual_memory::map_virtual_memory(unsigned long addr, unsigned long phys, 
 
 	} else {
 
+		pdpt = &reinterpret_cast<union pdpte*>(alloc_kernel_page())[pdpte];
+		pml4->data = reinterpret_cast<unsigned long>(pdpt) & PAGE_ADDRESS_MASK;
 
 		//TODO pdpt = alloc memory and set flags.
-		kprintf("[virtual_memory] UnImplementedException in pml4\n");
 
-		STOP;
 	}
 
 	pml4->data |= flags;
 
 	if(pdpt->normal.present) {
 
-		 pd = &get_pde(*pdpt)[pde];
+		pd = &get_pde(*pdpt)[pde];
+		pdpt->data |= flags;
 
 	} else {
 
+		pd = &reinterpret_cast<union pde*>(alloc_kernel_page())[pde];
+		pdpt->data = (reinterpret_cast<unsigned long>(pd) & PAGE_ADDRESS_MASK) | flags;
+		kprintf("pml4 %p\n", pdpt->data);
 		//TODO pd = alloc memory and set flags.
-		kprintf("[virtual_memory] UnImplementedException in pdpt\n");
-
-		STOP;
 
 	}
 
-	pdpt->data |= flags;
 
 
 	//ラージページか
 	if(is2MB) {
 
 
-		pd->data |= phys | flags | LARGE;
+		pd->data |= flags | LARGE;
+		pd->data |= phys & 0x000FFFFFFFE00000;
 
-		trace();
 
 
 	} else {
-/*
+
 		if(pd->normal.present) {
 
 
 		} else {
 
 
-
-
-		}*/
+		}
 
 		STOP;
 
@@ -143,12 +159,6 @@ void virtual_memory::map_virtual_memory(unsigned long addr, unsigned long phys, 
 
 
 
-
-
-	kprintf("pml4e %p %d pml4 address %p\n", pml4, pml4e, pml4->data);
-	kprintf("pdpt  %p %d pdpt address %p\n", pdpt, pdpte, pdpt->data);
-	kprintf("pd    %p %d pd   address %p\n", pd, pde, pd->data);
-	kprintf("sizeof %X\n", sizeof(union pml4e));
 
 }
 

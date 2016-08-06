@@ -5,6 +5,8 @@
 
 
 
+#define PAGE_ADDRESS_MASK 0x000FFFFFFFFFF000
+
 extern class virtual_memory virtual_memory;
 
 
@@ -195,14 +197,16 @@ private:
 	unsigned long physical_base_address;
 
 	//カーネルページテーブルの場所
-	unsigned long *kernel_page_tables;
+	void *kernel_page_tables;
 	unsigned long offset;
+
 
 
 
 	void write_cr3(unsigned long phys) {
 
 		asmv("movq %0, %%cr3" ::"r"(phys));
+		asmv("invlpg %0" :: "m"(phys));
 	}
 
 	unsigned long read_cr3() {
@@ -222,7 +226,7 @@ private:
 
 	inline union pdpte *get_pdpte(union pml4e pml4) {
 
-		unsigned long phys = pml4.data & 0x000FFFFFFFFFF000;
+		unsigned long phys = pml4.data & PAGE_ADDRESS_MASK;
 
 		return reinterpret_cast<union pdpte*>(phys);
 	}
@@ -234,7 +238,7 @@ private:
 
 	inline union pde *get_pde(union pdpte pdpt) {
 
-		unsigned long phys = pdpt.data & 0x000FFFFFFFFFF000;
+		unsigned long phys = pdpt.data & PAGE_ADDRESS_MASK;
 
 		return reinterpret_cast<union pde*>(phys);
 	}
@@ -252,6 +256,15 @@ public:
 
 	void virtual_memory_init();
 
+
+
+	void *alloc_kernel_page();
+
+	void clear_kernel_page() {
+
+		offset = 0;
+		kernel_page_tables = nullptr;
+	}
 
 	void map_virtual_memory(unsigned long addr, unsigned long flags, bool is2MB);
 	void map_virtual_memory(unsigned long addr, unsigned long phys, unsigned long flags, bool is2MB);

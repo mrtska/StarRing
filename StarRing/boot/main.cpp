@@ -50,6 +50,7 @@ void main(unsigned long magic, unsigned long mboot) {
 
 
 	kprintf("return\n");
+	STOP;
 	return;
 
 }
