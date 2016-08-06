@@ -4,6 +4,11 @@
 #include <system.h>
 
 
+
+#define MEMORY_BLOCK_SIZE 0x200000
+
+
+
 //物理メモリ管理
 extern class physical_memory physical_memory;
 
@@ -47,43 +52,6 @@ private:
 	unsigned long max_memory_address = 0;
 
 
-	void set_physical_memory_bit(unsigned long addr, unsigned long len) {
-
-		//2MiB以下は切り落とす
-		addr &= ~0x1FFFFF;
-
-		if(len == 0) {
-
-			STOP;
-		}
-
-
-		if(len & 0x1FFFFF) {
-
-			len += 0x200000;
-			len &= ~0x1FFFFF;
-		}
-
-
-		do {
-
-
-			//建てるべきbitの位置
-			unsigned long shift = addr / 0x200000;
-
-			//shiftから配列のインデックスを計算して割り出す
-
-			physical_memory_map[shift / 64] |= (1 << (shift % 64));
-
-
-			len -= 0x200000;
-
-		} while(len != 0);
-
-
-
-	}
-
 	//bootloaderからのいろいろな情報をパースする
 	void parse_multiboot_header(void *addr);
 
@@ -114,11 +82,17 @@ public:
 		return this->upper_memory;
 	}
 
+	unsigned long get_max_memory_address() {
+
+		return this->max_memory_address;
+	}
+
 	unsigned long alloc_physical_memory();
 
 	void release_physical_memory(unsigned long addr);
 
 
+	void set_physical_memory_bit(unsigned long addr, unsigned long len);
 
 
 

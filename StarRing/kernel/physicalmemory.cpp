@@ -213,6 +213,43 @@ void physical_memory::physical_memory_init(unsigned long addr) {
 	}
 }
 
+void physical_memory::set_physical_memory_bit(unsigned long addr, unsigned long len) {
+
+	//2MiB以下は切り落とす
+	addr &= ~0x1FFFFF;
+
+	if(len == 0) {
+
+		STOP;
+	}
+
+
+	if(len & 0x1FFFFF) {
+
+		len += MEMORY_BLOCK_SIZE;
+		len &= ~0x1FFFFF;
+	}
+
+
+	do {
+
+
+		//建てるべきbitの位置
+		unsigned long shift = addr / MEMORY_BLOCK_SIZE;
+
+		//shiftから配列のインデックスを計算して割り出す
+
+		physical_memory_map[shift / 64] |= (1 << (shift % 64));
+
+
+		len -= MEMORY_BLOCK_SIZE;
+
+	} while(len != 0);
+
+
+
+}
+
 unsigned long physical_memory::alloc_physical_memory() {
 
 
@@ -229,7 +266,7 @@ unsigned long physical_memory::alloc_physical_memory() {
 
 			if((this->physical_memory_map[shift / 64] & (1 << (shift % 64))) == 0) {
 
-				unsigned long long addr = shift * 0x200000;
+				unsigned long long addr = shift * MEMORY_BLOCK_SIZE;
 
 				if(addr >= this->max_memory_address) {
 
@@ -252,7 +289,7 @@ unsigned long physical_memory::alloc_physical_memory() {
 
 void physical_memory::release_physical_memory(unsigned long addr) {
 
-	int shift = addr / 0x200000;
+	int shift = addr / MEMORY_BLOCK_SIZE;
 
 	physical_memory_map[shift / 64] &= ~(1 << (shift % 64));
 }

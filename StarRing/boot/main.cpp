@@ -4,6 +4,9 @@
 #include <idt.h>
 
 #include <physicalmemory.h>
+#include <virtualmemory.h>
+
+#include <apic.h>
 
 //レガシーPICを無効化
 static void disable_legacy_pic(void) {
@@ -36,6 +39,11 @@ void main(unsigned long magic, unsigned long mboot) {
 
 	//物理メモリ管理初期化
 	physical_memory.physical_memory_init(mboot);
+
+	//仮想メモリ管理初期化
+	virtual_memory.virtual_memory_init();
+
+	apic.apic_init();
 
 
 

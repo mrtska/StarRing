@@ -75,7 +75,7 @@ ENTRYPOINT:
 
 
 	//仮想アドレスと物理アドレスをストレートマッピング
-	add	$8, %ebx
+/*	add	$8, %ebx
     addl $0x200000, %eax // 2MB : 0x200000
     movl %eax, (%ebx)
     movl $0, 4(%ebx)
@@ -93,7 +93,7 @@ ENTRYPOINT:
     add $8, %ebx
     addl $0x200000, %eax // 2MB : 0x800000
     movl %eax, (%ebx)
-    movl $0, 4(%ebx)
+    movl $0, 4(%ebx)*/
 
 	//PAEを有効化
 	movl %cr4, %eax
