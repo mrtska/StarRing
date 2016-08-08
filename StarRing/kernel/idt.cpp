@@ -2,17 +2,18 @@
 #include <idt.h>
 #include <stdio.h>
 #include <system.h>
+#include <string.h>
 
 
 //リンカスクリプトに書いた物を使う
-extern void *interrupt_descripter_table;
+extern void *interrupt_descriptor_table;
 
 //リンカスクリプトに書いた物を使う
-class idt idt(reinterpret_cast<void*>(&interrupt_descripter_table));
+class idt idt(reinterpret_cast<void*>(&interrupt_descriptor_table));
 
 idt::idt(void *p) {
 
-	idt_pointer = p;
+	idt_pointer = static_cast<union interrupt_descriptor*>(p);
 }
 
 void idt::load_idtr() {
@@ -24,7 +25,7 @@ void idt::load_idtr() {
 	} __attribute__((packed)) idtr;
 
 
-	idtr.limit = 0;
+	idtr.limit = 256 * 16 - 1;
 	idtr.base = reinterpret_cast<unsigned long>(idt_pointer);
 
 	kprintf("idtr %p\n", idtr.base);
@@ -32,11 +33,50 @@ void idt::load_idtr() {
 }
 
 void idt::idt_init() {
+
 	load_idtr();
+}
+
+
+//IDTに登録 構造体を作る
+void idt::register_interrupt(int id, void (*func)()) {
+
+
+	union interrupt_descriptor desc;
+
+
+	desc.bitfield.p = 1;	//ある
+	desc.offset0_15 = PTR_LOW(func);
+	desc.offset16_31 = PTR_MIDDLE(func);
+	desc.offset32_63 = PTR_HIGH(func);
+	desc.bitfield.fixed = 0xE;	//割り込みゲート
+
+	desc.bitfield.dpl = 0;
+	desc.bitfield.ist = 0;
+	desc.bitfield.selecter = 8;	//コードセグメント
+
+
+
+
+	this->register_interrupt(id, &desc);
+}
+
+//IDTに登録
+void idt::register_interrupt(int id, union interrupt_descriptor *desc) {
+
+	memcpy(&this->idt_pointer[id], desc, sizeof(*desc));
+}
+
+
+void idt::print_interrupt(int id) {
+
+	union interrupt_descriptor *desc = &this->idt_pointer[id];
+
+	kprintf("p %p\n", desc->bitfield.offset0_15);
+
 
 }
 
-void idt::register_interrupt(int id, interrupt_descripter desc) {
 
 
 
@@ -44,4 +84,18 @@ void idt::register_interrupt(int id, interrupt_descripter desc) {
 
 
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

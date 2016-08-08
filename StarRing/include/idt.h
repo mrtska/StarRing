@@ -1,10 +1,14 @@
 #pragma once
 
 
+//アドレス取得
+#define PTR_LOW(x) ((unsigned long)(x) & 0xFFFF)
+#define PTR_MIDDLE(x) (((unsigned long)(x) >> 16) & 0xFFFF)
+#define PTR_HIGH(x) ((unsigned long)(x) >> 32)
 
 
 //割り込みディスクリプタ
-union interrupt_descripter {
+union interrupt_descriptor {
 
 	struct {
 
@@ -18,7 +22,7 @@ union interrupt_descripter {
 	};
 
 	struct {
-	
+
 		unsigned short offset0_15;
 		unsigned short selecter;
 
@@ -34,9 +38,6 @@ union interrupt_descripter {
 		unsigned int offset32_63;
 		unsigned int reserved;
 
-
-
-
 	} bitfield;
 
 
@@ -47,7 +48,7 @@ extern class idt idt;
 class idt {
 
 private:
-	void *idt_pointer;
+	union interrupt_descriptor *idt_pointer;
 
 public:
 
@@ -57,7 +58,11 @@ public:
 	void idt_init();
 
 	//割り込みを登録する
-	void register_interrupt(int id, union interrupt_descripter desc);
+	void register_interrupt(int id, union interrupt_descriptor *desc);
+	void register_interrupt(int id, void (*func)());
+
+
+	void print_interrupt(int id);
 
 	void load_idtr();
 };

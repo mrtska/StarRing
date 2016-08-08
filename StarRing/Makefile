@@ -26,7 +26,7 @@ export MAKE
 export INCLUDE
 
 
-OBJECTS := boot/boot.sys kernel/kernel.sys #acpica/acpica.sys fs/fs.sys drivers/drivers.sys
+OBJECTS := boot/boot.sys kernel/kernel.sys drivers/drivers.sys#acpica/acpica.sys fs/fs.sys 
 
 .PHONY: all
 all: compile
@@ -36,12 +36,12 @@ compile:
 #	nasm -f bin -o boot/ap_boot.o boot/ap_boot.S
 #	touch ./boot/boot.S
 	
-	$(CD) boot;$(MAKE) 		#繝悶�ｼ繝域凾蜃ｦ逅�繧偵さ繝ｳ繝代う繝ｫ
-#	$(CD) internal;$(MAKE)	#蜀�驛ｨ蜃ｦ逅�繧偵さ繝ｳ繝代う繝ｫ
-	$(CD) kernel;$(MAKE)	#繧ｫ繝ｼ繝阪Ν譛ｬ菴薙ｒ繧ｳ繝ｳ繝代う繝ｫ
+	$(CD) boot;$(MAKE) 		#
+#	$(CD) internal;$(MAKE)	#
+	$(CD) drivers;$(MAKE)	#
+	$(CD) kernel;$(MAKE)	#
 #	$(CD) acpica;$(MAKE)	#ACPICA
-#	$(CD) fs;$(MAKE)		#繝輔ぃ繧､繝ｫ繧ｷ繧ｹ繝�繝�髢｢騾｣
-#	$(CD) drivers;$(MAKE)	#繝峨Λ繧､繝�
+#	$(CD) fs;$(MAKE)		#
 
 
 .PHONY: install
@@ -58,7 +58,7 @@ clean:
 	$(CD) kernel;$(MAKE) clean
 #	$(CD) acpica;$(MAKE) clean
 #	$(CD) fs;$(MAKE) clean
-#	$(CD) drivers;$(MAKE) clean
+	$(CD) drivers;$(MAKE) clean
 	
 .PHONY: test
 test:

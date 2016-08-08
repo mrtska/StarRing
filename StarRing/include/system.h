@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <stdio.h>
 
 #define NAME "StarRing"
 #define VERSION 1.0.0
@@ -57,6 +57,24 @@ static inline unsigned int inl(unsigned short port) {
 }
 
 
+static inline unsigned long *read_physical_address(unsigned long phys) {
+
+	return reinterpret_cast<unsigned long*>(phys + 0xFFFF800000000000);
+}
+
+
+static inline void write_physical_address(unsigned long phys, unsigned long value) {
+
+	unsigned long *addr = reinterpret_cast<unsigned long*>(phys + 0xFFFF800000000000);
+
+	*addr = value;
+}
+static inline void write_physical_address(unsigned long phys, unsigned int value) {
+
+	unsigned int *addr = reinterpret_cast<unsigned int*>(phys + 0xFFFF800000000000);
+
+	*addr = value;
+}
 
 
 

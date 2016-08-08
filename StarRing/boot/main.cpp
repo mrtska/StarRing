@@ -1,12 +1,16 @@
 
 #include <system.h>
 #include <stdio.h>
+#include <gdt.h>
 #include <idt.h>
 
 #include <physicalmemory.h>
 #include <virtualmemory.h>
 
 #include <apic.h>
+#include <trap.h>
+
+#include <drivers/keyboard.h>
 
 //レガシーPICを無効化
 static void disable_legacy_pic(void) {
@@ -30,9 +34,12 @@ static void disable_legacy_pic(void) {
 void main(unsigned long magic, unsigned long mboot) {
 
 
-	kprintf("Hello,Eclipse.\n");
+	kprintf("Hello,Eclipse\n");
 
 	disable_legacy_pic();
+
+	//GDT初期化
+	gdt.gdt_init();
 
 	//IDT初期化
 	idt.idt_init();
@@ -43,13 +50,21 @@ void main(unsigned long magic, unsigned long mboot) {
 	//仮想メモリ管理初期化
 	virtual_memory.virtual_memory_init();
 
+	trap_init();
+
+	//Advanced Programmable Interrupt Controller初期化
 	apic.apic_init();
 
 
 
+	keyboard.keyboard_init();
+
 
 
 	kprintf("return\n");
+	idt.print_interrupt(0x21);
+
+	asmv("sti");
 	STOP;
 	return;
 

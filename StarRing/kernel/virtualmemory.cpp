@@ -21,15 +21,13 @@ void *virtual_memory::alloc_kernel_page() {
 
 
 
-	kprintf("[virtual_memory] allocate %p\n", addr);
+	//kprintf("[virtual_memory] allocate %p\n", addr);
 
 	return addr;
 }
 void virtual_memory::virtual_memory_init() {
 
 
-
-	kprintf("current cr3: %p\n", read_cr3());
 
 	this->physical_base_address = read_cr3();
 
@@ -63,7 +61,7 @@ void virtual_memory::virtual_memory_init() {
 
 
 	//FFFF800000000000に物理アドレスを実装している容量全てストレートマッピングする
-	for(unsigned long addr = 0xFFFF800000000000, phys = 0; addr < physical_memory.get_max_memory_address(); addr += MEMORY_BLOCK_SIZE, phys += MEMORY_BLOCK_SIZE) {
+	for(unsigned long addr = 0xFFFF800000000000, phys = 0; phys < physical_memory.get_max_memory_address(); addr += MEMORY_BLOCK_SIZE, phys += MEMORY_BLOCK_SIZE) {
 
 		map_virtual_memory(addr, phys, PRESENT | WRITE | GLOBAL, true);
 	}
@@ -127,7 +125,6 @@ void virtual_memory::map_virtual_memory(unsigned long addr, unsigned long phys, 
 
 		pd = &reinterpret_cast<union pde*>(alloc_kernel_page())[pde];
 		pdpt->data = (reinterpret_cast<unsigned long>(pd) & PAGE_ADDRESS_MASK) | flags;
-		kprintf("pml4 %p\n", pdpt->data);
 		//TODO pd = alloc memory and set flags.
 
 	}

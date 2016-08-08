@@ -36,8 +36,11 @@ SECTIONS {
 		*(.gnu.linkonce.t*)
 	}
 
+    . = ALIGN(0x1000);
+    global_descriptor_table = .;
+    . += 0x1000;
 	. = ALIGN(0x1000);
-	interrupt_descripter_table = .;
+	interrupt_descriptor_table = .;
 	. += 0x1000;
 
 	.data ALIGN(0x1000) : AT(ADDR(.data) - VIRT_BASE) {
