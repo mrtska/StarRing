@@ -50,14 +50,15 @@ void main(unsigned long magic, unsigned long mboot) {
 	//仮想メモリ管理初期化
 	virtual_memory.virtual_memory_init();
 
+	//例外管理初期化
 	trap_init();
 
 	//Advanced Programmable Interrupt Controller初期化
 	apic.apic_init();
 
-
-
+	//キーボード初期化
 	keyboard.keyboard_init();
+
 
 
 
