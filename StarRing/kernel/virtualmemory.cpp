@@ -52,7 +52,6 @@ void virtual_memory::virtual_memory_init() {
 	map_virtual_memory(kernel_tables, kernel_tables, PRESENT | WRITE | GLOBAL, true);
 	map_virtual_memory(new_base_address, new_base_address, PRESENT | WRITE | GLOBAL, true);
 
-
 	//FFFFFFFF80000000から512MB分ストレートマッピングする
 	for(unsigned long addr = 0xFFFFFFFF80000000, phys = 0; addr < 0xFFFFFFFFA0000000; addr += MEMORY_BLOCK_SIZE, phys += MEMORY_BLOCK_SIZE) {
 

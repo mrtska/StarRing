@@ -13,7 +13,7 @@ physical_memory::physical_memory() {
 	memset(this->physical_memory_map, 0, sizeof(unsigned long) * 1000);
 
 }
-
+/*
 static const char *get_mmap_type(unsigned int type) {
 
 	switch(type) {
@@ -29,7 +29,7 @@ static const char *get_mmap_type(unsigned int type) {
 		return "NADRAM";
 	}
 	return "";
-}
+}*/
 
 
 void physical_memory::parse_multiboot_header(void *addr) {

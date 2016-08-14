@@ -62,7 +62,6 @@ void main(unsigned long magic, unsigned long mboot) {
 
 
 	kprintf("return\n");
-	idt.print_interrupt(0x21);
 
 	asmv("sti");
 	STOP;

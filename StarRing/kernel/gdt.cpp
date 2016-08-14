@@ -26,7 +26,6 @@ void gdt::load_gdtr() {
 	gdtr.limit = 15;
 	gdtr.base = reinterpret_cast<unsigned long>(gdt_pointer);
 
-	kprintf("gdtr %p\n", gdtr.base);
 	asmv("lgdt %0" :: "m"(gdtr));
 
 	asmv("mov $0x0, %ax");
@@ -42,7 +41,6 @@ void gdt::load_gdtr() {
 void gdt::gdt_init(void) {
 
 
-	kprintf("gdt pointer %p\n", sizeof(union global_descriptor));
 
 
 #define GDT_ENTRY_INIT(selector, base, limit, flags) \
@@ -52,11 +50,6 @@ void gdt::gdt_init(void) {
 
 	GDT_ENTRY_INIT(GDT_ENTRY_KERNEL_CS, 0, 0xFFFFF, 0xA09B);
 	GDT_ENTRY_INIT(GDT_ENTRY_KERNEL_DS, 0, 0xFFFFF, 0xC093);
-
-	kprintf("gdt cs %p\n", this->gdt_pointer[GDT_ENTRY_KERNEL_CS].data);
-
-
-
 
 
 

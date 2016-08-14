@@ -28,7 +28,6 @@ void idt::load_idtr() {
 	idtr.limit = 256 * 16 - 1;
 	idtr.base = reinterpret_cast<unsigned long>(idt_pointer);
 
-	kprintf("idtr %p\n", idtr.base);
 	asmv("lidt %0" :: "m"(idtr));
 }
 

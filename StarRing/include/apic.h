@@ -9,7 +9,7 @@
 #define LOCAL_APIC_BASE_ADDRESS 0xFEE00000UL
 
 
-
+#define IOAPIC_LEVEL_TRIGGER (1 << 15)
 
 
 
