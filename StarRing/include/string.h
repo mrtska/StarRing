@@ -1,6 +1,7 @@
 #pragma once
 
 
+
 //ぬるぽ
 #define NULL ((void*)0)
 
@@ -35,3 +36,5 @@ char *strerror(int errnum);
 size_t strlen(const char *s);
 size_t strnlen(const char *s, size_t count);
 //------
+
+

@@ -11,8 +11,8 @@ Created on: 2014/04/03
 #include <stdarg.h>
 #include <stdio.h>
 #include <system.h>
-#include <string.h>
 #include <spinlock.h>
+#include <string.h>
 //#include <drivers/serial.h>
 void * _Unwind_Resume = 0;
 unsigned short* textmemptr = (unsigned short*)0xFFFFFFFF800B8000;

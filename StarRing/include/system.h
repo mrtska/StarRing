@@ -56,6 +56,7 @@ static inline unsigned int inl(unsigned short port) {
 	return value;
 }
 
+#ifdef __cplusplus
 
 static inline unsigned long *read_physical_address(unsigned long phys) {
 
@@ -76,6 +77,6 @@ static inline void write_physical_address(unsigned long phys, unsigned int value
 	*addr = value;
 }
 
-
+#endif
 
 

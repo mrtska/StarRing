@@ -3,7 +3,8 @@ export LANG=C
 #螳夂ｾｩ鄒､
 HOME_DIR	= "$(CURDIR)"
 
-CC		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11
+CPP		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11
+CC		:= x86_64-pc-linux-gnu-gcc -pipe
 LD		:= x86_64-pc-linux-gnu-ld
 AS		:= x86_64-pc-linux-gnu-as
 OBJCOPY	:= x86_64-pc-linux-gnu-objcopy
@@ -16,6 +17,7 @@ MAKE	:= make
 INCLUDE := include
 
 export CC
+export CPP
 export LD
 export OBJCOPY
 export NM
@@ -26,7 +28,7 @@ export MAKE
 export INCLUDE
 
 
-OBJECTS := boot/boot.sys kernel/kernel.sys drivers/drivers.sys#acpica/acpica.sys fs/fs.sys 
+OBJECTS := boot/boot.sys kernel/kernel.sys drivers/drivers.sys acpica/acpica.sys #fs/fs.sys 
 
 .PHONY: all
 all: compile
@@ -38,10 +40,10 @@ compile:
 	
 	$(CD) boot;$(MAKE) 		#
 #	$(CD) internal;$(MAKE)	#
-	$(CD) drivers;$(MAKE)	#
 	$(CD) kernel;$(MAKE)	#
-#	$(CD) acpica;$(MAKE)	#ACPICA
+	$(CD) acpica;$(MAKE)	#ACPICA
 #	$(CD) fs;$(MAKE)		#
+	$(CD) drivers;$(MAKE)	#
 
 
 .PHONY: install
@@ -56,7 +58,7 @@ clean:
 	$(CD) boot;$(MAKE) clean
 #	$(CD) internal;$(MAKE) clean
 	$(CD) kernel;$(MAKE) clean
-#	$(CD) acpica;$(MAKE) clean
+	$(CD) acpica;$(MAKE) clean
 #	$(CD) fs;$(MAKE) clean
 	$(CD) drivers;$(MAKE) clean
 	

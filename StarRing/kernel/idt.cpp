@@ -1,8 +1,8 @@
 
 #include <idt.h>
 #include <stdio.h>
-#include <system.h>
 #include <string.h>
+#include <system.h>
 
 
 //リンカスクリプトに書いた物を使う
