@@ -52,6 +52,10 @@ private:
 	unsigned long max_memory_address = 0;
 
 
+	unsigned long acpi_rsdp_address = 0;
+
+
+
 	//bootloaderからのいろいろな情報をパースする
 	void parse_multiboot_header(void *addr);
 

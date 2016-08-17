@@ -34,7 +34,7 @@ $(TARGET):$(FILE)
 
 #バイナリ消去
 clean:
-	$(RM) -f $(FILE) $(TARGET)
+	#$(RM) -f $(FILE) $(TARGET)
 
 
 

@@ -13,10 +13,17 @@
 
 #define STOP while(1) asmv("hlt")
 
-#define trace() kprintf("[%s] file %s line %u\n", __FUNCTION__, __FILE__, __LINE__)
+#define trace() kprintf("[%s] %s line %u\n", __FILE__, __FUNCTION__, __LINE__)
+#define trace_s(s) kprintf("[%s] %s line %u %s\n", __FILE__, __FUNCTION__, __LINE__, s)
+
+
 #define lfence() asmv("lfence":::"memory")
 #define sfence() asmv("sfence":::"memory")
 #define mfence() asmv("mfence":::"memory")
+
+
+
+typedef unsigned long size_t;
 
 
 //インラインアセンブラ

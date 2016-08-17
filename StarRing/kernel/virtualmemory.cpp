@@ -149,15 +149,29 @@ void virtual_memory::map_virtual_memory(unsigned long addr, unsigned long phys, 
 
 		}
 
+		trace();
 		STOP;
 
 	}
 
 
-
-
 }
 
+//カーネルのデータセクションということにしてみる
+#define KERNEL_DATA_SECTION 0xFFFFFFFFA0000000
+
+//2MiB割り当てる
+void *virtual_memory::alloc_virtual_memory() {
+
+
+	unsigned long addr = physical_memory.alloc_physical_memory();
+
+	map_virtual_memory(addr + KERNEL_DATA_SECTION, addr, PRESENT | WRITE | GLOBAL, true);
+
+
+	return reinterpret_cast<void*>(addr + KERNEL_DATA_SECTION);
+
+}
 
 
 

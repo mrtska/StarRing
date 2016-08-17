@@ -22,11 +22,7 @@ void apic::apic_init() {
 
 
 
-	kprintf("page fault test %b\n", this->local_apic_register->spurious_interrupt_vecter);
-
-
 	this->local_apic_register->spurious_interrupt_vecter |= 0x100;
-
 
 
 }

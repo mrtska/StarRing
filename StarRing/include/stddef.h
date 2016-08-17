@@ -7,22 +7,19 @@
 
 
 
+template<class P, class M>
+size_t offsetof(const M P::*member) {
+	return (size_t) &( reinterpret_cast<P*>(0)->*member);
+}
 
-//MEMBERのオフセットを計算する GCCのものを使う
-#ifndef offsetof
-#define offsetof(TYPE, MEMBER) \
-	((size_t) ((char*)&((TYPE *)(0))->MEMBER - (char*)0))
-#endif
+/*template<class P, class M>
+P* container_of(M* ptr, const M P::*member) {
+	return (P*)( (char*)ptr - offsetof(member));
+}*/
 
-
-
-
-
-
-//構造体のフィールドのオフセットを計算する
-#define container_of(ptr, type, member) ({						\
-		const typeof(((type*)0)->member) *__mptr = (ptr);		\
-		(type*)((char*)__mptr - offsetof(type, member));})		\
-
+template<class P, class M>
+P* container_of(M* ptr, unsigned char *member) {
+	return (P*)((unsigned char*)ptr - member);
+}
 
 

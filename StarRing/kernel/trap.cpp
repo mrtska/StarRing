@@ -129,11 +129,14 @@ extern "C" void exec_stack_segment_fault() {
 extern "C" void exec_general_protection() {
 
 	trace();
+	STOP;
 }
 
 extern "C" void exec_page_fault() {
 
 	trace();
+
+	STOP;
 }
 
 

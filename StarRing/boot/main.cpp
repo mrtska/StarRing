@@ -6,14 +6,19 @@
 
 #include <physicalmemory.h>
 #include <virtualmemory.h>
+#include <slaballocator.h>
 
 #include <apic.h>
 #include <trap.h>
 
+#include <acpi.h>
+
 #include <drivers/keyboard.h>
 
+
+
 //レガシーPICを無効化
-static void disable_legacy_pic(void) {
+static void disable_legacy_pic() {
 
 	asmv("cli");
 
@@ -59,7 +64,11 @@ void main(unsigned long magic, unsigned long mboot) {
 	//キーボード初期化
 	keyboard.keyboard_init();
 
+	//カーネル用スラブアロケータ初期化
+	slab_allocator.slab_allocator_init();
 
+	//ACPI管理初期化
+	acpi.acpi_init();
 
 
 	kprintf("return\n");

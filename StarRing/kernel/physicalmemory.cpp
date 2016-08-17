@@ -1,5 +1,5 @@
 
-
+#include <system.h>
 #include <multiboot2.h>
 #include <physicalmemory.h>
 #include <stdio.h>
@@ -166,8 +166,8 @@ void physical_memory::parse_multiboot_header(void *addr) {
 
 			struct multiboot_tag_new_acpi *acpi = reinterpret_cast<struct multiboot_tag_new_acpi*>(tag);
 
-
-			kprintf("MULTIBOOT_TAG_TYPE_ACPI_NEW rsdp:%p\n", acpi->rsdp);
+			this->acpi_rsdp_address = reinterpret_cast<unsigned long>(acpi->rsdp);
+			//kprintf("MULTIBOOT_TAG_TYPE_ACPI_NEW rsdp:%p\n", acpi->rsdp);
 			break;
 		}
 		case MULTIBOOT_TAG_TYPE_NETWORK: {

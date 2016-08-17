@@ -66,13 +66,13 @@ SECTIONS {
 		*(COMMON)
 
 
-		. = ALIGN(0x10);
-
-		ap_stack = .;
-		. += 0x20000;
 
 	}
 
+	. = ALIGN(0x1000);
+
+    . = 0xFFFFFFFFA0000000;
+    . += 0x20000000;
 
 	kernel_end = .;
 

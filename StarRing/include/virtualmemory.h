@@ -269,6 +269,8 @@ public:
 	void map_virtual_memory(unsigned long addr, unsigned long flags, bool is2MB);
 	void map_virtual_memory(unsigned long addr, unsigned long phys, unsigned long flags, bool is2MB);
 
+	void *alloc_virtual_memory();
+
 };
 
 
