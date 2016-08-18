@@ -9,6 +9,25 @@ class slab_allocator slab_allocator;
 
 
 
+static const struct kmalloc_cache kmalloc_str[KMALLOC_DEFINE_COUNT] = {
+		{ 8,		"kmalloc-8"		},
+		{ 16,		"kmalloc-16"	},
+		{ 32,		"kmalloc-32"	},
+		{ 64,		"kmalloc-64"	},
+		{ 96,		"kmalloc-96"	},
+		{ 128,		"kmalloc-128"	},
+		{ 192,		"kmalloc-192"	},
+		{ 256,		"kmalloc-256"	},
+		{ 512,		"kmalloc-512"	},
+		{ 1024,		"kmalloc-1024"	},
+		{ 2048,		"kmalloc-2048"	},
+		{ 4096,		"kmalloc-4096"	},
+		{ 8192,		"kmalloc-8192"	},
+		{ 16384,	"kmalloc-16384"	},
+		{ 32768,	"kmalloc-32768"	},
+		{ 65536,	"kmalloc-65536"	}
+};
+
 
 void slab_allocator::calculate_slab_size(class kmem_cache *cache) {
 
@@ -60,19 +79,23 @@ void slab_allocator::slab_allocator_init() {
 
 
 
+	for(int i = 0; i < KMALLOC_DEFINE_COUNT; i++) {
+
+		struct kmalloc_cache kmallocc = kmalloc_str[i];
+
+		this->kmalloc_list[i] = this->kmem_cache_create(kmallocc.name, kmallocc.size);
+
+	}
+
+	auto a = kmalloc(8);
+	kprintf("object_count = %p\n", a);
+
+	kfree(a);
 
 
-
-	kprintf("object_count = %p\n", kmem_cache_create("kmem8", 8));
-
-
-	kprintf("object_count = %p\n", kmem_cache_create("kmem8", 8));
-
-	kprintf("object_count = %p\n", kmem_cache_create("kmem8", 8));
-
+	kprintf("object_count = %p\n", kmalloc(8));
 
 	kprintf("sizeof kmem_cache %u\n", sizeof(kmem_cache));
-
 
 
 
@@ -84,6 +107,92 @@ void slab_allocator::slab_allocator_init() {
 
 }
 
+void *slab_allocator::kmalloc(size_t size) {
+
+
+	for(int i = 0; i < KMALLOC_DEFINE_COUNT; i++) {
+
+		class kmem_cache *cache = this->kmalloc_list[i];
+
+		if(cache->object_size >= size) {
+
+			return cache->kmem_cache_alloc();
+		}
+
+
+	}
+
+
+	trace_s("panic. kmalloc");
+	STOP;
+	return nullptr;
+}
+
+void slab_allocator::kfree(void *addr) {
+
+
+	for(int i = 0; i < KMALLOC_DEFINE_COUNT; i++) {
+
+
+		class kmem_cache *cache = this->kmalloc_list[i];
+
+		bool ret = false;
+
+		struct slab *slab = reinterpret_cast<struct slab*>(reinterpret_cast<unsigned long>(addr) & ~(MEMORY_BLOCK_SIZE - 1));
+
+
+		cache->partial.foreach_safe(offsetof(&slab::list), [slab, &ret, cache, addr](struct slab *list_slab) {
+
+
+			if(ret) {
+
+				return;
+			}
+
+			if(slab == list_slab) {
+
+				cache->kmem_cache_free(addr);
+				ret = true;
+			}
+		});
+
+		if(ret) {
+
+			return;
+		}
+
+		cache->full.foreach(offsetof(&slab::list), [slab, &ret, cache, addr](struct slab *list_slab) {
+
+
+
+			if(ret) {
+
+				return;
+			}
+
+			if(slab == list_slab) {
+
+				cache->kmem_cache_free(addr);
+				ret = true;
+			}
+		});
+
+
+		if(ret) {
+
+			return;
+		}
+
+
+		trace_s("panic. kfree");
+		STOP;
+	}
+
+
+
+}
+
+
 
 class kmem_cache* slab_allocator::kmem_cache_create(const char *name, size_t size) {
 
@@ -91,6 +200,10 @@ class kmem_cache* slab_allocator::kmem_cache_create(const char *name, size_t siz
 	class kmem_cache *cache = static_cast<class kmem_cache*>(this->kmem_cache_cache.kmem_cache_alloc());
 
 
+	cache->list.reset();
+	cache->free.reset();
+	cache->partial.reset();
+	cache->full.reset();
 
 	//kmem_cacheのリストに入れる 管理用
 	kmem_cache_list.add_list_tail(&cache->list);
@@ -118,6 +231,7 @@ class kmem_cache* slab_allocator::kmem_cache_create(const char *name, size_t siz
 	calculate_slab_size(cache);
 
 
+
 	return cache;
 }
 
@@ -131,16 +245,17 @@ void *kmem_cache::kmem_cache_alloc() {
 	if(!this->partial.is_empty()) {
 
 
-		struct slab *slab = this->partial.value(offsetof(&slab::list));
+		struct slab *slab = this->partial.first(offsetof(&slab::list));
 
 		void *addr = alloc_object(slab);
+
 
 		//メモリが割り当てられていっぱいになったらリストを移動してアドレスを返す
 		if(addr) {
 
 			if(this->object_count <= slab->count) {
 
-				this->full.move(&slab->list);
+				slab->list.move(&this->full);
 			}
 
 			return addr;
@@ -149,10 +264,10 @@ void *kmem_cache::kmem_cache_alloc() {
 		//メモリが割り当てられずにスラブがいっぱいになっていたらリストを移動して新しくgrowする
 		if(this->object_count <= slab->count) {
 
-			this->full.move(&slab->list);
+			slab->list.move(&this->full);
 		}
-	}
 
+	}
 
 	//空のスラブが無かったら新しく作る
 	if(this->free.is_empty()) {
@@ -160,13 +275,18 @@ void *kmem_cache::kmem_cache_alloc() {
 		kmem_cache_grow();
 	}
 
-	struct slab *slab = this->free.value(offsetof(&slab::list));
+	struct slab *slab = this->free.first(offsetof(&slab::list));
 
 	void *addr = alloc_object(slab);
 
+
+
+
 	if(addr) {
 
-		this->partial.move(&slab->list);
+		slab->list.move(&this->partial);
+
+		//kprintf("new alloc %p\n", addr);
 
 		return addr;
 	} else {
@@ -181,18 +301,40 @@ void *kmem_cache::kmem_cache_alloc() {
 void kmem_cache::kmem_cache_free(void *addr) {
 
 
+	struct slab *slab;
 
 
+	if(this->slab_flags == ON_SLAB) {
+
+		slab = reinterpret_cast<struct slab*>(reinterpret_cast<unsigned long>(addr) & ~(MEMORY_BLOCK_SIZE - 1));
+
+	} else {
 
 
+		trace_s("panic. kmem_cache_free");
+		STOP;
+
+	}
+
+	unsigned int index = (reinterpret_cast<unsigned long>(addr) - reinterpret_cast<unsigned long>(slab->address)) / this->object_size;
+
+	kmem_bufctl *kmem_bufctl = get_kmem_bufctl(slab);
 
 
+	if(kmem_bufctl[index] == KMEM_BUFCTL_ALLOCATED) {
 
+
+		kmem_bufctl[index] = slab->free;
+		slab->free = index;
+		slab->count--;
+
+		if(slab->count == 0) {
+
+			slab->list.move(&this->free);
+		}
+
+	}
 }
-
-
-
-
 
 void kmem_cache::kmem_cache_grow() {
 
@@ -200,14 +342,11 @@ void kmem_cache::kmem_cache_grow() {
 	struct slab *slab;			//新しく作るスラブ
 	kmem_bufctl *kmem_bufctl;	//
 
-
-
-
-
 	//オンスラブだったら
 	if(this->slab_flags == ON_SLAB) {
 
 		slab = static_cast<struct slab*>(virtual_memory.alloc_virtual_memory());
+		slab->list.reset();
 
 		if(slab == nullptr) {
 
@@ -232,8 +371,6 @@ void kmem_cache::kmem_cache_grow() {
 
 	//全て解放済みのリストに入れる
 	this->free.add_list_tail(&slab->list);
-
-	kprintf("act %p\n", slab);
 
 	this->current_object_count += this->object_count;
 }

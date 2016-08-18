@@ -72,13 +72,19 @@ public:
 	}
 
 
-	T *value(unsigned long offset) {
+	T *first(unsigned long offset) {
 
 		return container_of<T>(this->next, reinterpret_cast<unsigned char*>(offset));
 	}
 
+	T *value(unsigned long offset) {
 
-	void foreach(unsigned long offset, void (*func)(T*)) {
+		return container_of<T>(this, reinterpret_cast<unsigned char*>(offset));
+	}
+
+
+	template <typename Func>
+	void foreach(unsigned long offset, Func func) {
 
 		class list<T> *pos;
 		for(pos = this->next; pos != this; pos = pos->next) {
@@ -88,11 +94,29 @@ public:
 		}
 	}
 
+	template <typename Func>
+	void foreach_safe(unsigned long offset, Func func) {
 
-	list() {
+		class list<T> *pos;
+
+		class list<T> *tmp;
+
+		for(pos = this->next, tmp = pos->next; pos != this; pos = tmp, tmp = pos->next) {
+
+
+			func(container_of<T>(pos, reinterpret_cast<unsigned char*>(offset)));
+		}
+	}
+
+	void reset() {
 
 		this->prev = this;
 		this->next = this;
+	}
+
+	list() {
+
+		reset();
 	}
 
 

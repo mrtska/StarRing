@@ -93,7 +93,7 @@ private:
 
 
 		//全て解放済みなので順番にインデックスする
-		for(int i = 0; i < this->object_count - 1; i++) {
+		for(int i = 0; i < (this->object_count - 1); i++) {
 
 			kmem_bufctl[i] = i + 1;
 		}
@@ -121,7 +121,7 @@ private:
 			kmem_bufctl[free] = KMEM_BUFCTL_ALLOCATED;
 			slab->count++;
 
-			return reinterpret_cast<void*>(reinterpret_cast<unsigned long>(slab->address) + (this->object_size * slab->free));
+			return reinterpret_cast<void*>(reinterpret_cast<unsigned long>(slab->address) + (this->object_size * free));
 		} else {
 
 			return nullptr;
@@ -131,8 +131,6 @@ private:
 
 
 public:
-
-
 
 	const char *get_name() {
 
@@ -147,12 +145,15 @@ public:
 
 	//キャッシュを広げる
 	void kmem_cache_grow();
-
-
-
 };
 
 
+#define KMALLOC_DEFINE_COUNT 16
+struct kmalloc_cache {
+
+	size_t size;
+	const char *name;
+};
 
 
 
@@ -172,6 +173,9 @@ private:
 
 
 	void calculate_slab_size(class kmem_cache *cache);
+
+	//kmallocで使うkmem_cacheのリスト
+	class kmem_cache *kmalloc_list[KMALLOC_DEFINE_COUNT];
 
 
 public:
