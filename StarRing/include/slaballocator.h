@@ -5,6 +5,8 @@
 #include <system.h>
 #include <physicalmemory.h>
 
+
+
 #define SLAB_LARGE_OBJECT_SIZE MEMORY_BLOCK_SIZE / 4
 
 extern class slab_allocator slab_allocator;
@@ -55,10 +57,10 @@ private:
 
 
 	//スラブのサイズ
-	size_t slab_size;
+	unsigned long slab_size;
 
 	//オブジェクトのサイズ
-	size_t object_size;
+	unsigned long object_size;
 
 	//オブジェクトの最大数
 	int object_count;
@@ -151,7 +153,7 @@ public:
 #define KMALLOC_DEFINE_COUNT 16
 struct kmalloc_cache {
 
-	size_t size;
+	unsigned long size;
 	const char *name;
 };
 
@@ -185,11 +187,11 @@ public:
 	void slab_allocator_init();
 
 
-	struct kmem_cache *kmem_cache_create(const char *name, size_t size);
+	struct kmem_cache *kmem_cache_create(const char *name, unsigned long size);
 
 
 	//カーネルメモリを割り当てる
-	void *kmalloc(size_t size);
+	void *kmalloc(unsigned long size);
 
 	//カーネルメモリを開放する
 	void kfree(void *addr);
@@ -204,20 +206,13 @@ public:
 
 
 
+void inline *operator new(unsigned long size) {
 
+	return slab_allocator.kmalloc(size);
+}
 
+void inline operator delete(void *addr) {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+	slab_allocator.kfree(addr);
+}
 

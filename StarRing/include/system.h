@@ -23,7 +23,6 @@
 
 
 
-typedef unsigned long size_t;
 
 
 //インラインアセンブラ
@@ -66,6 +65,10 @@ static inline unsigned int inl(unsigned short port) {
 #ifdef __cplusplus
 
 static inline unsigned long *read_physical_address(unsigned long phys) {
+
+	return reinterpret_cast<unsigned long*>(phys + 0xFFFF800000000000);
+}
+static inline unsigned long *translate_physical_address(unsigned long phys) {
 
 	return reinterpret_cast<unsigned long*>(phys + 0xFFFF800000000000);
 }

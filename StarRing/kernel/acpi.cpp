@@ -6,7 +6,6 @@
 
 
 
-
 //ACPICAのヘッダ
 extern "C" {
 
@@ -19,10 +18,10 @@ extern "C" {
 
 }
 
+#include <slaballocator.h>
 
 //ACPI管理クラス
 class acpi acpi;
-
 
 
 
@@ -64,14 +63,12 @@ void acpica_start() {
 		kprintf("ERROR! AcpiInitializetionSubSystem.\n");
 		return;
 	}
-	STOP;
 
-	status = AcpiInitializeTables((acpi_table_desc*)0, 4, false);
+	status = AcpiInitializeTables(nullptr, 4, false);
 	if(ACPI_FAILURE(status)) {
 		kprintf("ERROR! AcpiInitializetionTables.\n");
 		return;
 	}
-	STOP;
 
 	status = AcpiLoadTables();
 	if(ACPI_FAILURE(status)) {
@@ -79,36 +76,35 @@ void acpica_start() {
 		return;
 	}
 
-	//status = AcpiEnableSubsystem(ACPI_FULL_INITIALIZATION);
+	status = AcpiEnableSubsystem(ACPI_FULL_INITIALIZATION);
 
 	if(ACPI_FAILURE(status)) {
 		kprintf("ERROR! AcpiEnableSubsystem.\n");
 		return;
 	}
 
-	//status = AcpiInitializeObjects(ACPI_FULL_INITIALIZATION);
+	status = AcpiInitializeObjects(ACPI_FULL_INITIALIZATION);
 
 	if(ACPI_FAILURE(status)) {
 		kprintf("ERROR! AcpiInitializeObjects.\n");
 		return;
 	}
 
+
 	obj.Type = ACPI_TYPE_INTEGER;
 	obj.Integer.Value = 1;
 
-	//status = AcpiEvaluateObject(NULL, "\\_PIC", &pic_args, NULL);
+	status = AcpiEvaluateObject(nullptr, "\\_PIC", &pic_args, nullptr);
 
 	if(ACPI_FAILURE(status)) {
 		kprintf("ERROR! AcpiEvaluateObject.\n");
 		return;
 	}
-
 }
 
 //OSを初期化する 特にする処理は無い
 ACPI_STATUS AcpiOsInitialize(void) {
 
-	trace();
 	return AE_OK ;
 }
 
@@ -122,13 +118,12 @@ ACPI_STATUS AcpiOsTerminate(void) {
 //ACPIテーブルのアドレスを返す
 ACPI_PHYSICAL_ADDRESS AcpiOsGetRootPointer(void) {
 
-	return 0;
+	return physical_memory.get_acpi_rsdp_address();
 }
 
 //前定義されていたものをオーバーライドする
 ACPI_STATUS AcpiOsPredefinedOverride(const ACPI_PREDEFINED_NAMES *init, ACPI_STRING *new_val) {
 
-	trace();
 	*new_val = nullptr;
 	return AE_OK ;
 }
@@ -141,36 +136,36 @@ ACPI_STATUS AcpiOsTableOverride(ACPI_TABLE_HEADER *exist, ACPI_TABLE_HEADER **n)
 	return AE_OK ;
 }
 
+//物理アドレスを仮想アドレスに変換してあげる
 void *AcpiOsMapMemory(ACPI_PHYSICAL_ADDRESS paddr, ACPI_SIZE l) {
 
-	trace();
-	return (void*) (paddr);
-
+	return translate_physical_address(paddr);
 }
 
+//仮想アドレスとサイズが帰ってくるんだけどそれをどうしろと(´・ω・｀)
 void AcpiOsUnmapMemory(void *la, ACPI_SIZE l) {
 
 
-	trace();
+	//trace();
 }
 
 //メモリ割り当て
 void *AcpiOsAllocate(ACPI_SIZE size) {
-	//kprintf("AcpiOsAllocate size = %u\n", size);
-	//return kmalloc(size, 0);
-	trace();
-	return nullptr;//new int();
+
+
+	void *a = slab_allocator.kmalloc(size);
+	//kprintf("allocating %p\n", a);
+	return a;
 }
 
 void AcpiOsFree(void *mem) {
 
-	trace();
-//	kprintf("free %p\n", mem);
+	//kprintf("freeing %p\n", mem);
+	return slab_allocator.kfree(mem);
 }
 
 ACPI_THREAD_ID AcpiOsGetThreadId(void) {
 
-	trace();
 	return 1;
 }
 
@@ -192,56 +187,48 @@ void AcpiOsStall(UINT32 usec) {
 
 ACPI_STATUS AcpiOsCreateSemaphore(UINT32 max, UINT32 init, ACPI_HANDLE *r) {
 
-	trace();
 	return AE_OK ;
 }
 
 ACPI_STATUS AcpiOsDeleteSemaphore(ACPI_HANDLE h) {
 
-	trace();
 	return AE_OK ;
 }
 
 ACPI_STATUS AcpiOsWaitSemaphore(ACPI_HANDLE h, UINT32 u, UINT16 to) {
 
-	trace();
 	return AE_OK ;
 }
 
 ACPI_STATUS AcpiOsSignalSemaphore(ACPI_SEMAPHORE h, UINT32 u) {
 
-	trace();
 	return AE_OK;
 }
 
 ACPI_STATUS AcpiOsCreateLock(ACPI_HANDLE *o) {
 
-	trace();
 	return AE_OK ;
 }
 
 void AcpiOsDeleteLock(ACPI_HANDLE h) {
 
-	trace();
 }
 
 ACPI_CPU_FLAGS AcpiOsAcquireLock(ACPI_HANDLE h) {
 
-	trace();
 	return 0;
 }
 
 void AcpiOsReleaseLock(ACPI_HANDLE h, ACPI_CPU_FLAGS f) {
 
-	trace();
 }
 
 ACPI_STATUS AcpiOsInstallInterruptHandler(UINT32 intn, ACPI_OSD_HANDLER h, void *ctxt) {
 
 
 	trace();
-/*	kprintf("install interrupt: %d\n", intn);
-	set_intr_gate(intn + 0x20, acpi_interrupt_handler);
+	kprintf("install interrupt: %d\n", intn);
+/*	set_intr_gate(intn + 0x20, acpi_interrupt_handler);
 	io_apic_set_redirect(intn, 0, intn + 0x20);*/
 	return AE_OK;
 }
@@ -293,7 +280,6 @@ ACPI_STATUS AcpiOsWriteMemory(ACPI_PHYSICAL_ADDRESS a, UINT64 val, UINT32 wid) {
 
 ACPI_STATUS AcpiOsReadPort(ACPI_IO_ADDRESS addr, UINT32 *val, UINT32 wid) {
 
-	trace();
 	switch(wid) {
 	case 32:
 		*val = inl(addr);
@@ -310,7 +296,6 @@ ACPI_STATUS AcpiOsReadPort(ACPI_IO_ADDRESS addr, UINT32 *val, UINT32 wid) {
 
 ACPI_STATUS AcpiOsWritePort(ACPI_IO_ADDRESS addr, UINT32 val, UINT32 wid) {
 
-	trace();
 	switch(wid) {
 	case 32:
 		outl(addr, val);
@@ -360,17 +345,16 @@ ACPI_STATUS AcpiOsWritePciConfiguration(ACPI_PCI_ID *id, UINT32 reg, UINT64 val,
 
 void AcpiOsPrintf(const char *format, ...) {
 
-	/*va_list list;
+	va_list list;
 	va_start(list, format);
 	vprintf(format, list);
-	va_end(list);*/
-	trace();
+	va_end(list);
+
 }
 
 void AcpiOsVprintf(const char *format, va_list args) {
 
-
-	trace();
+	vprintf(format, args);
 }
 
 UINT64 AcpiOsGetTimer(void) {

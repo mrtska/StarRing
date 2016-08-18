@@ -2,14 +2,13 @@
 
 
 
-#include <string.h>
 
 
 
 
 template<class P, class M>
-size_t offsetof(const M P::*member) {
-	return (size_t) &( reinterpret_cast<P*>(0)->*member);
+unsigned long offsetof(const M P::*member) {
+	return (unsigned long) &( reinterpret_cast<P*>(0)->*member);
 }
 
 /*template<class P, class M>

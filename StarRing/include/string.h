@@ -1,10 +1,6 @@
 #pragma once
 
 
-
-//ぬるぽ
-#define NULL ((void*)0)
-
 //メモリサイズ
 typedef unsigned long size_t;
 

@@ -15,6 +15,11 @@
 
 #include <drivers/keyboard.h>
 
+extern "C" {
+
+#include "../acpica/include/acpi.h"
+
+}
 
 
 //レガシーPICを無効化
@@ -58,6 +63,7 @@ void main(unsigned long magic, unsigned long mboot) {
 	//例外管理初期化
 	trap_init();
 
+
 	//Advanced Programmable Interrupt Controller初期化
 	apic.apic_init();
 
@@ -74,6 +80,18 @@ void main(unsigned long magic, unsigned long mboot) {
 	kprintf("return\n");
 
 	asmv("sti");
+
+
+	ACPI_STATUS r;
+	unsigned char n = 5;
+	r = AcpiEnterSleepStatePrep(n);
+	if (ACPI_FAILURE(r)) {
+		kprintf("sleep prep: %s\n", AcpiFormatException(r));
+	}
+	r = AcpiEnterSleepState(n);
+	if (ACPI_FAILURE(r)) {
+		kprintf("sleep: %s\n", AcpiFormatException(r));
+	}
 	STOP;
 	return;
 

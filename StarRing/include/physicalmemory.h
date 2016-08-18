@@ -91,6 +91,11 @@ public:
 		return this->max_memory_address;
 	}
 
+	unsigned long get_acpi_rsdp_address() {
+
+		return this->acpi_rsdp_address;
+	}
+
 	unsigned long alloc_physical_memory();
 
 	void release_physical_memory(unsigned long addr);

@@ -5,6 +5,7 @@
 
 
 
+
 class slab_allocator slab_allocator;
 
 
@@ -64,19 +65,12 @@ void slab_allocator::slab_allocator_init() {
 	//kmem_cacheは512KiBもないのでオンスラブ
 	this->kmem_cache_cache.slab_flags = ON_SLAB;
 
-/*
-	if(this->kmem_cache_cache.slab_size >= SLAB_LARGE_OBJECT_SIZE) {
-
-		this->kmem_cache_cache.sl
-	}*/
-
 
 	//スラブのサイズを計算
 	calculate_slab_size(&this->kmem_cache_cache);
 
 	//kmem_cacheのリストに入れる 管理用
 	kmem_cache_list.add_list_tail(&this->kmem_cache_cache.list);
-
 
 
 	for(int i = 0; i < KMALLOC_DEFINE_COUNT; i++) {
@@ -86,28 +80,9 @@ void slab_allocator::slab_allocator_init() {
 		this->kmalloc_list[i] = this->kmem_cache_create(kmallocc.name, kmallocc.size);
 
 	}
-
-	auto a = kmalloc(8);
-	kprintf("object_count = %p\n", a);
-
-	kfree(a);
-
-
-	kprintf("object_count = %p\n", kmalloc(8));
-
-	kprintf("sizeof kmem_cache %u\n", sizeof(kmem_cache));
-
-
-
-
-
-	trace();
-	STOP;
-
-
 }
 
-void *slab_allocator::kmalloc(size_t size) {
+void *slab_allocator::kmalloc(unsigned long size) {
 
 
 	for(int i = 0; i < KMALLOC_DEFINE_COUNT; i++) {
@@ -182,19 +157,15 @@ void slab_allocator::kfree(void *addr) {
 
 			return;
 		}
-
-
-		trace_s("panic. kfree");
-		STOP;
 	}
 
-
-
+	kprintf("warning. kfree %p\n", addr);
+	STOP;
 }
 
 
 
-class kmem_cache* slab_allocator::kmem_cache_create(const char *name, size_t size) {
+class kmem_cache* slab_allocator::kmem_cache_create(const char *name, unsigned long size) {
 
 
 	class kmem_cache *cache = static_cast<class kmem_cache*>(this->kmem_cache_cache.kmem_cache_alloc());
@@ -374,6 +345,7 @@ void kmem_cache::kmem_cache_grow() {
 
 	this->current_object_count += this->object_count;
 }
+
 
 
 

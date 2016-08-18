@@ -8,11 +8,6 @@ template <typename T>
 class list {
 
 
-
-
-
-
-
 public:
 
 	//左方向のポインタ

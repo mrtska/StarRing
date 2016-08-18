@@ -107,11 +107,11 @@ void keyboard::keyboard_init() {
 
 
 	//タイプマティックレートを最大に
-	write_command_encoder(KEYBOARD_ENC_SET_TYPEMATIC);
-	write_command_encoder(0);
+	//write_command_encoder(KEYBOARD_ENC_SET_TYPEMATIC);
+	//write_command_encoder(0);
 
-	write_command_encoder(KEYBOARD_ENC_SETLED);
-	write_command_encoder(0x2);
+	//write_command_encoder(KEYBOARD_ENC_SETLED);
+	//write_command_encoder(0x2);
 
 
 }
