@@ -10,8 +10,8 @@ class physical_memory physical_memory;
 
 physical_memory::physical_memory() {
 
+	//メモリマップを0で初期化
 	memset(this->physical_memory_map, 0, sizeof(unsigned long) * 1000);
-
 }
 /*
 static const char *get_mmap_type(unsigned int type) {
@@ -31,7 +31,7 @@ static const char *get_mmap_type(unsigned int type) {
 	return "";
 }*/
 
-
+//grub2が親切にもくれた情報をパースしていろいろやる
 void physical_memory::parse_multiboot_header(void *addr) {
 
 	unsigned long longaddr = reinterpret_cast<unsigned long>(addr);
