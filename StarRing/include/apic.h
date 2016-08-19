@@ -2,17 +2,15 @@
 #pragma once
 
 
-
-
-
-
+//デフォルトのLocal APICのMMIOアドレス
 #define LOCAL_APIC_BASE_ADDRESS 0xFEE00000UL
 
 
 #define IOAPIC_LEVEL_TRIGGER (1 << 15)
 
 
-
+//Local APICのMMIOを強引に構造体にしたもの
+//なんでこんなにalignedがたくさんあるのかIntelさん教えてください
 struct local_apic_register {
 
 
@@ -231,9 +229,10 @@ public:
 	void apic_init();
 
 
-
+	//IOAPICのリダイレクションテーブルにベクタ番号を登録
 	void ioapic_set_redirect_table(int irq, unsigned long data);
 
+	//APICの割り込み完了通知
 	void apic_eoi() {
 
 		local_apic_register->eoi = 0;
