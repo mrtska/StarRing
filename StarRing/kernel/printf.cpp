@@ -169,10 +169,59 @@ int kkprintf(const char *format, ...) {
 }
 
 
+static volatile int is_enable;
+
+void serial_init(void) {
+
+	if(is_enable) {
+
+		return;
+	}
+
+	unsigned char test = inb(0x3F8 + 5);
+	if(test == 0xFF) {
+		trace();
+		is_enable = false;
+		return;
+	}
+
+	outb(0x3F8 + 1, 0x00);
+	outb(0x3F8 + 3, 0x80);
+	outb(0x3F8 + 0, 0x03);
+	outb(0x3F8 + 1, 0x00);
+	outb(0x3F8 + 3, 0x03);
+	outb(0x3F8 + 2, 0xC7);
+	outb(0x3F8 + 4, 0x0B);
+
+	is_enable = 1;
+
+}
+
+static void write_serial(char c) {
+
+	while(((inb(0x3F8 + 5) & 0x20) == 0));
+
+
+	outb(0x3F8, c);
+}
+
+
+void writes_serial(char *c) {
+
+	serial_init();
+	if(!is_enable) {
+
+		return;
+	}
+	while(*c) {
+
+		write_serial(*c++);
+	}
+}
 int kprintf(const char *format, ...) {
 
 
-	spin_lock(&printf_lock);
+	//spin_lock(&printf_lock);
 
 	char buf[1024];
 	va_list args;
@@ -213,7 +262,7 @@ int kprintf(const char *format, ...) {
 	outb(0x3D5, cur_pos >> 8);
 
 	//writes_serial(buf);
-	spin_unlock(&printf_lock);
+	//spin_unlock(&printf_lock);
 
 	return ret;
 }

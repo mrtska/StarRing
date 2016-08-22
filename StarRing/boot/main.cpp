@@ -12,14 +12,11 @@
 #include <trap.h>
 
 #include <acpi.h>
+#include <pci.h>
 
 #include <drivers/keyboard.h>
+#include <drivers/hpet.h>
 
-extern "C" {
-
-#include "../acpica/include/acpi.h"
-
-}
 
 
 //レガシーPICを無効化
@@ -54,15 +51,17 @@ void main(unsigned long magic, unsigned long mboot) {
 	//IDT初期化
 	idt.idt_init();
 
+	//例外管理初期化
+	trap_init();
+
 	//物理メモリ管理初期化
 	physical_memory.physical_memory_init(mboot);
 
 	//仮想メモリ管理初期化
 	virtual_memory.virtual_memory_init();
+	STOP;
 
-	//例外管理初期化
-	trap_init();
-
+STOP;
 
 	//Advanced Programmable Interrupt Controller初期化
 	apic.apic_init();
@@ -74,24 +73,19 @@ void main(unsigned long magic, unsigned long mboot) {
 	slab_allocator.slab_allocator_init();
 
 	//ACPI管理初期化
-	acpi.acpi_init();
+	//acpi.acpi_init();
+
+	//PCIデバイス初期化
+	pci.pci_init();
+
+	hpet.hpet_init();
 
 
-	kprintf("return\n");
+	kprintf("return");
 
 	asmv("sti");
 
 
-	ACPI_STATUS r;
-	unsigned char n = 5;
-	r = AcpiEnterSleepStatePrep(n);
-	if (ACPI_FAILURE(r)) {
-		kprintf("sleep prep: %s\n", AcpiFormatException(r));
-	}
-	r = AcpiEnterSleepState(n);
-	if (ACPI_FAILURE(r)) {
-		kprintf("sleep: %s\n", AcpiFormatException(r));
-	}
 	STOP;
 	return;
 

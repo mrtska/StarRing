@@ -70,12 +70,13 @@
 
 
 
-irq_entry keyboard_handler      //0x21
+irq_entry keyboard_handler          //0x21
 
 
+irq_entry acpi_interrupt_handler    //
 
 
-
+irq_entry hpet_handler              //0x22
 
 
 

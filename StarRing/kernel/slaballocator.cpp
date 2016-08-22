@@ -329,6 +329,19 @@ void kmem_cache::kmem_cache_grow() {
 		kmem_bufctl = get_kmem_bufctl(slab);
 
 		slab->address = kmem_bufctl + this->object_count;
+
+		if(reinterpret_cast<unsigned long>(slab->address) & ~(SYSTEM_ALIGNMENT_SIZE - 1)) {
+
+			unsigned long addr = reinterpret_cast<unsigned long>(slab->address);
+			addr += 8;
+			addr &= ~(SYSTEM_ALIGNMENT_SIZE - 1);
+
+			slab->address = reinterpret_cast<void*>(addr);
+
+			this->object_count--;
+		}
+
+
 		slab->count = 0;
 
 

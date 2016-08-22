@@ -7,7 +7,7 @@
 
 #include <system.h>
 #include <idt.h>
-
+#include <registers.h>
 
 
 extern "C" void divide_error(void);
@@ -62,6 +62,7 @@ void trap_init() {
 extern "C" void exec_divide_error() {
 
 	trace();
+	STOP;
 }
 
 
@@ -126,14 +127,34 @@ extern "C" void exec_stack_segment_fault() {
 	trace();
 }
 
-extern "C" void exec_general_protection() {
+extern "C" void exec_general_protection(struct registers_with_error *regs) {
 
+
+	kprintf("rip %p\n", regs->i.rip);
+	kprintf("rsi %p, rdi %p, rsp %p\n", regs->c.rsi, regs->c.rdi, regs->i.rsp);
+	kprintf("rax %p, rbx %p, rcx %p\n", regs->c.rax, regs->c.rbx, regs->c.rcx);
+	kprintf("rdx %p, r8  %p, r9  %p\n", regs->c.rdx, regs->c.r8, regs->c.r9);
+	kprintf("r10 %p, r11 %p, r12 %p\n", regs->c.r10, regs->c.r11, regs->c.r12);
+	kprintf("r13 %p, r14 %p, r15 %p\n", regs->c.r13, regs->c.r14, regs->c.r15);
+	kprintf("rbp %p cs %X, ss %X\n", regs->c.rbp, regs->i.cs, regs->i.ss);
 	trace();
 	STOP;
 }
 
-extern "C" void exec_page_fault() {
+extern "C" void exec_page_fault(struct registers_with_error *regs) {
 
+
+	kprintf("trap %p\n", regs);
+	/*
+
+
+	kprintf("rip %p\n", regs->i.rip);
+	kprintf("rsi %p, rdi %p, rsp %p\n", regs->c.rsi, regs->c.rdi, regs->i.rsp);
+	kprintf("rax %p, rbx %p, rcx %p\n", regs->c.rax, regs->c.rbx, regs->c.rcx);
+	kprintf("rdx %p, r8  %p, r9  %p\n", regs->c.rdx, regs->c.r8, regs->c.r9);
+	kprintf("r10 %p, r11 %p, r12 %p\n", regs->c.r10, regs->c.r11, regs->c.r12);
+	kprintf("r13 %p, r14 %p, r15 %p\n", regs->c.r13, regs->c.r14, regs->c.r15);
+	kprintf("rbp %p cs %X, ss %X\n", regs->c.rbp, regs->i.cs, regs->i.ss);*/
 	trace();
 
 	STOP;

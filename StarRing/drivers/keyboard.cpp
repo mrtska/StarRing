@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <apic.h>
 #include <system.h>
+#include <registers.h>
 
 class keyboard keyboard;
 
@@ -116,8 +117,9 @@ void keyboard::keyboard_init() {
 
 }
 
-extern "C" void exec_keyboard_handler() {
+INTERRUPT_HANDLER void exec_keyboard_handler(struct registers *regs) {
 
+	//kprintf("regs %p\n", regs->i.rip);
 
 
 	auto code = inb(KEYBOARD_PORT_ENCODER);

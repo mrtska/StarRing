@@ -13,7 +13,7 @@ physical_memory::physical_memory() {
 	//メモリマップを0で初期化
 	memset(this->physical_memory_map, 0, sizeof(unsigned long) * 1000);
 }
-/*
+
 static const char *get_mmap_type(unsigned int type) {
 
 	switch(type) {
@@ -29,7 +29,7 @@ static const char *get_mmap_type(unsigned int type) {
 		return "NADRAM";
 	}
 	return "";
-}*/
+}
 
 //grub2が親切にもくれた情報をパースしていろいろやる
 void physical_memory::parse_multiboot_header(void *addr) {
@@ -197,9 +197,11 @@ void physical_memory::physical_memory_init(unsigned long addr) {
 
 			break;
 		}
-
 		//使用中の物を登録するのでAVAILABLEは無視
 		if(entry.type == MULTIBOOT_MEMORY_AVAILABLE) {
+
+			kprintf("addr: %p, end: %p type: %s\n", entry.address, entry.address + entry.length, get_mmap_type(entry.type));
+
 
 			continue;
 		}
@@ -207,9 +209,6 @@ void physical_memory::physical_memory_init(unsigned long addr) {
 		//AVAILABLE以外を使用中にする
 		set_physical_memory_bit(entry.address, entry.length);
 
-
-
-		//kprintf("addr: %p, end: %p type: %s\n", entry.address, entry.address + entry.length, get_mmap_type(entry.type));
 	}
 }
 

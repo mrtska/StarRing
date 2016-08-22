@@ -57,8 +57,11 @@
 .extern exec_\sym
 .align 0x10
 \sym:
+
     save_registers
-    movq %rsp, %rsi
+
+
+    movq %rsp, %rdi
     call exec_\sym
 
     rest_registers
