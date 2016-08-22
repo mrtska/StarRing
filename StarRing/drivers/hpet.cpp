@@ -33,13 +33,7 @@ void hpet::hpet_init() {
 */
 
 
-
-
-
-
 	//this->hpet_base_address = 0xFED00000;//hpet->Address.Address;
-
-
 
 	//429B17F
 	unsigned int hpet_period = read_hpet(HPET_GCAP) >> 32;

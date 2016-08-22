@@ -130,7 +130,7 @@ extern "C" void exec_stack_segment_fault() {
 extern "C" void exec_general_protection(struct registers_with_error *regs) {
 
 
-	kprintf("rip %p\n", regs->i.rip);
+	kprintf("rip %p error %b\n", regs->i.rip, regs->error);
 	kprintf("rsi %p, rdi %p, rsp %p\n", regs->c.rsi, regs->c.rdi, regs->i.rsp);
 	kprintf("rax %p, rbx %p, rcx %p\n", regs->c.rax, regs->c.rbx, regs->c.rcx);
 	kprintf("rdx %p, r8  %p, r9  %p\n", regs->c.rdx, regs->c.r8, regs->c.r9);

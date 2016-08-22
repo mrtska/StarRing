@@ -70,7 +70,7 @@ void pci::pci_init() {
 	search_pci_device();
 
 
-/*
+
 
 
 	this->pci_device_list.foreach(offsetof(&pci_device::list), [](struct pci_device *dev) {
@@ -83,7 +83,7 @@ void pci::pci_init() {
 
 
 
-*/
+
 
 
 }

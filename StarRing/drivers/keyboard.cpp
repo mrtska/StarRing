@@ -8,6 +8,20 @@
 #include <system.h>
 #include <registers.h>
 
+
+
+
+//ACPICAのヘッダ
+extern "C" {
+
+#include "../acpica/include/acpi.h"
+
+}
+
+
+
+
+
 class keyboard keyboard;
 
 extern "C" void keyboard_handler(void);
@@ -140,8 +154,26 @@ INTERRUPT_HANDLER void exec_keyboard_handler(struct registers *regs) {
 
 	} else {
 
+		if(code == 1) {
 
-		kprintf("%c", key_US[code]);
+
+
+			ACPI_STATUS r;
+			int n = 5;
+			r = AcpiEnterSleepStatePrep(n);
+			if (ACPI_FAILURE(r)) {
+				kprintf("sleep prep: %s\n", AcpiFormatException(r));
+			}
+
+			r = AcpiEnterSleepState(n);
+			if (ACPI_FAILURE(r)) {
+				kprintf("sleep: %s\n", AcpiFormatException(r));
+			}
+		}
+
+
+
+		kprintf("%X", code);
 	}
 
 

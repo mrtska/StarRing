@@ -38,6 +38,19 @@ static void disable_legacy_pic() {
 	outb(0xA1, 0xFF);
 }
 
+extern unsigned int _bss_start;
+extern unsigned int _bss_end;
+
+//BSSセクション初期化
+extern "C" void bss_init(void) {
+
+	unsigned int *start = &_bss_start;
+	unsigned int *end = &_bss_end;
+	while(start < end) {
+		*start++ = 0x00;
+	}
+}
+
 void main(unsigned long magic, unsigned long mboot) {
 
 
@@ -59,9 +72,6 @@ void main(unsigned long magic, unsigned long mboot) {
 
 	//仮想メモリ管理初期化
 	virtual_memory.virtual_memory_init();
-	STOP;
-
-STOP;
 
 	//Advanced Programmable Interrupt Controller初期化
 	apic.apic_init();
@@ -73,7 +83,7 @@ STOP;
 	slab_allocator.slab_allocator_init();
 
 	//ACPI管理初期化
-	//acpi.acpi_init();
+	acpi.acpi_init();
 
 	//PCIデバイス初期化
 	pci.pci_init();

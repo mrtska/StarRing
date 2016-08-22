@@ -131,6 +131,7 @@ ENTRYPOINT:
 .code64
 .align 8
 .extern main
+.extern bss_init
 .extern ctors
 //ロングモード
 long_mode:
@@ -152,6 +153,7 @@ high:
 	pushq %rdx
 
 
+    call bss_init
 
 	movq $ctors, %rdx
 
@@ -181,6 +183,7 @@ constructed:
     popq %rdx
 	popq %rdi
 	popq %rsi
+
 
 
 	//main.c#mainを呼び出し

@@ -200,7 +200,7 @@ void physical_memory::physical_memory_init(unsigned long addr) {
 		//使用中の物を登録するのでAVAILABLEは無視
 		if(entry.type == MULTIBOOT_MEMORY_AVAILABLE) {
 
-			kprintf("addr: %p, end: %p type: %s\n", entry.address, entry.address + entry.length, get_mmap_type(entry.type));
+			//kprintf("addr: %p, end: %p type: %s\n", entry.address, entry.address + entry.length, get_mmap_type(entry.type));
 
 
 			continue;

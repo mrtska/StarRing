@@ -2,7 +2,7 @@
 #include <system.h>
 #include <slaballocator.h>
 #include <virtualmemory.h>
-
+#include <string.h>
 
 
 
@@ -317,6 +317,8 @@ void kmem_cache::kmem_cache_grow() {
 	if(this->slab_flags == ON_SLAB) {
 
 		slab = static_cast<struct slab*>(virtual_memory.alloc_virtual_memory());
+		memset(slab, 0, 0x200000);
+
 		slab->list.reset();
 
 		if(slab == nullptr) {

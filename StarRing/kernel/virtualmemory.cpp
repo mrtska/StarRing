@@ -2,7 +2,7 @@
 #include <virtualmemory.h>
 #include <physicalmemory.h>
 #include <stdio.h>
-
+#include <string.h>
 
 class virtual_memory virtual_memory;
 
@@ -35,24 +35,27 @@ void virtual_memory::virtual_memory_init() {
 	unsigned long kernel_tables = physical_memory.alloc_physical_memory();
 	this->kernel_page_tables = reinterpret_cast<unsigned long*>(kernel_tables);
 
+
 	//カーネルページを割り当てるアドレスを現在のページテーブルにマッピングする
 	map_virtual_memory(kernel_tables, kernel_tables, PRESENT | WRITE | GLOBAL, true);
+
+	memset(this->kernel_page_tables, 0, 0x200000);
+
 
 
 	//新しくCR3に代入するベースアドレス
 	unsigned long new_base_address = physical_memory.alloc_physical_memory();
 
+
 	map_virtual_memory(new_base_address, new_base_address, PRESENT | WRITE | GLOBAL, true);
+	memset(reinterpret_cast<unsigned long*>(new_base_address), 0, 0x200000);
 
 	//新しいカーネルページの場所
 	this->physical_base_address = new_base_address;
 
-
 	//新しいページテーブルにもここだけストレートマッピング
 	map_virtual_memory(kernel_tables, kernel_tables, PRESENT | WRITE | GLOBAL, true);
 	map_virtual_memory(new_base_address, new_base_address, PRESENT | WRITE | GLOBAL, true);
-
-	STOP;
 	//FFFFFFFF80000000から512MB分ストレートマッピングする
 	for(unsigned long addr = 0xFFFFFFFF80000000, phys = 0; addr < 0xFFFFFFFFA0000000; addr += MEMORY_BLOCK_SIZE, phys += MEMORY_BLOCK_SIZE) {
 
@@ -64,7 +67,6 @@ void virtual_memory::virtual_memory_init() {
 
 		map_virtual_memory(addr, phys, PRESENT | WRITE | GLOBAL, true);
 	}
-
 
 	this->write_cr3(this->physical_base_address);
 }
