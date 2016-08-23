@@ -221,7 +221,7 @@ void writes_serial(char *c) {
 int kprintf(const char *format, ...) {
 
 
-	//spin_lock(&printf_lock);
+	spin_lock(&printf_lock);
 
 	char buf[1024];
 	va_list args;
@@ -262,7 +262,7 @@ int kprintf(const char *format, ...) {
 	outb(0x3D5, cur_pos >> 8);
 
 	//writes_serial(buf);
-	//spin_unlock(&printf_lock);
+	spin_unlock(&printf_lock);
 
 	return ret;
 }

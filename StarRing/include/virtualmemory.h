@@ -203,13 +203,13 @@ private:
 
 
 
-	void write_cr3(unsigned long phys) {
+	void inline write_cr3(unsigned long phys) {
 
 		asmv("movq %0, %%cr3" ::"r"(phys));
 		asmv("invlpg %0" :: "m"(phys));
 	}
 
-	unsigned long read_cr3() {
+	unsigned long inline read_cr3() {
 
 		unsigned long ret;
 		asmv("movq %%cr3, %0" : "=r"(ret));
@@ -256,7 +256,10 @@ public:
 
 	void virtual_memory_init();
 
+	void inline apply_kernel_page() {
 
+		this->write_cr3(this->physical_base_address);
+	}
 
 	void *alloc_kernel_page();
 

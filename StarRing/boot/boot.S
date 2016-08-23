@@ -196,6 +196,75 @@ hlt
 jmp 1b
 
 
+
+//APがここへジャンプしてくる ap_boot.Sより
+.code32
+.extern ap_stack
+.extern ap_main
+.align 0x100
+ap_boot_32:
+
+    //割り込み無効
+    cli
+
+    //一応EFLAGSを初期化
+    push $0
+    popf
+
+    //PAEを有効化
+    movl %cr4, %eax
+    bts  $5, %eax
+    bts  $8, %eax
+    bts  $9, %eax
+    bts  $10, %eax
+    movl %eax, %cr4
+
+    //ページテーブルを設定
+    movl $(_boot_pml4), %eax
+    movl %eax, %cr3
+
+    //MSR.LMEビットを建て、ロングモードへ
+    movl $0xC0000080, %ecx
+    rdmsr
+    bts  $8, %eax
+    bts  $0, %eax
+    wrmsr
+
+    //ページング有効化
+    movl %cr0, %eax
+    bts  $31, %eax
+    bts  $1, %eax
+    movl %eax, %cr0
+
+    //仮GDTを設定
+    movl $(_lmode_gdt_start), (_boot_gdtr) + 0x2
+    lgdt (_boot_gdtr)
+
+    //ap_long_modeへジャンプ
+    ljmp $0x8, $(ap_long_mode)
+
+.code64
+ap_long_mode:
+
+    //ディレクションフラグをクリア
+    cld
+
+    //ap_highへ相対ジャンプ
+    movq $ap_high, %rax
+    jmp *%rax
+
+.globl ap_high
+ap_high:
+
+
+
+    //仮スタックポインタを設定
+    movq $((0x4000) + 0xFFFFFFFF80000000), %rax
+    movq %rax, %rsp
+
+    jmp ap_main
+
+
 .align 0x1000
 
 //GDT
@@ -240,10 +309,11 @@ mboot_info:
 
 
 
-
-
-
-
+.globl ap_boot_start
+ap_boot_start:
+.incbin "ap_boot.o"
+.globl ap_boot_end
+ap_boot_end:
 
 
 

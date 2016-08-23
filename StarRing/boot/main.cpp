@@ -7,6 +7,8 @@
 #include <physicalmemory.h>
 #include <virtualmemory.h>
 #include <slaballocator.h>
+#include <wait.h>
+#include <smp.h>
 
 #include <apic.h>
 #include <trap.h>
@@ -36,6 +38,7 @@ static void disable_legacy_pic() {
 
 	outb(0x21, 0xFF);
 	outb(0xA1, 0xFF);
+
 }
 
 extern unsigned int _bss_start;
@@ -88,12 +91,15 @@ void main(unsigned long magic, unsigned long mboot) {
 	//PCIデバイス初期化
 	pci.pci_init();
 
+	//HPET初期化
 	hpet.hpet_init();
 
+	asmv("sti");
+
+	//AP起動
+	smp.smp_init();
 
 	kprintf("return");
-
-	asmv("sti");
 
 
 	STOP;
@@ -102,6 +108,30 @@ void main(unsigned long magic, unsigned long mboot) {
 }
 
 
+unsigned char ap_stack[16][0x4000];
+
+extern "C" void ap_main() {
+
+
+	virtual_memory.apply_kernel_page();
+
+
+	//スタックポインタを正しく設定
+	asmv("movq %0, %%rsp" : : "r"(&ap_stack[apic.get_local_apic_id()][0x2000]));
+
+	//GDT初期化
+	gdt.gdt_init();
+
+	//IDT初期化
+	idt.idt_init();
+
+
+
+	kprintf("apic id %p\n", apic.get_local_apic_id());
+
+	STOP;
+
+}
 
 
 

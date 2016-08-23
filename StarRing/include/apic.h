@@ -232,6 +232,12 @@ public:
 	//IOAPICのリダイレクションテーブルにベクタ番号を登録
 	void ioapic_set_redirect_table(int irq, unsigned long data);
 
+
+	unsigned int inline get_local_apic_id() {
+
+		return local_apic_register->local_apic_id >> 24;
+	}
+
 	//APICの割り込み完了通知
 	void apic_eoi() {
 

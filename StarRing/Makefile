@@ -35,8 +35,9 @@ all: compile
 
 .PHONY: compile
 compile:
-#	nasm -f bin -o boot/ap_boot.o boot/ap_boot.S
+	nasm -f bin -o boot/ap_boot.o boot/ap_boot.S
 #	touch ./boot/boot.S
+	$(RM) -f boot/boot.o
 	
 	$(CD) boot;$(MAKE) 		#
 #	$(CD) internal;$(MAKE)	#

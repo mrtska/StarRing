@@ -172,8 +172,12 @@ INTERRUPT_HANDLER void exec_keyboard_handler(struct registers *regs) {
 		}
 
 
+		if(code == 0x3F) {
 
-		kprintf("%X", code);
+			AcpiReset();
+		}
+
+		kprintf("%c", key_US[code]);
 	}
 
 

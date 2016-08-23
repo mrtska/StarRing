@@ -6,7 +6,6 @@ VIRT_BASE = 0xFFFFFFFF80000000;
 SECTIONS {
 
 
-
 	. = 0x100000;
 
 	.boot : {

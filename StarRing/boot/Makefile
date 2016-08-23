@@ -13,6 +13,7 @@ TARGET := boot.sys
 #コンパイル
 compile: $(TARGET)
 $(TARGET): $(FILE)
+	
 	$(LD) -r -Map boot.map -o $(TARGET) $(FILE)
 	
 
