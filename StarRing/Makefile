@@ -3,7 +3,7 @@ export LANG=C
 #螳夂ｾｩ鄒､
 HOME_DIR	= "$(CURDIR)"
 
-CPP		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11
+CPP		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11 -nostartfiles
 CC		:= x86_64-pc-linux-gnu-gcc -pipe
 LD		:= x86_64-pc-linux-gnu-ld
 AS		:= x86_64-pc-linux-gnu-as
@@ -50,7 +50,7 @@ compile:
 .PHONY: install
 install:
 	
-	$(LD) -nodefaultlibs -Map kernel.map -T boot/bootlinker.ld -o kernel.sys $(OBJECTS)
+	$(LD) -nodefaultlibs -nostdlib -Map kernel.map -T boot/bootlinker.ld -L/lib/gcc/x86_64-pc-linux-gnu/4.8.2 -o kernel.sys $(OBJECTS) -lsupc++ -lgcc
 	$(CP) -f ./kernel.sys /cygdrive/g/KERNEL.SYS
 	sync
 

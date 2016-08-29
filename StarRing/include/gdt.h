@@ -50,7 +50,6 @@ class gdt final {
 private:
 
 	union global_descriptor *gdt_pointer;
-	void load_gdtr();
 
 public:
 
@@ -62,6 +61,7 @@ public:
 
 	//GDTを初期化
 	void gdt_init(void);
+	void load_gdtr();
 
 
 };

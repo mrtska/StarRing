@@ -117,7 +117,7 @@ extern "C" void ap_main() {
 
 
 	//スタックポインタを正しく設定
-	asmv("movq %0, %%rsp" : : "r"(&ap_stack[apic.get_local_apic_id()][0x2000]));
+	asmv("movq %0, %%rsp" : : "r"(&ap_stack[*reinterpret_cast<int*>(0xFFFF8000FEE00020) >> 24][0x2000]));
 
 	//GDT初期化
 	gdt.gdt_init();

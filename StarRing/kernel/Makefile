@@ -1,5 +1,5 @@
 #ブート時
-FILE := string.o printf.o idt.o physicalmemory.o virtualmemory.o apic.o interrupt.o exception.o trap.o gdt.o acpi.o acpica.o slaballocator.o pci.o sched.o smp.o wait.o #pci.o smp.o wait.o task.o systemcall.o elf.o ipi.o vmm.o ioctl.o
+FILE := stdc++.o string.o printf.o idt.o physicalmemory.o virtualmemory.o apic.o interrupt.o exception.o trap.o gdt.o acpi.o acpica.o slaballocator.o pci.o sched.o smp.o wait.o #pci.o smp.o wait.o task.o systemcall.o elf.o ipi.o vmm.o ioctl.o
 #FILE += prctl.o sys.o env.o
 
 TARGET := kernel.sys

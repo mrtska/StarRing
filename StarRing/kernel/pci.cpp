@@ -3,6 +3,8 @@
 #include <pci.h>
 #include <slaballocator.h>
 
+#include <drivers/fb.h>
+
 
 class pci pci;
 
@@ -76,14 +78,19 @@ void pci::pci_init() {
 	this->pci_device_list.foreach(offsetof(&pci_device::list), [](struct pci_device *dev) {
 
 
-		kprintf("vendor 0x%X, device 0x%X, bus %u, dev %u, func %u, class %X\n", dev->vendor, dev->device, dev->bus, dev->dev, dev->function, dev->classcode);
+		//kprintf("vendor 0x%X, device 0x%X, bus %u, dev %u, func %u, class %X\n", dev->vendor, dev->device, dev->bus, dev->dev, dev->function, dev->classcode);
+
+		frame_buffer::get_frame_buffer_list()->foreach(offsetof(&frame_buffer::list), [dev](class frame_buffer *fb) {
+
+			if(fb->verify_pci_id(dev)) {
+
+				fb->frame_buffer_init(dev);
+			}
+
+
+		});
 
 	});
-
-
-
-
-
 
 
 }
@@ -102,4 +109,26 @@ unsigned int pci::read_configuration(unsigned short bus, unsigned short device, 
 	return inl(PCI_CONFIG_DATA);
 
 }
+
+unsigned int pci::read_configuration(struct pci_device *device, unsigned int reg) {
+
+	return read_configuration(device->bus, device->dev, device->function, reg);
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

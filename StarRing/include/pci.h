@@ -90,7 +90,7 @@ public:
 
 
 	unsigned int read_configuration(unsigned short bus, unsigned short device, unsigned short feature, unsigned int reg);
-
+	unsigned int read_configuration(struct pci_device *device, unsigned int reg);
 
 	void write_configuration(unsigned short bus, unsigned short device, unsigned short feature, unsigned int reg, unsigned int value);
 
