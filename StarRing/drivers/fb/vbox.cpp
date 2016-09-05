@@ -24,7 +24,12 @@ bool vbox_frame_buffer::verify_pci_id(struct pci_device *pci_device) {
 
 void vbox_frame_buffer::frame_buffer_init(struct pci_device *pci_device) {
 
+
+
 	trace();
+
+
+	frame_buffer *fb = dynamic_cast<frame_buffer*>(this);
 
 	this->pci_device = pci_device;
 

@@ -40,9 +40,9 @@ public:
 
 	class list<class frame_buffer> list;
 
-	virtual bool verify_pci_id(struct pci_device *pci_device);
+	virtual bool verify_pci_id(struct pci_device *pci_device) = 0;
 
-	virtual void frame_buffer_init(struct pci_device *pci_device);
+	virtual void frame_buffer_init(struct pci_device *pci_device) = 0;
 
 
 	static class list<class frame_buffer> *get_frame_buffer_list() {

@@ -54,7 +54,7 @@ extern "C" void bss_init(void) {
 	}
 }
 
-void main(unsigned long magic, unsigned long mboot) {
+int main(unsigned long magic, unsigned long mboot) {
 
 
 	kprintf("Hello,Eclipse\n");
@@ -103,7 +103,7 @@ void main(unsigned long magic, unsigned long mboot) {
 
 
 	STOP;
-	return;
+	return 0;
 
 }
 

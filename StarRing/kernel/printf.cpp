@@ -14,7 +14,7 @@ Created on: 2014/04/03
 #include <spinlock.h>
 #include <string.h>
 //#include <drivers/serial.h>
-void * _Unwind_Resume = 0;
+//void *_Unwind_Resume = 0;
 unsigned short* textmemptr = (unsigned short*)0xFFFFFFFF800B8000;
 static volatile unsigned char printf_lock;
 

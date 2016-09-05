@@ -5,7 +5,7 @@ TARGET := boot.sys
 
 .cpp.o:
 
-	$(CPP) -mcmodel=kernel -I../$(INCLUDE) -ffreestanding -nostdlib -mno-red-zone -Wall -c $< -o $@
+	$(CPP) -I../$(INCLUDE) -c $< -o $@
 
 .S.o:
 	$(CC) -c -o $@ $<

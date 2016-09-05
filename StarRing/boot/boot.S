@@ -138,9 +138,11 @@ long_mode:
 
 	//highへ相対ジャンプ
 	movq $high, %rax
+
 	jmp  *%rax
 
 high:
+
 	//ディレクションフラグをクリア
 	cld
 
@@ -250,7 +252,10 @@ ap_long_mode:
     cld
 
     //ap_highへ相対ジャンプ
-    movq $ap_high, %rax
+    movq $(ap_high), %rax
+1:
+    hlt
+jmp 1b
     jmp *%rax
 
 .globl ap_high

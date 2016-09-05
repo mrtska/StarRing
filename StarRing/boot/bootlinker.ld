@@ -23,15 +23,18 @@ SECTIONS {
 
 	. += VIRT_BASE;
 
+    . = ALIGN(0x1000);
 	ctors  = .;
 	.ctors ALIGN(0x1000) : AT(ADDR(.ctors) - VIRT_BASE) {
-		*(.ctors)
+		*(.ctors*)
+		*(.init_array)
 	}
+    . = ALIGN(0x1000);
 	ctors_end = .;
-	. = ALIGN(0x1000);
 
 	.text ALIGN(0x1000) : AT(ADDR(.text) - VIRT_BASE) {
 		*(.text)
+		*(.text.*)
 		*(.gnu.linkonce.t*)
 	}
 
@@ -44,14 +47,29 @@ SECTIONS {
 
 	.data ALIGN(0x1000) : AT(ADDR(.data) - VIRT_BASE) {
 		*(.data)
+		*(.data.*)
 		*(.gnu.linkonce.d*)
 	}
 
 	. = ALIGN(0x1000);
 
 	.rodata ALIGN(0x1000) : AT(ADDR(.rodata) - VIRT_BASE) {
-		*(.rodata*)
+		*(.rodata)
+		*(.rodata.*)
 		*(.gnu.linkonce.r*)
+	}
+
+    .eh_frame_hdr ALIGN(0x1000) : AT(ADDR(.eh_frame) - VIRT_BASE) {
+
+        *(.eh_frame_hdr)
+        *(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
+
+    }
+	.eh_frame ALIGN(0x1000) : AT(ADDR(.eh_frame) - VIRT_BASE) {
+
+        *(.eh_frame)
+        *(.eh_frame.*)
+
 	}
 
 	_loadEnd = . - VIRT_BASE;
@@ -60,10 +78,10 @@ SECTIONS {
 	.bss ALIGN(0x1000) : AT(ADDR(.bss) - VIRT_BASE) {
 		_bss_start = .;
 		*(.bss)
+		*(.bss.*)
 		. = ALIGN(0x1000);
 		_bss_end = .;
 		*(COMMON)
-
 
 
 	}
@@ -79,7 +97,6 @@ SECTIONS {
 
 	/DISCARD/ : {
 		*(.comment)
-		*(.eh_frame)
 	}
 
 }

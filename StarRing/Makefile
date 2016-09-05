@@ -3,12 +3,12 @@ export LANG=C
 #螳夂ｾｩ鄒､
 HOME_DIR	= "$(CURDIR)"
 
-CPP		:= x86_64-pc-linux-gnu-g++ -pipe -std=c++11 -nostartfiles
-CC		:= x86_64-pc-linux-gnu-gcc -pipe
-LD		:= x86_64-pc-linux-gnu-ld
-AS		:= x86_64-pc-linux-gnu-as
-OBJCOPY	:= x86_64-pc-linux-gnu-objcopy
-NM		:= x86_64-pc-linux-gnu-nm
+CPP		:= /usr/cross/bin/g++ -nostdlib -mcmodel=kernel -ffreestanding -pipe -std=c++11 -mno-red-zone -Wall
+CC		:= /usr/cross/bin/gcc -nostdlib -mcmodel=kernel -ffreestanding -pipe -mno-red-zone  -Wall
+LD		:= /usr/cross/bin/ld 
+AS		:= /usr/cross/bin/as
+OBJCOPY	:= /usr/cross/bin/objcopy
+NM		:= /usr/cross/bin/nm
 RM		:= rm
 MAKE	:= make
 CP		:= cp
@@ -50,10 +50,15 @@ compile:
 .PHONY: install
 install:
 	
-	$(LD) -nodefaultlibs -nostdlib -Map kernel.map -T boot/bootlinker.ld -L/lib/gcc/x86_64-pc-linux-gnu/4.8.2 -o kernel.sys $(OBJECTS) -lsupc++ -lgcc
+	$(LD) -nodefaultlibs -static -Map kernel.map -T boot/bootlinker.ld -o kernel.sys $(OBJECTS) -L/usr/cross/lib/gcc/x86_64-pc-linux-gnu/6.2.0/ -L/usr/cross/lib64 -lsupc++ -lgcc_eh -lgcc -lstdc++
+	
+	  
+.PHONY: copy 
+copy:
+	
 	$(CP) -f ./kernel.sys /cygdrive/g/KERNEL.SYS
 	sync
-
+	
 .PHONY: clean
 clean:
 	$(CD) boot;$(MAKE) clean
