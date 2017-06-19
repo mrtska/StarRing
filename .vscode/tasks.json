@@ -1,0 +1,15 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "tasks": [
+        {
+            "isBuildCommand": true,
+            "taskName": "build",
+            "command": "grunt",
+            "isShellCommand": true,
+            "args": ["shell:all"],
+            "showOutput": "always"
+        }
+    ],
+    "version": "0.1.0"
+}

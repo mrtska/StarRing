@@ -1,0 +1,26 @@
+{
+  "name": "starring",
+  "version": "1.0.0",
+  "description": "hobby os",
+  "main": "gruntfile.js",
+  "dependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-shell": "2.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Hello, StarRing\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrtska/StarRing.git"
+  },
+  "author": "mrtska",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrtska/StarRing/issues"
+  },
+  "homepage": "https://github.com/mrtska/StarRing#readme"
+}

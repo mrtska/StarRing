@@ -3,12 +3,12 @@ export LANG=C
 #螳夂ｾｩ鄒､
 HOME_DIR	= "$(CURDIR)"
 
-CPP		:= /usr/cross/bin/g++ -nostdlib -mcmodel=kernel -ffreestanding -pipe -std=c++11 -mno-red-zone -Wall
-CC		:= /usr/cross/bin/gcc -nostdlib -mcmodel=kernel -ffreestanding -pipe -mno-red-zone  -Wall
-LD		:= /usr/cross/bin/ld 
-AS		:= /usr/cross/bin/as
-OBJCOPY	:= /usr/cross/bin/objcopy
-NM		:= /usr/cross/bin/nm
+CPP		:= /usr/bin/g++ -nostdlib -mcmodel=kernel -ffreestanding -pipe -std=c++11 -mno-red-zone -Wall
+CC		:= /usr/bin/gcc -nostdlib -mcmodel=kernel -ffreestanding -pipe -mno-red-zone  -Wall
+LD		:= /usr/bin/ld 
+AS		:= /usr/bin/as
+OBJCOPY	:= /usr/bin/objcopy
+NM		:= /usr/bin/nm
 RM		:= rm
 MAKE	:= make
 CP		:= cp
@@ -30,9 +30,6 @@ export INCLUDE
 
 OBJECTS := boot/boot.sys kernel/kernel.sys drivers/drivers.sys acpica/acpica.sys #fs/fs.sys 
 
-.PHONY: all
-all: compile
-
 .PHONY: compile
 compile:
 	nasm -f bin -o boot/ap_boot.o boot/ap_boot.S
@@ -50,7 +47,7 @@ compile:
 .PHONY: install
 install:
 	
-	$(LD) -nodefaultlibs -static -Map kernel.map -T boot/bootlinker.ld -o kernel.sys $(OBJECTS) -L/usr/cross/lib/gcc/x86_64-pc-linux-gnu/6.2.0/ -L/usr/cross/lib64 -lsupc++ -lgcc_eh -lgcc -lstdc++
+	$(LD) -nodefaultlibs -static -Map kernel.map -T boot/bootlinker.ld -o kernel.sys $(OBJECTS) -L/usr/lib/gcc/x86_64-pc-linux-gnu/7.1.0/ -L/usr/lib64 -lsupc++ -lgcc_eh -lgcc -lstdc++
 	
 	  
 .PHONY: copy 
