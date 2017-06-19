@@ -1,3 +1,18 @@
 // 既定の設定とユーザー設定を上書きするには、このファイル内に設定を挿入します
 {
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/*.o": true,
+        "**/*.sys": true
+    },
+    "startanyshell.shells": [
+        {
+            "description": "Start VirtualBox with Debug",
+            "command": "\"C:\\Program Files\\Oracle\\VirtualBox\\VirtualBox.exe\" --startvm StarRing --debug"
+        }
+    ]
 }

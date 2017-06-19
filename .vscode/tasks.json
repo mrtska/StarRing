@@ -9,6 +9,13 @@
             "isShellCommand": true,
             "args": ["shell:all"],
             "showOutput": "always"
+        },
+        {
+            "taskName": "cleanall",
+            "command": "grunt",
+            "isShellCommand": true,
+            "args": ["shell:cleanall"],
+            "showOutput": "always"
         }
     ],
     "version": "0.1.0"

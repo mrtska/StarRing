@@ -51,7 +51,6 @@ ENTRYPOINT:
 	push	$0
 	popf
 
-
 	//PML4セットアップ
 	movl $(_boot_pdpt) + (PG_PRESENT | PG_WRITE), (_boot_pml4)
 

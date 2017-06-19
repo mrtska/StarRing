@@ -93,6 +93,7 @@ int main(unsigned long magic, unsigned long mboot) {
 
 	//HPET初期化
 	hpet.hpet_init();
+STOP;
 
 	asmv("sti");
 
