@@ -1,9 +1,4 @@
 # StarRing
 StarRing OS
 
-MITライセンス
-
-
-このプログラムに使用されているライブラリ
-
-・ACPICA Copyright © 2016 Intel Corporation. All rights reserved.
+64bit x86_64 kernel with ACPICA.
