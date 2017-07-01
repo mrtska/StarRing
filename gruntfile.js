@@ -9,10 +9,10 @@ module.exports = function (grunt) {
                 command: "bash -c 'make compile install'"
             },
             build: {
-                command: "bash -c 'make compile'"
+                command: "bash -c 'make build'"
             },
             clean: {
-                command: "bash -c 'make clean'"
+                command: "bash -c 'make -s clean'"
             },
             install: {
                 command: "bash -c 'make install'"

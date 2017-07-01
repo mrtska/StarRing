@@ -3,3 +3,5 @@
 *.map
 *.sys
 /node_modules/
+
+/build/
