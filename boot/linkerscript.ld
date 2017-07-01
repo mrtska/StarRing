@@ -10,7 +10,7 @@ SECTIONS {
     .boot : {
 
         *(.boot)
-		. = ALIGN(0x1000);
+		. = ALIGN(0x1000);  /* ←これめっちゃだいじ！ */
     }
 
     . += VIRT_BASE;
