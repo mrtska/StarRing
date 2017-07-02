@@ -3,14 +3,14 @@
 
 
 
-
-
 namespace starring::boot {
 
-    void main() {
+    extern "C" void main() {
 
-        ;
-
+        while(true) {
+       
+            asm("hlt");
+        }
     }
 }
 
