@@ -1,22 +1,23 @@
 
-CC		:= gcc
-CPP		:= g++
+CC		:= clang
+CPP		:= clang++
+LD		:= ld.lld
 
-CFLAGS := -MMD -nostdlib -mcmodel=kernel -ffreestanding -pipe -mno-red-zone -Wall
-CPPFLAGS := -MMD -nostdlib -mcmodel=kernel -ffreestanding -pipe -std=c++11 -mno-red-zone -Wall
+CFLAGS := -g -MMD -nostdlib -mcmodel=kernel -ffreestanding -pipe -mno-red-zone -Wall
+CPPFLAGS := -g -MMD -stdlib=libc++ -mcmodel=kernel -ffreestanding -pipe -std=c++1z -mno-red-zone -Wall
 
 HEADERFILES := $(wildcard **/*.h)
 
 build/%.o: %.S
 	$(CC) $(CFLAGS) -c $< -o $@
 build/%.o: %.cpp
-	$(CPP) $(CPPFLAGS) -I./include -c $< -o $@
+	$(CPP) $(CPPFLAGS) -I./include -I./include/std -c $< -o $@
 
 ASMFILES := $(wildcard **/*.S)
 CPPFILES := $(wildcard **/*.cpp)
 OBJECTS = $(addprefix build/,$(ASMFILES:.S=.o)) $(addprefix build/,$(CPPFILES:.cpp=.o))
 
-OBJDIR := build build/boot build/kernel
+OBJDIR := build build/boot build/kernel build/util
 
 mkdir:
 	mkdir -p $(OBJDIR)
@@ -27,7 +28,7 @@ build: mkdir $(OBJECTS) install
 -include $(OBJECTS:.o=.d)
 
 install:
-	$(LD) -nodefaultlibs -static -Map kernel.map -T boot/linkerscript.ld -o kernel.sys $(OBJECTS) -L/usr/lib/gcc/x86_64-pc-linux-gnu/7.1.0/ -L/usr/lib64 -lsupc++ -lgcc_eh -lgcc -lstdc++
+	$(LD) -static -m elf_x86_64 -Map kernel.map -script boot/linkerscript.ld -o kernel.sys /usr/local/lib/libc++.a /usr/local/lib/libc++abi.a /usr/local/lib/libunwind.a $(OBJECTS)
 
 
 .PHONY: clean

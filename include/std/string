@@ -1,0 +1,32 @@
+#pragma once
+
+namespace std {
+
+    class string {
+
+    private:
+
+
+    public:
+        unsigned int length();
+        char *char_array();
+
+        string& operator=(const char* str) {
+
+            return *this;
+        }
+
+    };
+
+
+    unsigned int strlen(const char *str) {
+
+        char *start;
+        char *s = const_cast<char*>(str);
+        start = s;
+        while( *s != 0 ) {
+            ++s;
+        }
+        return s - start;
+    }
+}

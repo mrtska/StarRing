@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Any",
+            "includePath": [
+                "${workspaceRoot}/include",
+                "${workspaceRoot}/include/std"
+            ],
+            "defines": [
+                "_DEBUG"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}/include",
+                    "${workspaceRoot}/include/std"
+                ]
+            }
+        }
+    ]
+}
