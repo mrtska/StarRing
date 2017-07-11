@@ -1,7 +1,10 @@
 
 #include <starring.h>
 #include <util/kprintf.h>
+#include <string>
 
+extern unsigned long bss_start;
+extern unsigned long bss_end;
 
 namespace starring::boot {
 
@@ -21,15 +24,29 @@ namespace starring::boot {
         outb(0xA1, 0xFF);
     }
 
+    static void clear_bss() {
+
+        unsigned long *start = &bss_start;
+        unsigned long *end = &bss_end;
+        while(start < end) {
+            *start++ = 0x00;
+        }
+    }
+
     extern "C" void main(unsigned long magic, unsigned long mboot) {
 
         disable_legacy_pic();
+        clear_bss();
 
+        util::kputs("Hello, World!!!");
+        
+        starring.gdt.init();
 
 
 
         starring.boot();
 
+        util::kputs("boot end");
         STOP;
     }
 }

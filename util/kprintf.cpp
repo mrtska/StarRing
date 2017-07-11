@@ -17,8 +17,33 @@ namespace starring::util {
         *where = c | 7 << 8;
         textmode.add();
     }
-
     void kputs(const char *str) {
+
+        for(int i = 0; i < std::strlen(str); i++) {
+
+            kprint(str[i]);
+        }
+        textmode.newline();
+    }
+    
+    void kputs(unsigned long num) {
+
+        char str[64];
+
+        std::sprintf(str, "%p", num);
+
+        for(int i = 0; i < std::strlen(str); i++) {
+
+            kprint(str[i]);
+        }
+        textmode.newline();
+    }
+    
+    void kputs(void* num) {
+
+        char str[64];
+
+        std::sprintf(str, "%p", num);
 
         for(int i = 0; i < std::strlen(str); i++) {
 

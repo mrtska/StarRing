@@ -4,7 +4,7 @@ CPP		:= clang++
 LD		:= ld.lld
 
 CFLAGS := -g -MMD -nostdlib -mcmodel=kernel -ffreestanding -pipe -mno-red-zone -Wall
-CPPFLAGS := -g -MMD -stdlib=libc++ -mcmodel=kernel -ffreestanding -pipe -std=c++1z -mno-red-zone -Wall
+CPPFLAGS := -g -MMD -mno-sse -stdlib=libc++ -mcmodel=kernel -ffreestanding -pipe -std=c++1z -mno-red-zone -Wall
 
 HEADERFILES := $(wildcard **/*.h)
 

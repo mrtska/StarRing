@@ -38,8 +38,9 @@ namespace starring::util {
     };
 
     //テキストモード時にB8000に書き込み
-    void kputs(const char* format);
-
+    void kputs(const char* msg);
+    void kputs(unsigned long msg);
+    void kputs(void* num);
     void kprint(const char c);
 }
 

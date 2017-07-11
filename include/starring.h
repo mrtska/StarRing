@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <boot/gdt.h>
 
 //インラインアセンブラ
 #define asmv __asm__ __volatile__
@@ -55,11 +56,14 @@ namespace starring {
     class starring {
 
         public:
-        void boot();
+
+            boot::global_descriptor_table gdt;
+
+
+            void boot();
 
 
     };
 
     extern class starring starring;
 }
-

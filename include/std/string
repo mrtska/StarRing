@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdarg.h>
+
 namespace std {
 
     class string {
@@ -17,16 +19,13 @@ namespace std {
         }
 
     };
-
-
-    unsigned int strlen(const char *str) {
-
-        char *start;
-        char *s = const_cast<char*>(str);
-        start = s;
-        while( *s != 0 ) {
-            ++s;
-        }
-        return s - start;
-    }
+        
+    void *memcpy(void *s, const void *ct, unsigned int size);
+    void *memmove(void *s1, const void *s2, unsigned int n);
+    void *memset(void *s, int c, unsigned int n);
+    unsigned int strnlen(const char *s, unsigned int count);
+    unsigned int strlen(const char *str);
+        
+    int sprintf(char *data, const char *format, ...);
+    int vsprintf(char *buf, const char *format, va_list args);
 }
