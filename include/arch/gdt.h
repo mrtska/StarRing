@@ -2,7 +2,7 @@
 
 
 
-namespace starring::boot {
+namespace starring::arch {
         
     union global_descriptor {
 
@@ -25,8 +25,8 @@ namespace starring::boot {
     class global_descriptor_table {
 
     private:
-        const int GDT_ENTRY_KERNEL_CODE_SEGMENT = 1;
-        const int GDT_ENTRY_KERNEL_DATA_SEGMENT = 2;
+        static const int GDT_ENTRY_KERNEL_CODE_SEGMENT = 1;
+        static const int GDT_ENTRY_KERNEL_DATA_SEGMENT = 2;
 
         global_descriptor *gdt_pointer = nullptr;
 

@@ -84,6 +84,19 @@ extern "C" int strcmp(const char *s1, const char *s2) {
 	return 0;
 }
 
+extern "C" int isupper(int c) {
+	return (unsigned) c - 'A' < 26;
+}
+
+extern "C" int isdigit(int c) {
+
+	return (unsigned) c - '0' < 10;
+}
+
+
+extern "C" int isxdigit(int c) {
+	return isdigit(c) || ((unsigned)c | 32) - 'a' < 6;
+}
 
 int vsnprintf(char *s, unsigned int n, const char *fmt, va_list args) {
 

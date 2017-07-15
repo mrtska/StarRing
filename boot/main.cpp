@@ -39,10 +39,14 @@ namespace starring::boot {
         clear_bss();
 
         util::kputs("Hello, World!!!");
-        
+
         starring.gdt.init();
 
+        starring.idt.init();
 
+        starring.apic.init();
+
+        starring.keyboard.init();
 
         starring.boot();
 

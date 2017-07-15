@@ -20,10 +20,6 @@ SECTIONS {
 		*(.text)
 		. = ALIGN(0x1000);
 		. += 0x1000;
-		PROVIDE(global_descriptor_table_address = .);
-		. += 0x1000;
-		interrupt_descriptor_table = .;
-		. += 0x1000;
 		bsp_kernel_stack = .;
 	}
 

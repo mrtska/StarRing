@@ -1,7 +1,10 @@
 
 #pragma once
 
-#include <boot/gdt.h>
+#include <arch/gdt.h>
+#include <arch/idt.h>
+#include <arch/apic.h>
+#include <drivers/keyboard.h>
 
 //インラインアセンブラ
 #define asmv __asm__ __volatile__
@@ -14,7 +17,6 @@
 #define STOP while(true) asmv("hlt")
 
 
-#define INTERRUPT_HANDLER extern "C"
 
 namespace starring {
 
@@ -57,7 +59,12 @@ namespace starring {
 
         public:
 
-            boot::global_descriptor_table gdt;
+            arch::global_descriptor_table gdt;
+            arch::interrupt_descriptor_table idt;
+
+            arch::apic apic;
+
+            drivers::keyboard_device keyboard;
 
 
             void boot();

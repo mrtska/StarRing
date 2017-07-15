@@ -17,7 +17,7 @@ ASMFILES := $(wildcard **/*.S)
 CPPFILES := $(wildcard **/*.cpp)
 OBJECTS = $(addprefix build/,$(ASMFILES:.S=.o)) $(addprefix build/,$(CPPFILES:.cpp=.o))
 
-OBJDIR := build build/boot build/kernel build/util
+OBJDIR := build build/boot build/arch build/kernel build/util build/drivers
 
 mkdir:
 	mkdir -p $(OBJDIR)

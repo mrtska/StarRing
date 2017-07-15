@@ -126,3 +126,11 @@ longmode:
 1:
 hlt
 jmp 1b
+
+.data
+//カーネルで使うGDTとIDTのアドレス
+.globl global_descriptor_table_address, interrupt_descriptor_table_address
+global_descriptor_table_address:
+    .space 0x1000
+interrupt_descriptor_table_address:
+    .space 0x1000
